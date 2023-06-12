@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\{Folder};
+
+class Files extends Model
+{
+    use HasFactory;
+
+    protected $table = "files";
+    protected $primaryKey = "id";
+    protected $fillable = ['folder_id' , 'path' , 'extension' , 'type' ];
+
+    public function folder()
+    {
+        return $this->belongsTo(Folder::class , 'folder_id' , 'id');
+    }
+}

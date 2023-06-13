@@ -48,4 +48,7 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post("award-job" , [JobController::class , "awardJob"]);
     Route::get("awarded-job-list", [JobController::class ,"awardedJobList"]);
     Route::post("add-favourite" , [UserController::class , 'addFavourite']);
+    // Route::post("view-folderfiles" , [ViewFolderFiles::class , 'viewfolderfiles']);
+
+    Route::post('/filesclientfolder', [FolderController::class, 'filesClientFolder']);
 });

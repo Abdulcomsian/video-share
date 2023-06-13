@@ -2,6 +2,7 @@
 
 namespace App\Http\Repository;
 use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal};
+use Illuminate\Support\Facades\DB;
 
 class JobHandler{
 
@@ -26,11 +27,11 @@ class JobHandler{
             );
             
         $skills = json_decode($request->skills);
-        $skillable = "Job";
+        $skillable = "App\Models\PersonalJob";
         $skillList =[];
         foreach($skills as $skill)
         {
-            $skillList[] =["title" => $skill , "skillable_id" => $jobId , "skillable_url" => $skillable];
+            $skillList[] =["title" => $skill , "skillable_id" => $jobId , "skillable_type" => $skillable];
         }
 
         Skill::insert($skillList);
@@ -43,7 +44,7 @@ class JobHandler{
     {
         $clientId = auth()->user()->id;
 
-        $jobList = PersonalJob::with("")->where("client_id" , $clientId )->orderBy('id' , 'desc')->get();
+        $jobList = PersonalJob::where("client_id" , $clientId )->orderBy('id' , 'desc')->get();
 
         return ['success' => true , 'jobs' => $jobList];
 
@@ -54,9 +55,15 @@ class JobHandler{
     {
         $clientId = auth()->user()->id;
 
-        $requestList = PersonalJob::where("client_id" , $clientId )->with('allEditor.proposal')->orderBy('id' , 'desc')->get();
-
-        return ['success' => true , 'request' => $requestList];
+        $jobList = DB::table('personal_jobs')
+                         ->join( 'job_editor_request' , 'personal_jobs.id' , '=' , 'job_editor_request.job_id')
+                         ->join('users' , 'users.id' , '=' , 'job_editor_request.editor_id')
+                         ->join('requests' , 'requests.id' , '=' , 'job_editor_request.request_id')
+                         ->where('personal_jobs.client_id' , $clientId)
+                         ->selectRaw('personal_jobs.id as job_id , job_editor_request.id as proposal_id , personal_jobs.deadline ,  personal_jobs.title , personal_jobs.budget , personal_jobs.description as job_description , requests.bid_price , requests.description as proposal_detail')
+                         ->get();
+        
+        return ['success' => true , 'request' => $jobList];
 
     }
 
@@ -89,17 +96,53 @@ class JobHandler{
     public function awardedJobList()
     {
         $clientId = auth()->user()->id;
-        $awardedJobs = PersonalJob::with(['allEditor.proposal' => function($query){
-                                        $query->where('awarded' , 1 );
-                                    }])
-                                    ->where('client_id' , $clientId )
-                                    ->get();
+
+        $awardedJobs = DB::table('personal_jobs')
+                                ->join( 'job_editor_request' , 'personal_jobs.id' , '=' , 'job_editor_request.job_id')
+                                ->join('users' , 'users.id' , '=' , 'job_editor_request.editor_id')
+                                ->join('requests' , 'requests.id' , '=' , 'job_editor_request.request_id')
+                                ->where('personal_jobs.client_id' , $clientId)
+                                ->where('personal_jobs.status' , '=' , 'awarded')
+                                ->selectRaw('personal_jobs.id as job_id , job_editor_request.id as proposal_id , personal_jobs.deadline ,  personal_jobs.title , personal_jobs.budget , personal_jobs.description as job_description , requests.bid_price , requests.description as proposal_detail')
+                                ->get();
+
         
-        dd($awardedJobs);
         return ["success" => true , "awardedJobs" => $awardedJobs];
                 
 
     }
 
+    public function proposalList()
+    {
+        $editorId = auth()->user()->id;
+
+        $proposalList = DB::table("personal_jobs")
+                            ->join("job_editor_request" , "job_editor_request.job_id", "=" , "personal_jobs.id")
+                            ->join("requests" , "requests.id" , "=" , "job_editor_request.request_id")
+                            ->join("users" , "users.id" , "=" , "job_editor_request.editor_id")
+                            ->selectRaw(' users.id as editor_id , personal_jobs.title as job_title ,personal_jobs.deadline , personal_jobs.description as job_description , requests.description as proposal_detail , requests.bid_price')
+                            ->where('job_editor_request.editor_id' , $editorId)
+                            ->get();    
+            
+        
+        return ['success' => true , 'proposals' => $proposalList];
+    }
+
+
+    public function jobDetail($request)
+    {
+        $jobId = $request->job_id;
+        
+        $personalJob = PersonalJob::with('skills')->where('id' , $jobId)->first();
+
+        return ["success" => true , "jobDetail" => $personalJob];
+    }
+
 
 }
+
+
+ 
+
+
+

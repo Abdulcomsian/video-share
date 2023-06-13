@@ -3,7 +3,7 @@
 namespace App\Http\Repository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
-use App\Models\User;
+use App\Models\{ User , Favourite };
 use App\Mail\VerificationMail;
 
 class UserHandler{
@@ -43,6 +43,38 @@ class UserHandler{
                 'expires_in'=> JWTAuth::factory()->getTTL() * 60,
                 'user'=> auth()->user()
         ];
+    }
+
+    public function addEditorFavourite($request)
+    {
+        $editorId = $request->editor_id;
+        $clientId = auth()->user()->id;
+        
+        Favourite::create([
+          "editor_id" => $editorId,
+          "client_id" => $clientId
+        ]);
+
+        return ["success"=> true , "msg" => "Editor Add To Favourite Successfully"];
+
+    }
+
+    public function favouriteList()
+    {
+        $userId = auth()->user()->id;
+
+        $favouriteList = User::with('favourite.editor')->where('id' , $userId)->first();
+
+        return ["success" => true , 'favourites' => $favouriteList];
+    }
+
+    public function profileDetail()
+    {
+        $userId = auth()->user()->id;
+
+        $profile = User::with('editorProfile' ,'skills')->where('id' , $userId)->first();
+
+        return ['success' => true , 'profile' => $profile];
     }
 
 }

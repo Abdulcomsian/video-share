@@ -98,4 +98,35 @@ class JobController extends Controller
         return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
     }
    }
+
+   public function getProposalList()
+   {
+        try{
+            $response = $this->jobHandler->proposalList();
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+        }
+   }
+
+   public function getJobDetail(Request $request)
+   {
+    try{
+        $validator = Validator::make( $request->all() , [
+                                'job_id' => 'required|numeric'
+                                    ]);
+        if($validator->fails())
+        {
+            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()]);
+        }else{
+            $response = $this->jobHandler->jobDetail($request);
+            return response()->json($response);
+        }
+
+    }catch(\Exception $e){
+        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+    }
+   }
+
 }

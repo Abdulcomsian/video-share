@@ -17,7 +17,7 @@ class CreateSkills extends Migration
             $table->id();
             $table->string('title');
             $table->unsignedBigInteger('skillable_id');
-            $table->string('skillable_url');
+            $table->string('skillable_type');
             $table->timestamps();
         });
     }

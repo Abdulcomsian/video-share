@@ -68,7 +68,8 @@ class User extends Authenticatable implements JWTSubject
 
     public function skills()
     {
-        return $this->hasMany(Skill::class, 'skillable');
+         return $this->morphMany(Skill::class, 'skillable');
+        // return $this->hasMany(Skill::class, 'skillable_url')->where('skillable_url', self::class);;
     }
 
     public function favourite()
@@ -78,7 +79,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function editorProfile()
     {
-        return $this->hasOne(EditorProfile::class , 'user_id' , 'id');
+        return $this->hasOne(EditorProfile::class , 'editor_id' , 'id');
     }
 
     public function portfolio()
@@ -101,7 +102,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Folder::class , 'client_id' , 'id');
     }
 
-    public function proposal()
+    public function bid()
     {
         return $this->belongsToMany(PersonalJob::class ,'job_editor_request' ,'editor_id' , 'job_id');
     }

@@ -4,16 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Repository\{ EditorHandler };
+use App\Http\Repository\{ EditorHandler , UserHandler };
 use App\Models\User;
 
 class UserController extends Controller
 {
     protected $editorHandler;
+    protected $userHandler;
 
-    public function __construct(EditorHandler $editorHandler)
+    public function __construct(EditorHandler $editorHandler , UserHandler $userHandler)
     {
         $this->editorHandler = $editorHandler;    
+        $this->userHandler  = $userHandler;
     }
 
     public function updateEditorProfile(Request $request)
@@ -281,7 +283,6 @@ class UserController extends Controller
         try{
             $validator = Validator::make( $request->all(), [
                 "editor_id"   => "required|numeric",
-                "client_id" => "required|numeric" 
             ]);
 
             if($validator->fails())
@@ -290,12 +291,41 @@ class UserController extends Controller
             
             }else{
 
-                $response = $this->editorHandler->addEditorFavourite($request);
+                $response = $this->userHandler->addEditorFavourite($request);
 
                 return response()->json($response);
             }
 
         
+        }catch(\Exception $e)
+        {
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+        } 
+    }
+
+
+    public function getFavouriteList()
+    {
+        try{
+
+            $response = $this->userHandler->favouriteList();
+
+            return response()->json($response);
+
+        }catch(\Exception $e)
+        {
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+        } 
+    }
+
+    public function getProfileDetail()
+    {
+        try{
+
+            $response = $this->userHandler->profileDetail();
+
+            return response()->json($response);
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);

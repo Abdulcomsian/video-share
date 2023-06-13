@@ -58,7 +58,7 @@ class FolderController extends Controller
         $this->folderHandler = $folderHandler;
     }
 
-    public function filesClientFolder(Request $request)
+    public function addFolderFile(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -67,9 +67,13 @@ class FolderController extends Controller
             ]);
 
             if ($validator->fails()) {
+
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()]);
+            
             } else {
+                
                 $response = $this->folderHandler->createFilesInFolder($request);
+                
                 return response()->json($response);
             }
         } catch (\Exception $e) {

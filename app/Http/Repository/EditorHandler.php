@@ -25,13 +25,13 @@ class EditorHandler{
                 ]
             );
 
-        $skillable ="Editor";
+        $skillable ="App\Models\User";
         $skillList = [];
 
 
         foreach($skills as $skill)
         {
-            array_push($skillList , ["title" => $skill , "skillable_id" => auth()->user()->id , "skillable_url" => $skillable ]);
+            array_push($skillList , ["title" => $skill , "skillable_id" => auth()->user()->id , "skillable_type" => $skillable ]);
         }
 
         if(sizeof($skillList) > 0)
@@ -155,10 +155,10 @@ class EditorHandler{
     {
         $skills = json_decode($request->skills);
         $skillList = [];
-        $skillable = "Editor";
+        $skillable = "App\Models\User";
         foreach($skills as $skill)
         {
-            $skillList[] = ["title" => $skill , "skillable_id" => auth()->user()->id ,"skillable_url" => $skillable ];
+            $skillList[] = ["title" => $skill , "skillable_id" => auth()->user()->id ,"skillable_type" => $skillable ];
         }
 
         Skill::insert($skillList);
@@ -184,18 +184,6 @@ class EditorHandler{
         return ["success"=> true , "msg" => "Editor Education Updated Successfully"];
     }
 
-    public function addEditorFavourite($request)
-    {
-        $editorId = $request->editor_id;
-        $clientId = $request->client_id;
 
-        Favourite::create([
-          "editor_id" => $editorId,
-          "client_id" => $clientId
-        ]);
-
-        return ["success"=> true , "msg" => "Editor Add To Favourite Successfully"];
-
-    }
 
 }

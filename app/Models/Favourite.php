@@ -17,4 +17,9 @@ class Favourite extends Model
     {
         return $this->belongsTo(User::class , 'client_id' , 'id');
     }
+
+    public function editor()
+    {
+        return $this->belongsTo(User::class , 'editor_id' , 'id');
+    }
 }

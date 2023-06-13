@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\{user};
+use App\Models\{User , Skill};
 
 class PersonalJob extends Model
 {
@@ -17,6 +17,11 @@ class PersonalJob extends Model
     public function user()
     {
         return $this->belongsTo(User::class , 'client_id' , 'id');
+    }
+
+    public function skills()
+    {
+        return $this->morphMany(Skill::class, 'skillable');
     }
 
 

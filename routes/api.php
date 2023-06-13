@@ -35,6 +35,8 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::post('add-editor-skill' , [UserController::class ,'addEditorSkill']);
     Route::post('update-education' , [UserController::class ,'updateEducation']);
     Route::post('add-job-request' , [JobController::class , 'addJobRequest']);
+    Route::get('profile-detail' , [UserController::class , 'getProfileDetail']);
+    Route::get('proposal-list' , [JobController::class , 'getProposalList']);
     Route::post('logout' , [AuthController::class , 'logout']);
 });
 
@@ -48,7 +50,7 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post("award-job" , [JobController::class , "awardJob"]);
     Route::get("awarded-job-list", [JobController::class ,"awardedJobList"]);
     Route::post("add-favourite" , [UserController::class , 'addFavourite']);
-    // Route::post("view-folderfiles" , [ViewFolderFiles::class , 'viewfolderfiles']);
-
-    Route::post('/filesclientfolder', [FolderController::class, 'filesClientFolder']);
+    Route::get('favourite-list' , [UserController::class , 'getFavouriteList']);
+    Route::post('/add-folder-file', [FolderController::class, 'addFolderFile']);
+    Route::post('/job-detail', [JobController::class, 'getJobDetail']);
 });

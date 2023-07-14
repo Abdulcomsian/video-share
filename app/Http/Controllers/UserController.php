@@ -332,4 +332,18 @@ class UserController extends Controller
         } 
     }
 
+    public function getEditorList()
+    {
+        try{
+
+            $response = $this->userHandler->editorList();
+
+            return response()->json($response);
+
+        }catch(\Exception $e)
+        {
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+        }
+    }
+
 }

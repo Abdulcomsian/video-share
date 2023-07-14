@@ -1,28 +1,5 @@
 <?php
 
-// namespace App\Http\Repository;
-// use App\Models\Folder;
-
-// class FolderHandler{
-
-//     public function createClientFolder($request)
-//     {
-//         $clientId = auth()->user()->id;
-//         $name  = $request->name;
-
-//         Folder::create([
-//             "client_id" => $clientId,
-//             "name"  => $name
-//         ]);
-
-//         return ["success" => true , "msg" => "Folder Created Successfully"];
-
-//     }
-
-// }
-
-
-// FolderController.php
 
 namespace App\Http\Repository;
 
@@ -32,47 +9,6 @@ use Illuminate\Support\Facades\Storage;
 
 class FolderHandler
 {
-    // public function createFilesInFolder($request)
-    // {
-    //     $folderId = $request->folder_id;
-    //     $files = $request->file('files');
-    //     $folder = Folder::findOrFail($folderId);
-
-    //     // if ($files) {
-    //         // foreach ($files as $file) {
-    //             // Store each file in the folder
-    //             $path = Storage::putFile('folder_files/' . $folder->id, $files);
-    //             $extension = $files->getClientOriginalExtension();
-    //             // Create a new file record in the database
-    //             $createdFile = $folder->files()->create([
-    //                 'folder_id' => 1,
-    //                 'path' => 'ABC',
-    //                 'extension' => 'png',
-    //                 'type' => '1',
-
-
-    //             ]);
-
-    //             // $createdFile->refresh(); // Refresh the file instance to get the updated data
-    //     //     }
-    //     // }
-
-    //     return [
-    //         "success" => true,
-    //         "msg" => "Files Uploaded Successfully",
-    //         "folder_id" => $folder->id,
-    //         "files" => $folder->files->map(function ($file)
-    //         {
-    //             return [
-    //                 "id" => $file->id,
-    //                 "path" => $file->path,
-    //                 "extension" => $file->extension,
-    //                 "type" => $file->type,
-    //                 "folder_id" => $file->folder_id,
-    //             ];
-    //         }),
-    //     ];
-    // }
 
         public function createFilesInFolder($request)
         {
@@ -112,6 +48,25 @@ class FolderHandler
                 "folder_id" => $folder->id,
                 "files" => $uploadedFiles,
             ];
+        }
+
+
+        public function createFolder($request)
+        {
+            try{
+                $clientId = auth()->user()->id;
+                $name  = $request->name;
+
+                Folder::create([
+                    "client_id" => $clientId,
+                    "name"  => $name
+                ]);
+
+                return ["success" => true , "msg" => "Folder Created Successfully"];
+
+            }catch(\Exception $e){
+                return ["success" => false , "msg"=> $e->getMessage()];
+            }
         }
 
 }

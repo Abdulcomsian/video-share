@@ -77,4 +77,10 @@ class UserHandler{
         return ['success' => true , 'profile' => $profile];
     }
 
+    public function editorList()
+    {
+        $editorList  = User::where('type',2)->orderBy('id' ,'desc')->get();
+        return ['success' => true , 'editorList' => $editorList];
+    }
+
 }

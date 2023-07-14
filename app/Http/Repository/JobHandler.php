@@ -102,7 +102,7 @@ class JobHandler{
                                 ->join('users' , 'users.id' , '=' , 'job_editor_request.editor_id')
                                 ->join('requests' , 'requests.id' , '=' , 'job_editor_request.request_id')
                                 ->where('personal_jobs.client_id' , $clientId)
-                                ->where('personal_jobs.status' , '=' , 'awarded')
+                                ->where('personal_jobs.status' , 'LIKE' , '%awarded%')
                                 ->selectRaw('personal_jobs.id as job_id , job_editor_request.id as proposal_id , personal_jobs.deadline ,  personal_jobs.title , personal_jobs.budget , personal_jobs.description as job_description , requests.bid_price , requests.description as proposal_detail')
                                 ->get();
 
@@ -136,6 +136,28 @@ class JobHandler{
         $personalJob = PersonalJob::with('skills')->where('id' , $jobId)->first();
 
         return ["success" => true , "jobDetail" => $personalJob];
+    }
+
+    public function awardClientJob($request)
+    {
+        try{    
+            $jobId = $request->job_id;
+            $requestId = $request->request_id;
+
+            EditorRequest::where(
+              [  
+                ['job_id' , $jobId],
+                ['request_id' , $requestId]
+              ]
+            )->update(['status' => 1]);
+
+            PersonalJob::where( 'id' , $jobId )->update(['status' => 'awarded']);
+
+            return ['success' => true , 'msg' => 'Job Awarded Successfully'];
+
+        }catch(\Exception $e){
+            return ['success' => true , 'msg' => $e->getMessage()];
+        }
     }
 
 

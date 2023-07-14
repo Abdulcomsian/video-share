@@ -20,7 +20,8 @@ use App\Http\Controllers\{ AuthController ,  UserController , FolderController ,
 
 Route::match(['GET', 'POST'], '/login', [AuthController::class, 'login'])->name('login');
 Route::post('register' ,[AuthController::class , 'register']);
-Route::post('verify',[AuthController::class , 'verifyUser']);
+Route::post('verify-code',[AuthController::class , 'verifyUser']);
+Route::post('logout' , [AuthController::class , 'logout']);
 
 /* Editor Routes*/
 Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
@@ -37,7 +38,6 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::post('add-job-request' , [JobController::class , 'addJobRequest']);
     Route::get('profile-detail' , [UserController::class , 'getProfileDetail']);
     Route::get('proposal-list' , [JobController::class , 'getProposalList']);
-    Route::post('logout' , [AuthController::class , 'logout']);
 });
 
 
@@ -51,6 +51,7 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::get("awarded-job-list", [JobController::class ,"awardedJobList"]);
     Route::post("add-favourite" , [UserController::class , 'addFavourite']);
     Route::get('favourite-list' , [UserController::class , 'getFavouriteList']);
-    Route::post('/add-folder-file', [FolderController::class, 'addFolderFile']);
-    Route::post('/job-detail', [JobController::class, 'getJobDetail']);
+    Route::post('add-folder-file', [FolderController::class, 'addFolderFile']);
+    Route::post('job-detail', [JobController::class, 'getJobDetail']);
+    Route::get('editor-list' , [UserController::class , 'getEditorList']);
 });

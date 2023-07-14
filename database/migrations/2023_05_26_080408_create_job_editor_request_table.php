@@ -18,6 +18,7 @@ class CreateJobEditorRequestTable extends Migration
             $table->unsignedBigInteger('editor_id');
             $table->unsignedBigInteger('job_id');
             $table->unsignedBigInteger('request_id');
+            $table->boolean('status')->defualt(0);
             $table->foreign('editor_id')->references('id')->on('users');
             $table->foreign('job_id')->references('id')->on('personal_jobs');
             $table->foreign('request_id')->references('id')->on('requests');

@@ -80,4 +80,27 @@ class FolderController extends Controller
             return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
         }
     }
+
+    public function createClientFolder(Request $request){
+
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()]);
+            
+            } else {
+                
+                $response = $this->folderHandler->createFolder($request);
+                
+                return response()->json($response);
+            }
+        } catch (\Exception $e) {
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+        }
+
+    }
 }

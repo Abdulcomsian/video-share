@@ -150,4 +150,16 @@ class JobController extends Controller
     }
    }
 
+
+   public function getJobList(Request $request)
+   {
+
+    try{
+        $response = $this->jobHandler->getEditorJobs();
+        return response()->json($response);
+    }catch(\Exception $e){
+        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+    }
+   }
+
 }

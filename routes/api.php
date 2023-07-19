@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{ AuthController ,  UserController , FolderController , JobController};
+use App\Http\Controllers\{ AuthController ,  UserController , FolderController , JobController , BillingController};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -38,6 +38,7 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::post('add-job-request' , [JobController::class , 'addJobRequest']);
     Route::get('profile-detail' , [UserController::class , 'getProfileDetail']);
     Route::get('proposal-list' , [JobController::class , 'getProposalList']);
+    Route::get('job-list' , [JobController::class , 'getJobList']);
 });
 
 
@@ -54,4 +55,5 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('add-folder-file', [FolderController::class, 'addFolderFile']);
     Route::post('job-detail', [JobController::class, 'getJobDetail']);
     Route::get('editor-list' , [UserController::class , 'getEditorList']);
+    Route::post('pay-bill' , [BillingController::class , 'payBill']);
 });

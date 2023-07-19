@@ -12,7 +12,7 @@ class EditorRequest extends Model
 
     protected $table = "job_editor_request";
     protected $primaryKey = "id";
-    protected $fillable = ['editor_id' , 'job_id' , 'request_id'];
+    protected $fillable = ['editor_id' , 'job_id' , 'request_id', 'status'];
 
     public function proposal()
     {

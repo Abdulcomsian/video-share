@@ -78,11 +78,12 @@ class JobHandler{
                         "description" => $description,
                         "bid_price" => $bidPrice
                     ]);
-        
+
         EditorRequest::create([
             "editor_id" => $editorId,
             "job_id" => $jobId,
-            "request_id" => $requestId
+            "request_id" => $requestId,
+            "status" => 0
         ]);
 
 
@@ -158,6 +159,22 @@ class JobHandler{
         }catch(\Exception $e){
             return ['success' => true , 'msg' => $e->getMessage()];
         }
+    }
+
+
+    public function getEditorJobs()
+    {
+    
+        $jobs = DB::table('personal_jobs')
+                    ->join('job_editor_request', 'job_id' ,'=' , 'personal_jobs.id'  )
+                    ->join('users' , 'job_editor_request.editor_id' ,'=' ,'users.id')
+                    ->join('requests' , 'job_editor_request.request_id' , '=' , 'requests.id')
+                    ->where('job_editor_request.status' ,'=' , 1)
+                    ->where('job_editor_request.editor_id' , '=' , auth()->user()->id)
+                    ->selectRaw('personal_jobs.id as job_id, personal_jobs.title as job_title,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price')
+                    ->get();       
+
+      return $jobs;
     }
 
 

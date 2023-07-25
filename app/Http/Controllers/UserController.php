@@ -30,7 +30,7 @@ class UserController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()]);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
                 
             }else{
                 $response = $this->editorHandler->editorProfile($request);
@@ -41,7 +41,7 @@ class UserController extends Controller
         
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -55,7 +55,7 @@ class UserController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()]);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
             
             }else{
 
@@ -67,7 +67,7 @@ class UserController extends Controller
         
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -81,7 +81,7 @@ class UserController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()]);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
             
             }else{
                 $response = $this->editorHandler->editorEducation($request);
@@ -92,7 +92,7 @@ class UserController extends Controller
         
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -105,7 +105,7 @@ class UserController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()]);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
             
             }else{
 
@@ -117,7 +117,7 @@ class UserController extends Controller
         
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -134,7 +134,7 @@ class UserController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()]);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
             
             }else{
 
@@ -146,7 +146,7 @@ class UserController extends Controller
         
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -159,7 +159,7 @@ class UserController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()]);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
             
             }else{
 
@@ -171,7 +171,7 @@ class UserController extends Controller
         
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -184,7 +184,7 @@ class UserController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()]);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
             
             }else{
 
@@ -196,7 +196,7 @@ class UserController extends Controller
         
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -209,7 +209,7 @@ class UserController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()]);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
             
             }else{
 
@@ -221,7 +221,7 @@ class UserController extends Controller
         
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -234,7 +234,7 @@ class UserController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()]);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
             
             }else{
 
@@ -246,7 +246,7 @@ class UserController extends Controller
         
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -262,7 +262,7 @@ class UserController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()]);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
             
             }else{
 
@@ -274,7 +274,7 @@ class UserController extends Controller
         
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -287,7 +287,7 @@ class UserController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()]);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
             
             }else{
 
@@ -299,7 +299,7 @@ class UserController extends Controller
         
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         } 
     }
 
@@ -314,7 +314,7 @@ class UserController extends Controller
 
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         } 
     }
 
@@ -328,7 +328,7 @@ class UserController extends Controller
 
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         } 
     }
 
@@ -342,7 +342,7 @@ class UserController extends Controller
 
         }catch(\Exception $e)
         {
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()]);
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
 

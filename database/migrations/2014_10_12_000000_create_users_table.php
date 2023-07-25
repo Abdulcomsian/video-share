@@ -21,6 +21,8 @@ class CreateUsersTable extends Migration
             $table->string('phone_number')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('onboarding')->default(0);
+            $table->string('stripe_account_id')->nullable();
             $table->string('verification_code')->nullable();
             $table->longText('profile_image')->nullable();
             $table->rememberToken();

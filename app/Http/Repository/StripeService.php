@@ -5,7 +5,7 @@ use Stripe\Stripe;
 use Stripe\Charge;
 use Stripe\Token;
 use Stripe\Transfer;
-use Stripe\Customer;
+use Stripe\StripeClient;
 
 class StripeService{
 
@@ -41,10 +41,22 @@ class StripeService{
 
         // $EDITOR_STRIPE_ACCOUNT_ID = 4000000000000077;
         // Create a transfer to the employee's Stripe account
+
+        $stripeConnectedAccount = new StripeClient(env('STRIPE_SECRET'));
+        
+        $account = $stripeConnectedAccount->accounts->create([
+            'type' => 'standard',
+            'default_currency' => 'usd',
+            'email' => 'rajashayzee@yahoo.com'
+        ]);
+
+        $accountId = $account->id;
+
+
         $transfer = Transfer::create([
             'amount' => $editorAmount * 100,
             'currency' => 'usd',
-            'destination' => 'acct_1Acj2PFGmaRb7x8S', 
+            'destination' => $accountId, 
             'transfer_group' => 'ORDER_'.$charge->id,
         ]);
 

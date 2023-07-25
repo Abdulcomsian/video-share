@@ -30,7 +30,7 @@ class AuthController extends Controller
 
             if ($validator->fails()) {
                 
-                return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $validator->getMessageBag()]);
+                return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $validator->getMessageBag()] , 400);
             
             } else {
 
@@ -49,7 +49,7 @@ class AuthController extends Controller
             }
         } catch (\Exception $e) {
 
-            return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $e->getMessage()]);
+            return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $e->getMessage()] , 401);
         
         }
         
@@ -66,7 +66,7 @@ class AuthController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $validator->getMessageBag()]); 
+                return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $validator->getMessageBag()] , 400); 
             
             }else{
                 
@@ -79,7 +79,7 @@ class AuthController extends Controller
 
         }catch(\Exception $e){
             
-            return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $e->getMessage()]);
+            return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $e->getMessage()] , 401);
         
         }
     }
@@ -100,12 +100,12 @@ class AuthController extends Controller
                 return response()->json(['success' => true , 'msg' => 'User verified successfully']);
 
             }else{
-                return response()->json(['success' => false , 'msg' => 'Something Went Wrong' , 'error' => "Verification Code Doesn't Match"]);
+                return response()->json(['success' => false , 'msg' => 'Something Went Wrong' , 'error' => "Verification Code Doesn't Match"] , 400);
             }
 
         }catch(\Exception $e)
         {
-            return response()->json(['success' => false , 'msg' => 'Something Went Wrong' , 'error' => $e->getMessage()]);
+            return response()->json(['success' => false , 'msg' => 'Something Went Wrong' , 'error' => $e->getMessage()] , 401);
         }
 
 

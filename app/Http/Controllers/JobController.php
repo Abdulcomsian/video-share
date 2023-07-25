@@ -30,7 +30,7 @@ class JobController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success" => false , "msg" => "Something Went Wrong" , "error"=> $validator->getMessageBag()]);
+                return response()->json(["success" => false , "msg" => "Something Went Wrong" , "error"=> $validator->getMessageBag()] ,400);
 
             }else{
                 $response = $this->jobHandler->addClientJob($request);
@@ -38,7 +38,7 @@ class JobController extends Controller
             }
     
         }catch(\Exception $e){
-            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
 
     }
@@ -51,7 +51,7 @@ class JobController extends Controller
             return response()->json($response);
     
         }catch(\Exception $e){
-            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -63,7 +63,7 @@ class JobController extends Controller
             return response()->json($response);
     
         }catch(\Exception $e){
-            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -77,14 +77,14 @@ class JobController extends Controller
                         ]);
             if($validator->fails())
             {
-                return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()]);
+                return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
             }else{
                 $response = $this->jobHandler->addJobProposal($request);
                 return response()->json($response);
             }
     
         }catch(\Exception $e){
-            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -95,7 +95,7 @@ class JobController extends Controller
         return response()->json($response);
 
     }catch(\Exception $e){
-        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
     }
    }
 
@@ -106,7 +106,7 @@ class JobController extends Controller
             return response()->json($response);
 
         }catch(\Exception $e){
-            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
    }
 
@@ -118,14 +118,14 @@ class JobController extends Controller
                                     ]);
         if($validator->fails())
         {
-            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()]);
+            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
         }else{
             $response = $this->jobHandler->jobDetail($request);
             return response()->json($response);
         }
 
     }catch(\Exception $e){
-        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
     }
    }
 
@@ -139,14 +139,14 @@ class JobController extends Controller
                                     ]);
         if($validator->fails())
         {
-            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()]);
+            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
         }else{
             $response = $this->jobHandler->awardClientJob($request);
             return response()->json($response);
         }
 
     }catch(\Exception $e){
-        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
     }
    }
 
@@ -158,7 +158,7 @@ class JobController extends Controller
         $response = $this->jobHandler->getEditorJobs();
         return response()->json($response);
     }catch(\Exception $e){
-        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
     }
    }
 

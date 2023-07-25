@@ -28,7 +28,7 @@ class BillingController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()]);
+                return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] , 400);
             }else{
                 $response = $this->stripe->processPayment($request);
 
@@ -36,7 +36,7 @@ class BillingController extends Controller
             }
 
         }catch(\Exception $e){
-
+            return response()->json(["success" => false , "error" => $e->getMessage()] , 401);
         }
     }
 }

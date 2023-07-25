@@ -1,47 +1,5 @@
 <?php
 
-// namespace App\Http\Controllers;
-
-// use Illuminate\Http\Request;
-// use App\Http\Repository\FolderHandler;
-// use Illuminate\Support\Facades\Validator;
-
-// class FolderController extends Controller
-// {
-//     protected $folderHandler;
-
-//     public function __construct(FolderHandler $folderHandler)
-//     {
-//         $this->folderHandler = $folderHandler;
-//     }
-
-//     public function createClientFolder(Request $request)
-//     {
-//         try{
-//             $validator = Validator::make($request->all() ,[
-//                 "name" => "required|string"
-//             ]);
-//             if($validator->fails())
-//             {
-//                 return response()->json(["success" => false , "msg" => "Something Went Wrong" , "error" => $validator->getMessageBag()]);
-//             }else{
-
-//                 $response = $this->folderHandler->createClientFolder($request);
-//                 return response()->json($response);
-//             }
-
-//         }catch(\Exception $e){
-//             return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
-
-//         }
-
-//     }
-
-
-// }
-
-
-// FolderHandler.php
 
 namespace App\Http\Controllers;
 
@@ -68,7 +26,7 @@ class FolderController extends Controller
 
             if ($validator->fails()) {
 
-                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()]);
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
             
             } else {
                 
@@ -77,7 +35,7 @@ class FolderController extends Controller
                 return response()->json($response);
             }
         } catch (\Exception $e) {
-            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
     }
 
@@ -90,7 +48,7 @@ class FolderController extends Controller
 
             if ($validator->fails()) {
 
-                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()]);
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
             
             } else {
                 
@@ -99,7 +57,7 @@ class FolderController extends Controller
                 return response()->json($response);
             }
         } catch (\Exception $e) {
-            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()]);
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
 
     }

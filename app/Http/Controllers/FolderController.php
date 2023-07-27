@@ -61,4 +61,93 @@ class FolderController extends Controller
         }
 
     }
+
+    public function getClientFolders()
+    {
+        try{
+
+            $response = $this->folderHandler->clientFolders();
+                
+            return response()->json($response); 
+
+        }catch(\Exception $e){
+
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        
+        }
+    }
+
+    public function getFolderDetail(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'folder_id' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
+            
+            } else {
+                
+                $response = $this->folderHandler->folderDetail($request);
+                
+                return response()->json($response);
+            }
+        } catch (\Exception $e) {
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
+
+
+    public function deleteClientFolder(Request $request)
+    {
+        try{
+
+            $validator = Validator::make($request->all(), [
+                'folder_id' => 'required',
+            ]);   
+            
+            if ($validator->fails()) {
+
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
+            
+            } else {
+                
+                $response = $this->folderHandler->deleteFolder($request);
+                
+                return response()->json($response);
+            }
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
+
+    public function updateClientFolder(Request $request)
+    {
+        try{
+
+            $validator = Validator::make($request->all(), [
+                'folder_id' => 'required',
+                'folder_name' => 'required'
+            ]);   
+            
+            if ($validator->fails()) {
+
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
+            
+            } else {
+                
+                $response = $this->folderHandler->updateFolder($request);
+                
+                return response()->json($response);
+            }
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
+
+
 }

@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{ AuthController ,  UserController , FolderController , JobController , BillingController};
+use App\Http\Controllers\{ AuthController ,  UserController , FolderController , JobController , BillingController , FileController};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -56,4 +56,10 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('job-detail', [JobController::class, 'getJobDetail']);
     Route::get('editor-list' , [UserController::class , 'getEditorList']);
     Route::post('pay-bill' , [BillingController::class , 'payBill']);
+    Route::get('folder-list' , [FolderController::class , 'getClientFolders']);
+    Route::post('folder-detail' , [FolderController::class , 'getFolderDetail']);
+    Route::post('upload-files' , [FileController::class , 'uploadClientFile']);
+    Route::post('delete-file' , [FileController::class , 'deleteClientFile']);
+    Route::post('update-folder' , [FolderController::class, 'updateClientFolder']);
+    Route::post('delete-folder' , [FolderController::class , 'deleteClientFolder']);
 });

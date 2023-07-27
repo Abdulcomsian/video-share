@@ -19,7 +19,7 @@ class CreateFilesTable extends Migration
             $table->longText("path");
             $table->string("extension");
             $table->unsignedBigInteger("type");
-            $table->foreign("folder_id")->references("id")->on("folders");
+            $table->foreign("folder_id")->references("id")->on("folders")->onDelete('cascade');
             $table->timestamps();
         });
     }

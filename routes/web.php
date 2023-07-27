@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\{DashboardController}; 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,6 +13,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+Route::get('/' , [DashboardController::class , 'getAdminDashboard'])->name('get.admin.dashboard');
+Route::get('/client-list' , [DashboardController::class , 'getAdminDashboard'])->name('get.client.list');
+Route::get('/editor-list' , [DashboardController::class , 'getAdminDashboard'])->name('get.editor.list');
+Route::get('/folder-list' , [DashboardController::class , 'getAdminDashboard'])->name('get.folder.list');
+
+// Route::get('/nouman-home' , [DashboardController::class , 'getAdminDashboard'])->name('get.admin.dashboard');

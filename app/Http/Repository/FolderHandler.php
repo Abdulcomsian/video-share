@@ -69,6 +69,44 @@ class FolderHandler
             }
         }
 
+        public function clientFolders()
+        {
+            $userId = auth()->user()->id;
+
+            $folders = Folder::where('client_id' , $userId)->get();
+
+            return ["success" => true , "msg" => "Folder Fetched Successfully" , "folders" => $folders];
+        }
+
+        public function folderDetail($request)
+        {
+            $folderId = $request->folder_id;
+
+            $folderDetail = Folder::with('client')->where('id' , $folderId)->first();
+
+            return ["success" => true , "msg" => "Folder Detail Fetched Successfully" , "folderDetail" => $folderDetail];
+
+        }
+
+        public function deleteFolder($request)
+        {
+            $folderId = $request->folder_id;
+
+            Folder::where('id' , $folderId)->delete();
+            
+            return ["success" => true , "msg" => "Folder Deleted Successfully"];
+        }
+
+        public function updateFolder($request)
+        {
+            $folderId = $request->folder_id;
+            $name = $request->folder_name;
+
+            Folder::where('id' , $folderId)->update(['name' => $name]);
+
+            return ["success" => true , "msg" => "Folder Updated Successfully"];
+
+        }
 }
 
 

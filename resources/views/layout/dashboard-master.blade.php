@@ -36,6 +36,21 @@ License: For each use you must have a valid license purchased only from above li
     <!--end::Global Stylesheets Bundle-->
     @toastr_css
     {{-- Page Specific Styles        --}}
+    <style>
+        a.paginate_button {
+                margin: 0px 4px;
+                color: #ff4b00;
+                cursor: pointer;
+            }
+        a.paginate_button:hover {
+            color: #000000;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            color: #000000!important;
+            background: none!important;
+            border: none!important;
+        }
+    </style>
     @yield('css')
 
 </head>
@@ -95,6 +110,7 @@ License: For each use you must have a valid license purchased only from above li
 <script src="{{asset('assets/js/custom/modals/create-app.js')}}"></script>
 <script src="{{asset('assets/js/custom/modals/upgrade-plan.js')}}"></script>
 <script type="text/javascript" src="https://cdn.rawgit.com/t4t5/sweetalert/v0.2.0/lib/sweet-alert.min.js"></script>
+@yield('script-cdn')
 <script>
 // document.getElementByClassName('deleteBtn').onclick = function(){
 //     swal({

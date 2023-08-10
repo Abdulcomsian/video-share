@@ -5,6 +5,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
 use App\Models\{ User , Favourite };
 use App\Mail\VerificationMail;
+use App\Http\AppConst;
 
 class UserHandler{
     
@@ -40,7 +41,7 @@ class UserHandler{
         return [
                 'access_token'=>$token,
                 'token_type'=>'bearer',
-                'expires_in'=> JWTAuth::factory()->getTTL() * 60,
+                'expires_in'=> JWTAuth::factory()->getTTL() * 180,
                 'user'=> auth()->user()
         ];
     }
@@ -79,8 +80,14 @@ class UserHandler{
 
     public function editorList()
     {
-        $editorList  = User::where('type',2)->orderBy('id' ,'desc')->get();
+        $editorList  = User::where('type', AppConst::EDITOR)->orderBy('id' ,'desc')->get();
         return ['success' => true , 'editorList' => $editorList];
+    }
+
+    public function clientList()
+    {
+        $clientList = User::where('type' , AppConst::CLIENT)->orderBy('id' , 'desc')->get();
+        return ['success' => true , 'clientList' => $clientList];
     }
 
 }

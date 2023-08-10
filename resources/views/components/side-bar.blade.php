@@ -67,7 +67,7 @@
                     </a>
                 </div>
                 <div class="menu-item">
-                    <a class="menu-link  {{Request::is('client-list*') ? 'active' : ''}}" href="{{route('get.client.list')}}">
+                    <a class="menu-link  {{Request::is('clients*') ? 'active' : ''}}" href="{{route('client.page')}}">
 										<span class="menu-icon">
 											<!--begin::Svg Icon | path: icons/duotone/Design/Sketch.svg-->
 											<span class="svg-icon svg-icon-2">
@@ -81,7 +81,7 @@
                     </a>
                 </div>
                 <div class="menu-item">
-                    <a class="menu-link {{Request::is('editor-list*') ? 'active' : ''}}" href="{{route('get.editor.list')}}">
+                    <a class="menu-link {{Request::is('editors*') ? 'active' : ''}}" href="{{route('editor.page')}}">
 										<span class="menu-icon">
 											<!--begin::Svg Icon | path: icons/duotone/Design/Sketch.svg-->
 											<span class="svg-icon svg-icon-2">
@@ -102,7 +102,7 @@
                 </div>
                 <div class="menu-item">
                     {{-- <a class="menu-link  {{Request::is('payment*') ? 'active' : ''}}" href="{{route('payment_transactions.index')}}"> --}}
-                    <a class="menu-link  {{Request::is('folder-list*') ? 'active' : ''}}" href="{{route('get.folder.list')}}">
+                    <a class="menu-link  {{Request::is('folders*') ? 'active' : ''}}" href="{{route('folder.page')}}">
 										<span class="menu-icon">
 											<!--begin::Svg Icon | path: icons/duotone/Design/Sketch.svg-->
 											<span class="svg-icon svg-icon-2">

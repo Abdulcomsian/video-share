@@ -3,8 +3,8 @@
     <div class="container-fluid d-flex flex-column flex-md-row align-items-center justify-content-between">
         <!--begin::Copyright-->
          <div class="text-dark order-2 order-md-1">
-             <span class="text-muted fw-bold me-1">2021©</span>
-             <a href="#" target="_blank" class="text-gray-800 text-hover-primary">Callidus Mena IT Team</a>
+             <span class="text-muted fw-bold me-1">2023©</span>
+             <a href="#" target="_blank" class="text-gray-800 text-hover-primary">Video Sharing</a>
         </div>
         <!--end::Copyright-->
     </div>

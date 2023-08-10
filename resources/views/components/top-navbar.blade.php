@@ -71,7 +71,7 @@
                                     <!--end::Avatar-->
                                     <!--begin::Username-->
                                     <div class="d-flex flex-column">
-                                        <div class="fw-bolder d-flex align-items-center fs-5">{{\Illuminate\Support\Facades\Auth::user()->nam ?? ''}}
+                                        <div class="fw-bolder d-flex align-items-center fs-5">{{\Illuminate\Support\Facades\Auth::user()->name ?? ''}}
                                         </div>
                                         <a href="#" class="fw-bold text-muted text-hover-primary fs-7">{{Auth::user()->email ?? ''}}</a>
                                     </div>
@@ -93,13 +93,28 @@
                             <!--begin::Menu item-->
                             <div class="menu-item px-5">
                                {{-- <a href="authentication/flows/basic/sign-in.html" class="menu-link px-5">Sign Out</a> --}}
-                                {{-- <button class="menu-link px-5"
+
+                               {{-- <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                   onclick="event.preventDefault();
+                                                 document.getElementById('logout-form').submit();">
+                                    {{ __('Logout') }} Logout
+                                </a>
+
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
+                                </form>
+                            </div> --}}
+
+
+
+                                <button class="menu-link px-5"
                                    onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                     {{ __('Logout') }}
-                                </button> --}}
+                                </button>
 
-                                <form id="logout-form" action="{{ route('get.folder.list') }}" method="POST" class="d-inline">
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                     @csrf
                                     <button type="submit" class="menu-link px-5">Logout</button>
                                 </form>

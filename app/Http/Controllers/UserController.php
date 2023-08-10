@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Repository\{ EditorHandler , UserHandler };
-use App\Models\User;
+use DataTables;
+use PhpParser\Node\Expr\AssignOp\Div;
 
 class UserController extends Controller
 {
@@ -345,5 +346,69 @@ class UserController extends Controller
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
     }
+
+
+    public function getDashboardClientList()
+    {
+        try{
+            $response  = $this->userHandler->clientList();
+
+            $clientList = $response['clientList'];
+
+           return \DataTables::of($clientList)
+                    ->addIndexColumn()
+                    ->addColumn('name' , function($client){
+                        return $client->full_name;
+                    })
+                    ->addColumn('image' , function($client){
+                        $file = is_null($client->image) ? asset('uploads/avatar.png') : asset('uploads/'.$client->image) ;
+                        return "<img src='$file'/>";
+                    })
+                    ->addColumn('email' , function($client){
+                        return $client->email;
+                    })
+                    ->addColumn('phone' , function($client){
+                        return $client->phone_number ?? "<div class='px-5'>--</div>";
+                    })
+                    ->rawColumns(['image' , 'phone'])
+                    ->make(true);
+
+        }catch(\Exception $e)
+        {
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
+        }
+    }
+
+    public function getDashboardEditorList()
+    {
+        try{
+            $response  = $this->userHandler->editorList();
+
+            $editorList = $response['editorList'];
+
+           return \DataTables::of($editorList)
+                    ->addIndexColumn()
+                    ->addColumn('name' , function($editor){
+                        return $editor->full_name;
+                    })
+                    ->addColumn('image' , function($editor){
+                        $file = is_null($editor->image) ? asset('uploads/avatar.png')  : asset('uploads/'.$editor->image);
+                        return "<img src='$file'/>";
+                    })
+                    ->addColumn('email' , function($editor){
+                        return $editor->email;
+                    })
+                    ->addColumn('phone' , function($editor){
+                        return $editor->phone_number ?? "<div class='px-5'>--</div>";
+                    })
+                    ->rawColumns(['image' , 'phone'])
+                    ->make(true);
+
+        }catch(\Exception $e)
+        {
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
+        }
+    }
+
 
 }

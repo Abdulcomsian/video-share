@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Repository\FolderHandler;
 use Illuminate\Support\Facades\Validator;
+use DataTables;
+use Yajra\DataTables\Contracts\DataTable;
 
 class FolderController extends Controller
 {
@@ -147,6 +149,56 @@ class FolderController extends Controller
         }catch(\Exception $e){
             return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
+    }
+
+    public function getFolderList()
+    {
+        try {
+
+           $folders =  $this->folderHandler->folderList();
+
+           $folderList = $folders['folderList'];
+
+           return DataTables::of($folderList)
+                        ->addIndexColumn()
+                        ->addColumn("client_name" , function($folder){
+                            return $folder->client->full_name;
+                        })
+                        ->addColumn("client_email" , function($folder){
+                            return $folder->client->email;
+                        })
+                        ->addColumn("folder_name" , function($folder){
+                            return $folder->name;
+                        })
+                        ->addColumn("action" , function($folder){
+                            return "<div><a href=".url('folder/'.$folder->id)."></a> <i class='fas fa-eye'></i></div>";
+                        })
+                        ->rawColumns(['action'])
+                        ->make(true);
+
+        } catch(\Exception $e){
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
+
+
+    public function getFolderFiles(Request $request)
+    {
+        $validator = Validator::make( $request->all() , [
+            'folder_id' => 'required'
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json(['success' => false , 'error' => $validator->getMessageBag()]); 
+        }else{
+
+            $response = $this->folderHandler->getFiles($request);
+
+            return response()->json($response);
+
+        }
+
     }
 
 

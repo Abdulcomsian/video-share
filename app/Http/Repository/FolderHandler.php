@@ -57,14 +57,37 @@ class FolderHandler
                 $clientId = auth()->user()->id;
                 $name  = $request->name;
 
-                Folder::create([
-                    "client_id" => $clientId,
-                    "name"  => $name
-                ]);
+                $folderName = trim(str_replace(" " , "-" , $name).'-'.$clientId);
 
-                return ["success" => true , "msg" => "Folder Created Successfully"];
+                $folderCount = Folder::where('name' , $folderName)->count();
+
+                if($folderCount == 0){
+
+                    $check = Storage::disk('s3')->makeDirectory($folderName);
+
+                    if($check)
+                    {
+                        Folder::create([
+                            "client_id" => $clientId,
+                            "name"  => $folderName
+                        ]);
+
+                        return ["success" => true , "msg" => "Folder Created Successfully"];
+
+                    }else{
+                   
+                        return response()->json(["success" => false , "msg" => "Error While Creating Folder"]);
+                    }
+                
+                }else{
+                    return response()->json(["success" => false , "msg" => "Folder Already Exist"]);
+                
+                }
+
+                
 
             }catch(\Exception $e){
+
                 return ["success" => false , "msg"=> $e->getMessage()];
             }
         }
@@ -92,8 +115,12 @@ class FolderHandler
         {
             $folderId = $request->folder_id;
 
-            Folder::where('id' , $folderId)->delete();
+            $folder = Folder::where('id' , $folderId)->first();
             
+            Storage::disk('s3')->deleteDirectory($folder->name);
+            
+            $folder->delete();
+
             return ["success" => true , "msg" => "Folder Deleted Successfully"];
         }
 
@@ -101,12 +128,79 @@ class FolderHandler
         {
             $folderId = $request->folder_id;
             $name = $request->folder_name;
+            $folder = Folder::where('id' , $folderId)->first();
+            $clientId = auth()->user()->id;
+            $folderName = str_replace(" ","-",$name)."-".$clientId;
 
-            Folder::where('id' , $folderId)->update(['name' => $name]);
+            $folderCount = Folder::where('name' , $folderName)->count();
 
-            return ["success" => true , "msg" => "Folder Updated Successfully"];
+            if($folderCount == 0)
+            {
+                $files = Storage::disk('s3')->allFiles($folder->name);
+
+                $newFolder = Storage::disk('s3')->makeDirectory($folderName);
+
+                if($newFolder){
+                    
+                    foreach($files as $file)
+                    {
+                        $newKey = str_replace($folder->name, $folderName, $file);
+                        
+                        Storage::disk('s3')->copy($file, $newKey);
+                    }
+
+                    Storage::disk('s3')->deleteDirectory($folder->name);
+
+                    $folder->name = $folderName;
+
+                    $folder->save();
+
+                    return ["success" => true , "msg" => "Folder Updated Successfully"];
+                }else{
+
+                    return ["success" => false , "msg" => "Something Went Wrong"];
+                }
+
+
+                
+            }else{
+                return ["success" => false , "msg" => "Can't Change Folder Name Already Folder Exist With This Name"];
+            }
+
+    
+            
 
         }
+
+        public function folderList()
+        {
+            $folderList = Folder::with('client')->orderBy('id' , 'desc')->get();
+
+            return ["success" => true , "folderList" => $folderList ];
+        }
+
+        public function getFiles($request)
+        {
+            $folderId = $request->folder_id;
+
+            $bucketName = config('filesystems.disks.s3.bucket');
+
+            $bucketAddress = "https://$bucketName.s3.amazonaws.com/";
+
+            $folder = Folder::find($folderId);
+
+            $folderPath = $folder->name;
+
+            $filesList = Storage::disk('s3')->files($folderPath);
+
+            $files = array_map( function($file) use ($bucketAddress){
+                return $bucketAddress.$file;
+            }, $filesList);
+
+            return ["success" => true , "files" => $files ];
+        }
+
+
 }
 
 

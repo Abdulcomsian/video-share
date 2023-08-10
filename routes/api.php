@@ -18,6 +18,7 @@ use App\Http\Controllers\{ AuthController ,  UserController , FolderController ,
 //     return $request->user();
 // });
 
+
 Route::match(['GET', 'POST'], '/login', [AuthController::class, 'login'])->name('login');
 Route::post('register' ,[AuthController::class , 'register']);
 Route::post('verify-code',[AuthController::class , 'verifyUser']);
@@ -62,4 +63,5 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('delete-file' , [FileController::class , 'deleteClientFile']);
     Route::post('update-folder' , [FolderController::class, 'updateClientFolder']);
     Route::post('delete-folder' , [FolderController::class , 'deleteClientFolder']);
+    Route::post('get-folder-files' , [FolderController::class , 'getFolderFiles']);
 });

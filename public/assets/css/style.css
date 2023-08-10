@@ -339,3 +339,20 @@ table.attachmentTable, table.attachmentTable td, table.attachmentTable th {
 img.logo {
     width: 68px;
 }
+
+.card-counter.dashboard-card {
+    background: rgb(243,112,33);
+    background: linear-gradient(90deg, rgba(243,112,33,1) 25%, rgba(239,83,50,1) 83%);
+    margin: 10px 0px 10px 0px;
+    padding: 20px 10px 20px 20px;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    font-size: 20px;
+    border-radius: 10px;
+}
+
+.card-counter.dashboard-card i {
+    font-size: 80px;
+    color: white;
+}

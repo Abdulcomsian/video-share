@@ -11,7 +11,7 @@ class UserHandler{
     
     public function findUser($email , $password , $type)
     {
-        $token = auth()->attempt(["email" => $email , "password" => $password]);
+        $token = auth()->guard('api')->attempt(["email" => $email , "password" => $password]);
         
         if(!$token)
         {
@@ -22,7 +22,7 @@ class UserHandler{
             $jwt = $this->respondWithToken($token);
             
             if($type == "register"){
-                $verificationCode = rand(111111,999999);
+                $verificationCode = rand(1111,9999);
                 User::where('id' , auth()->user()->id)->update(['verification_code' => $verificationCode]);
                 Mail::to($email)->send(new VerificationMail($verificationCode ));
                 $msg = "User Added Successfully";

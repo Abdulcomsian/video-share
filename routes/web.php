@@ -17,7 +17,7 @@ Auth::routes(['except' => ['register']]);
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
-Route::middleware(['web.admin.verify'])->group(function(){
+Route::middleware([ 'auth' , 'web.admin.verify'])->group(function(){
     Route::get('/' , [DashboardController::class , 'getAdminDashboard'])->name('get.admin.dashboard');
     Route::get('/clients' , [DashboardController::class , 'getClientPage'])->name('client.page');
     Route::get('/client-list' , [UserController::class , 'getDashboardClientList'])->name('get.client.list');

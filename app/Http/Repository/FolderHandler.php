@@ -184,20 +184,26 @@ class FolderHandler
             $folderId = $request->folder_id;
 
             $bucketName = config('filesystems.disks.s3.bucket');
-
-            $bucketAddress = "https://$bucketName.s3.amazonaws.com/";
-
+            
             $folder = Folder::find($folderId);
-
+            
             $folderPath = $folder->name;
+            
+            $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
+            
+            $files = Files::with('folder')->where('folder_id' , $folderId)->get();
 
-            $filesList = Storage::disk('s3')->files($folderPath);
 
-            $files = array_map( function($file) use ($bucketAddress){
-                return $bucketAddress.$file;
-            }, $filesList);
 
-            return ["success" => true , "files" => $files ];
+            // $filesList = Storage::disk('s3')->files($folderPath);
+
+            // $files = array_map( function($file) use ($bucketAddress){
+            //     return $bucketAddress.$file;
+            // }, $filesList);
+
+            // dd($files);
+
+            return ["success" => true , "files" => $files , "bucket_address" => $bucketAddress ];
         }
 
 

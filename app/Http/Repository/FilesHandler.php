@@ -40,7 +40,6 @@ class FilesHandler{
             return ["success" => true , "msg" => "Files Added Successfully"];
 
         }catch(\Exception $e){
-            dd("s3 is not working" , $e->getMessage());
             return response()->json(['success' => false , "msg" => $e->getMessage()]);
         }
     }

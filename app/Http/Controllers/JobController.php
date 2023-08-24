@@ -162,4 +162,15 @@ class JobController extends Controller
     }
    }
 
+   public function getUnassignedJobs(){
+    try{
+        $response = $this->jobHandler->unassignedJobs();
+        return response()->json($response);
+    }catch(\Exception $e){
+        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+    }
+
+   }
+
+
 }

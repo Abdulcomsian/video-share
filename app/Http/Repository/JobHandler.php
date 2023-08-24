@@ -178,6 +178,12 @@ class JobHandler{
     }
 
 
+    public function unassignedJobs(){
+        $unassignedJobs = PersonalJob::where('status' , 'unawarded')->get();
+        return $unassignedJobs;
+    }
+
+
 }
 
 

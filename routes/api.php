@@ -40,6 +40,7 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::get('profile-detail' , [UserController::class , 'getProfileDetail']);
     Route::get('proposal-list' , [JobController::class , 'getProposalList']);
     Route::get('job-list' , [JobController::class , 'getJobList']);
+    Route::get('unassigned-job-list' , [JobController::class , 'getUnassignedJobs']);
 });
 
 

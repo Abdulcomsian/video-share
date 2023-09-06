@@ -11,6 +11,6 @@ class JobProposal extends Model
 
     protected $table = "requests";
     protected $primaryKey = "id";
-    protected $fillable = [ "description" , "bid_price"];
+    protected $fillable = [ "description" , "bid_price" , 'status'];
 
 }

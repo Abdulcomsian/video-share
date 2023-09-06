@@ -59,10 +59,19 @@ class JobHandler{
                          ->join( 'job_editor_request' , 'personal_jobs.id' , '=' , 'job_editor_request.job_id')
                          ->join('users' , 'users.id' , '=' , 'job_editor_request.editor_id')
                          ->join('requests' , 'requests.id' , '=' , 'job_editor_request.request_id')
-                         ->where('personal_jobs.client_id' , $clientId)
-                         ->selectRaw('personal_jobs.id as job_id , job_editor_request.id as proposal_id , personal_jobs.deadline ,  personal_jobs.title , personal_jobs.budget , personal_jobs.description as job_description , requests.bid_price , requests.description as proposal_detail')
+                        //  ->leftJoin('skills', 'job_editor_request.editor_id', '=', 'skills.skillable_id')
+                         ->where('personal_jobs.client_id' , $clientId )
+                         ->where('personal_jobs.status' , 'unawarded')
+                         ->selectRaw('personal_jobs.id as job_id , job_editor_request.id as proposal_id , personal_jobs.deadline ,  personal_jobs.title , personal_jobs.budget , personal_jobs.description as job_description , requests.bid_price , requests.description as proposal_detail, users.full_name as editor_name, users.email as editor_email, users.profile_image as editor_profile_image' )
+                         ->selectSub(function($query){
+                            $query->selectRaw('GROUP_CONCAT(skills.title) as editor_skills')
+                                  ->from('skills')
+                                  ->whereRaw('job_editor_request.editor_id = skills.skillable_id')
+                                  ->where('skillable_type', 'App\Models\User');
+                         } , 'editor_skills')
                          ->get();
-        
+
+
         return ['success' => true , 'request' => $jobList];
 
     }
@@ -97,17 +106,18 @@ class JobHandler{
     public function awardedJobList()
     {
         $clientId = auth()->user()->id;
-
         $awardedJobs = DB::table('personal_jobs')
                                 ->join( 'job_editor_request' , 'personal_jobs.id' , '=' , 'job_editor_request.job_id')
                                 ->join('users' , 'users.id' , '=' , 'job_editor_request.editor_id')
                                 ->join('requests' , 'requests.id' , '=' , 'job_editor_request.request_id')
                                 ->where('personal_jobs.client_id' , $clientId)
-                                ->where('personal_jobs.status' , 'LIKE' , '%awarded%')
-                                ->selectRaw('personal_jobs.id as job_id , job_editor_request.id as proposal_id , personal_jobs.deadline ,  personal_jobs.title , personal_jobs.budget , personal_jobs.description as job_description , requests.bid_price , requests.description as proposal_detail')
+                                ->where('personal_jobs.status' ,  'awarded')
+                                ->where('job_editor_request.status' , 1)
+                                ->where('requests.status' , 1)
+                                ->selectRaw('personal_jobs.id as job_id, job_editor_request.id as proposal_id, personal_jobs.deadline, personal_jobs.title, personal_jobs.budget, personal_jobs.description as job_description, requests.bid_price, requests.description as proposal_detail, personal_jobs.awarded_date')
                                 ->get();
-
-        
+                                // ->unique('job_id')
+                                // ->toSql();
         return ["success" => true , "awardedJobs" => $awardedJobs];
                 
 
@@ -152,8 +162,10 @@ class JobHandler{
               ]
             )->update(['status' => 1]);
 
-            PersonalJob::where( 'id' , $jobId )->update(['status' => 'awarded']);
+            PersonalJob::where( 'id' , $jobId )->update(['status' => 'awarded' , 'awarded_date' => date('Y-m-d H:i:s')]);
 
+            JobProposal::where('id' , $requestId)->update(['status' => 1]);
+            
             return ['success' => true , 'msg' => 'Job Awarded Successfully'];
 
         }catch(\Exception $e){

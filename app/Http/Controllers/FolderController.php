@@ -4,7 +4,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Repository\FolderHandler;
+use App\Http\Repository\{ FolderHandler , FilesHandler };
 use Illuminate\Support\Facades\Validator;
 use DataTables;
 use Yajra\DataTables\Contracts\DataTable;
@@ -12,10 +12,12 @@ use Yajra\DataTables\Contracts\DataTable;
 class FolderController extends Controller
 {
     protected $folderHandler;
+    protected $fileHandler;
 
-    public function __construct(FolderHandler $folderHandler)
+    public function __construct(FolderHandler $folderHandler , FilesHandler $fileHandler)
     {
         $this->folderHandler = $folderHandler;
+        $this->fileHandler = $fileHandler;
     }
 
     public function addFolderFile(Request $request)
@@ -199,6 +201,64 @@ class FolderController extends Controller
 
         }
 
+    }
+
+
+    public function shareFile(Request $request)
+    {
+        $validator = Validator::make($request->all() , [
+            'job_id' => 'required',
+            'files.*' => 'file|mimes:mp4,avi,jpg,png,jpeg,mpeg|max:51200' 
+        ]);
+
+        if($validator->fails()){
+            
+            return response()->json(['success' => false , 'error' => $validator->getMessageBag()]); 
+        
+        }else{
+            $checkFolder = $this->folderHandler->checkShareFolder($request->job_id);
+
+            if(!$checkFolder){
+
+                $response = $this->folderHandler->createShareFolder($request->job_id);
+               
+               if($response['success'] == false)
+               {
+                
+                    return response()->json($response); 
+               
+               }
+            }
+
+            $response = $this->fileHandler->uploadShareFolderFiles($request);
+
+            return response()->json($response);
+
+        }
+    }
+
+    public function getShareFiles(Request $request)
+    {
+        try{
+
+            $validator = Validator::make($request->all(), [
+                'job_id' => 'required',
+            ]);   
+            
+            if ($validator->fails()) {
+
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
+            
+            } else {
+                
+                $response = $this->folderHandler->getShareFolderFiles($request);
+                
+                return response()->json($response);
+            }
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
     }
 
 

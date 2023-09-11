@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\{User , Skill};
+use App\Models\{User , Skill , ShareFolder};
 
 class PersonalJob extends Model
 {
@@ -24,10 +24,14 @@ class PersonalJob extends Model
         return $this->morphMany(Skill::class, 'skillable');
     }
 
-
     public function allEditor()
     {
         return $this->belongsToMany(User::class , 'job_editor_request', 'job_id' , 'editor_id');
+    }
+
+    public function folder()
+    {
+        return $this->hasOne(ShareFolder::class , 'job_id' , 'id');
     }
 
 }

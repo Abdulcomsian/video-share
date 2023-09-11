@@ -3,8 +3,7 @@
 
 namespace App\Http\Repository;
 
-use App\Models\Folder;
-use App\Models\Files;
+use App\Models\{ ShareFolder , Files , Folder, PersonalJob, ShareFolderFiles};
 use Illuminate\Support\Facades\Storage;
 
 class FolderHandler
@@ -202,6 +201,68 @@ class FolderHandler
             // }, $filesList);
 
             // dd($files);
+
+            return ["success" => true , "files" => $files , "bucket_address" => $bucketAddress ];
+        }
+
+
+        public function checkShareFolder($jobId)
+        {
+           return ShareFolder::where('id' , $jobId)->first();
+        }
+
+        public function createShareFolder($jobId)
+        {
+            try{
+                $editorId = auth()->user()->id;
+                $jobId  = $jobId;
+
+                $job = PersonalJob::where('id' , $jobId )->first();
+
+                $jobTitle = $job->title;
+
+                $folderName = trim(str_replace(" " , "-" , $jobTitle).'-'.$editorId).'-'.strtotime(date('Y-m-d H:i:s'));
+
+                $check = Storage::disk('s3')->makeDirectory($folderName);
+
+                if($check)
+                {
+                    ShareFolder::create([
+                        "editor_id" => $editorId,
+                        "job_id" => $jobId, 
+                        "name"  => $folderName,
+                    ]);
+
+                    return ["success" => true , "msg" => "Folder Created Successfully"];
+
+                }else{
+                
+                    return ["success" => false , "msg" => "Error While Creating Folder"];
+                }
+
+
+            }catch(\Exception $e){
+
+                return ["success" => false , "msg"=> $e->getMessage()];
+            }
+        }
+
+
+        public function getShareFolderFiles($request)
+        {
+            $jobId = $request->job_id;
+
+            $bucketName = config('filesystems.disks.s3.bucket');
+            
+            $personalJob = PersonalJob::with('folder')->where('id' , $jobId)->first();
+
+            $folder = $personalJob->folder;
+            
+            $folderPath = $folder->name;
+            
+            $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
+            
+            $files = ShareFolderFiles::with('folder')->where('share_folder_id' , $folder->id)->get();
 
             return ["success" => true , "files" => $files , "bucket_address" => $bucketAddress ];
         }

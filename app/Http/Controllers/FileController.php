@@ -68,4 +68,29 @@ class FileController extends Controller
         }
     }
 
+    
+    public function deleteShareFile(Request $request)
+    {
+        try{
+
+            $validator = Validator::make($request->all(), [
+                'file_id' => 'required',
+            ]);   
+            
+            if ($validator->fails()) {
+
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
+            
+            } else {
+                
+                $response = $this->filesHandler->deleteShareMedia($request);
+                
+                return response()->json($response);
+            }
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
+
 }

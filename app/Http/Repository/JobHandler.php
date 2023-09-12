@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Repository;
-use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal};
+
+use App\Http\AppConst;
+use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal, JobPayment};
 use Illuminate\Support\Facades\DB;
 
 class JobHandler{
@@ -62,7 +64,7 @@ class JobHandler{
                         //  ->leftJoin('skills', 'job_editor_request.editor_id', '=', 'skills.skillable_id')
                          ->where('personal_jobs.client_id' , $clientId )
                          ->where('personal_jobs.status' , 'unawarded')
-                         ->selectRaw('personal_jobs.id as job_id , job_editor_request.id as proposal_id , personal_jobs.deadline ,  personal_jobs.title , personal_jobs.budget , personal_jobs.description as job_description , requests.bid_price , requests.description as proposal_detail, users.full_name as editor_name, users.email as editor_email, users.profile_image as editor_profile_image' )
+                         ->selectRaw('requests.id as request_id, personal_jobs.id as job_id , job_editor_request.id as proposal_id , personal_jobs.deadline ,  personal_jobs.title , personal_jobs.budget , personal_jobs.description as job_description , requests.bid_price , requests.description as proposal_detail, users.full_name as editor_name, users.email as editor_email, users.profile_image as editor_profile_image' )
                          ->selectSub(function($query){
                             $query->selectRaw('GROUP_CONCAT(skills.title) as editor_skills')
                                   ->from('skills')
@@ -165,6 +167,8 @@ class JobHandler{
             PersonalJob::where( 'id' , $jobId )->update(['status' => 'awarded' , 'awarded_date' => date('Y-m-d H:i:s')]);
 
             JobProposal::where('id' , $requestId)->update(['status' => 1]);
+
+            JobPayment::create(['job_id' => $jobId , 'request_id' => $requestId , 'client_transfer_status' => AppConst::CLIENT_PENDING , 'editor_transfer_status' => AppConst::EDITOR_PENDING]);
             
             return ['success' => true , 'msg' => 'Job Awarded Successfully'];
 
@@ -193,6 +197,29 @@ class JobHandler{
     public function unassignedJobs(){
         $unassignedJobs = PersonalJob::where('status' , 'unawarded')->get();
         return $unassignedJobs;
+    }
+
+    public function cancelJob($request){
+        
+        $jobId = $request->job_id;
+
+        PersonalJob::where('id' , $jobId)->update(['status' => 'unawarded']);
+
+        $requests = EditorRequest::where('job_id' , $jobId)
+                                    ->where('status' , 1)
+                                    ->get();
+        
+        foreach($requests as $editorRequest)
+        {
+            $requestId = $editorRequest->request_id;
+            JobProposal::where('id' , $requestId)->update(['status' => 0]);
+            $editorRequest->status = 0;
+            $editorRequest->save();
+        }
+
+        
+        return ['success' => true , 'msg' => 'Job Canceled Successfully'];
+        
     }
 
 

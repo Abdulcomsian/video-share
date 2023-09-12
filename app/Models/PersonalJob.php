@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\{User , Skill , ShareFolder};
+use App\Models\{User , Skill , ShareFolder , JobPayment};
 
 class PersonalJob extends Model
 {
@@ -32,6 +32,11 @@ class PersonalJob extends Model
     public function folder()
     {
         return $this->hasOne(ShareFolder::class , 'job_id' , 'id');
+    }
+
+    public function payment()
+    {
+        return $this->hasOne(JobPayment::class  , 'job_id' , 'id');
     }
 
 }

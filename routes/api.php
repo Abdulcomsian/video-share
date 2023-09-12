@@ -68,4 +68,6 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('update-folder' , [FolderController::class, 'updateClientFolder']);
     Route::post('delete-folder' , [FolderController::class , 'deleteClientFolder']);
     Route::post('get-folder-files' , [FolderController::class , 'getFolderFiles']);
+    Route::post('process-payment', [BillingController::class , 'processBilling']);
+    Route::post('cancel-job' , [JobController::class , 'cancelAwardedJob']);
 });

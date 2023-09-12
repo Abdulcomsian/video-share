@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{ PersonalJob };
-use App\Http\Repository\{JobHandler};
+use App\Http\Repository\{JobHandler , StripeService};
 use Illuminate\Support\Facades\Validator;
 
 class JobController extends Controller
 {
     protected $jobHandler;
+    protected $stripeService;
 
-    public function __construct(JobHandler $jobHandler)
+    public function __construct(JobHandler $jobHandler , StripeService $stripeService)
     {
         $this->jobHandler = $jobHandler;
+        $this->stripeService = $stripeService;
     }
     
     public function addJob(Request $request)
@@ -134,8 +135,8 @@ class JobController extends Controller
    {
     try{
         $validator = Validator::make( $request->all() , [
-                                    'job_id' => 'required|numeric',
-                                    'request_id' => 'required|numeric'
+                                        'job_id' => 'required|numeric',
+                                        'request_id' => 'required|numeric'
                                     ]);
         if($validator->fails())
         {
@@ -170,6 +171,26 @@ class JobController extends Controller
         return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
     }
 
+   }
+
+   public function cancelAwardedJob(Request $request)
+   {
+        try{
+            $validator = Validator::make( $request->all() , [
+                'job_id' => 'required|numeric',
+            ]);
+
+            if($validator->fails())
+            {
+                return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
+            }else{
+                $response = $this->jobHandler->cancelJob($request);
+                return response()->json($response);
+            }
+    
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
    }
 
 

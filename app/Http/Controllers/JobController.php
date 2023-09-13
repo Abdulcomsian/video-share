@@ -194,4 +194,17 @@ class JobController extends Controller
    }
 
 
+   public function cancelJobs(Request $request)
+   {
+    try{
+
+        $response = $this->jobHandler->cancelJobList();
+        return response()->json($response);
+
+    }catch(\Exception $e){
+        return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+    }
+   }
+
+
 }

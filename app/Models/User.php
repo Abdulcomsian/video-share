@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\{ PersonalJob , Comment , Skill ,  EditorProfile , Education , Address , Folder };
+use App\Models\{ PersonalJob , Comment , Skill ,  EditorProfile , Education , Address , Folder , EditorRequest};
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -105,6 +105,16 @@ class User extends Authenticatable implements JWTSubject
     public function bid()
     {
         return $this->belongsToMany(PersonalJob::class ,'job_editor_request' ,'editor_id' , 'job_id');
+    }
+
+    public function biddings()
+    {
+        return $this->hasMany(EditorRequest::class , 'editor_id' , 'id');
+    }
+
+    public function cancelJob()
+    {
+        return $this->hasMany(EditorRequest::class , 'editor_id', 'id')->where('status' , 2);
     }
 
 

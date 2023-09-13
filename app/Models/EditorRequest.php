@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\{ JobProposal};
+use App\Models\{ JobProposal , PersonalJob };
 
 class EditorRequest extends Model
 {
@@ -17,6 +17,11 @@ class EditorRequest extends Model
     public function proposal()
     {
         return $this->belongsTo(JobProposal::class , 'request_id' , 'id');
+    }
+
+    public function job()
+    {
+        return $this->belongsTo(PersonalJob::class , 'job_id' , 'id');
     }
 
 }

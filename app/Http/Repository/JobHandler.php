@@ -3,7 +3,7 @@
 namespace App\Http\Repository;
 
 use App\Http\AppConst;
-use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal, JobPayment};
+use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal, JobPayment , User};
 use Illuminate\Support\Facades\DB;
 
 class JobHandler{
@@ -64,6 +64,8 @@ class JobHandler{
                         //  ->leftJoin('skills', 'job_editor_request.editor_id', '=', 'skills.skillable_id')
                          ->where('personal_jobs.client_id' , $clientId )
                          ->where('personal_jobs.status' , 'unawarded')
+                         ->where('requests.status', '!=' , 2)
+                         ->where('job_editor_request.status' ,'!=' , 2)
                          ->selectRaw('requests.id as request_id, personal_jobs.id as job_id , job_editor_request.id as proposal_id , personal_jobs.deadline ,  personal_jobs.title , personal_jobs.budget , personal_jobs.description as job_description , requests.bid_price , requests.description as proposal_detail, users.full_name as editor_name, users.email as editor_email, users.profile_image as editor_profile_image' )
                          ->selectSub(function($query){
                             $query->selectRaw('GROUP_CONCAT(skills.title) as editor_skills')
@@ -212,14 +214,24 @@ class JobHandler{
         foreach($requests as $editorRequest)
         {
             $requestId = $editorRequest->request_id;
-            JobProposal::where('id' , $requestId)->update(['status' => 0]);
-            $editorRequest->status = 0;
+            JobProposal::where('id' , $requestId)
+                        ->where('status' , 1)
+                        ->update(['status' => 2]);
+            $editorRequest->status = 2;
             $editorRequest->save();
         }
 
         
         return ['success' => true , 'msg' => 'Job Canceled Successfully'];
         
+    }
+
+
+    public function cancelJobList()
+    {
+        $userId = auth()->user()->id;
+        $cancelJobs = User::with('cancelJob.job')->where('id', $userId)->get();
+        return ["success" => true , "cancelJobs" => $cancelJobs];
     }
 
 

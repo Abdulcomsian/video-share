@@ -44,6 +44,7 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::post('share-files' , [FolderController::class , 'shareFile']);
     Route::post('share-folder-files' , [FolderController::class , 'getShareFiles']);
     Route::post('delete-share-file' , [FileController::class , 'deleteShareFile']);
+    Route::get('cancel-jobs' , [JobController::class , 'cancelJobs']);
 });
 
 

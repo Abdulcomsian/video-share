@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{DashboardController, UserController , FolderController}; 
+use App\Http\Controllers\{BillingController, DashboardController, UserController , FolderController}; 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,4 +25,9 @@ Route::middleware([ 'auth' , 'web.admin.verify'])->group(function(){
     Route::get('/editor-list' , [UserController::class , 'getDashboardEditorList'])->name('get.editor.list');
     Route::get('/folders' , [DashboardController::class , 'getFolderPage'])->name('folder.page');
     Route::get('/folder-list' , [FolderController::class , 'getFolderList'])->name('get.folder.list');
+    //test routes starts here
+    Route::get("billing" , [BillingController::class , 'getBillingPage']);
+    Route::post("add-billing" , [BillingController::class , 'processBillingFees'])->name('stripe.store');
+    //test routes ends here
 });
+

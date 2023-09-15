@@ -46,10 +46,11 @@ class BillingController extends Controller
             $validator = Validator::make($request->all() , [
                 'request_id' => 'required',
                 'job_id' => 'required',
-                'cvc' => 'required',
-                'card_exp_month' => 'required',
-                'card_exp_year' => 'required',
-                'card_number' => 'required'
+                'payment_method' => 'required' 
+                // 'cvc' => 'required',
+                // 'card_exp_month' => 'required',
+                // 'card_exp_year' => 'required',
+                // 'card_number' => 'required'
             ]);
 
             if($validator->fails())
@@ -69,5 +70,40 @@ class BillingController extends Controller
 
 
     }
+
+
+    public function getBillingPage(){
+        return view('admin.billing');
+    }
+
+    public function processBillingFees(Request $request){
+        try{
+            $validator = Validator::make($request->all() , [
+                'request_id' => 'required',
+                'job_id' => 'required',
+                'payment_method' => 'required' 
+                // 'cvc' => 'required',
+                // 'card_exp_month' => 'required',
+                // 'card_exp_year' => 'required',
+                // 'card_number' => 'required'
+            ]);
+
+            if($validator->fails())
+            {
+                return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] , 400);
+
+            }else{
+
+                $response = $this->stripe->processPayment($request);
+                dd($response);
+                return response()->json($response);
+            }
+
+        }catch(\Exception $e){
+            dd($e->getMessage());
+            return response()->json(["success" => false , "error" => $e->getMessage()] , 400);
+        }
+    }
+
 }
 

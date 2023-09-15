@@ -19,30 +19,45 @@ class StripeService{
             // $amount = $request->amount;
             $jobRequest = JobProposal::where('id' , $request->request_id)->first();
 
-            Stripe::setApiKey(env('STRIPE_SECRET'));
-
             //creating token
-            $token = Token::create([
-                'card' => [
-                    'number' => $request->card_number,
-                    'exp_month' => $request->card_exp_month,
-                    'exp_year' => $request->card_exp_year,
-                    'cvc' => $request->cvc,
-                ],
+            //token code starts here
+            //Stripe::setApiKey(env('STRIPE_SECRET'));
+
+            // $token = Token::create([
+            //     'card' => [
+            //         'number' => $request->card_number,
+            //         'exp_month' => $request->card_exp_month,
+            //         'exp_year' => $request->card_exp_year,
+            //         'cvc' => $request->cvc,
+            //     ],
+            // ]);
+
+            // $charge = Charge::create([
+            //     'amount' => $jobRequest->bid_price * 100, // Stripe accepts amounts in cents
+            //     'currency' => 'usd',
+            //     'source' => $token->id,
+            //     'description' => 'Payment for service',
+            // ]);
+
+            //token code ends here
+            $stripe = new StripeClient(env('STRIPE_SECRET'));
+
+            $charge = $stripe->paymentIntents->create([
+                'amount' => 99 * 100,                   // Amount in cents (in this case, $99)
+                'currency' => 'usd',                   // Currency (US dollars)
+                'payment_method' => $request->payment_method,// provide id of payment
+                'description' => 'test stripe ',
+                'confirm' => true,                     // Confirm the payment immediately
+                'receipt_email' => $request->email     // Email address for receipt
             ]);
 
-            $charge = Charge::create([
-                'amount' => $jobRequest->bid_price * 100, // Stripe accepts amounts in cents
-                'currency' => 'usd',
-                'source' => $token->id,
-                'description' => 'Payment for service',
-            ]);
-
-            if($charge){
+            if($charge->status == 'succeeded'){
                 JobPayment::where('request_id' , $request->request_id)
                             ->where('job_id' , $request->job_id)
                             ->update(['client_transfer_status' => AppConst::CLIENT_PAYED , 'client_payment_date' => date("Y-m-d")]);
-                return ['success' => true , 'msg' => 'Payment Processed Successfully'];
+                return ['success' => true , 'msg' => 'Payment Processed Successfully' , 'detail' => $charge];
+            }else{
+                return ['success' => false , 'msg' => 'Something Went Wrong' , 'detail' => $charge];
             }
 
 

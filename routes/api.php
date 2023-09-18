@@ -70,5 +70,7 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('delete-folder' , [FolderController::class , 'deleteClientFolder']);
     Route::post('get-folder-files' , [FolderController::class , 'getFolderFiles']);
     Route::post('process-payment', [BillingController::class , 'processBilling']);
+    Route::get('public-key' , [BillingController::class , 'getPublicKey']);
+    Route::post('get-payment-intent' , [BillingController::class , 'getPaymentIntent']);
     Route::post('cancel-job' , [JobController::class , 'cancelAwardedJob']);
 });

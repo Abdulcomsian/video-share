@@ -105,5 +105,40 @@ class BillingController extends Controller
         }
     }
 
+    public function getPublicKey()
+    {
+        try {
+            $response =  $this->stripe->getPublishableKey();
+
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "error" => $e->getMessage()] , 400);
+        }
+    }
+
+    public function getPaymentIntent(Request $request){
+        try{
+            $validator = Validator::make($request->all() , [
+                'job_id' => 'required',
+            ]);
+
+            if($validator->fails())
+            {
+                return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] , 400);
+
+            }else{
+
+                $response = $this->stripe->createPaymentIntent($request);
+                
+                return response()->json($response);
+            }
+
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "error" => $e->getMessage()] , 400);
+        }
+    }
+
 }
 

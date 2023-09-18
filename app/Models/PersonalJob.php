@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\{User , Skill , ShareFolder , JobPayment};
+use App\Models\{User , Skill , ShareFolder , JobPayment , EditorRequest};
 
 class PersonalJob extends Model
 {
@@ -37,6 +37,11 @@ class PersonalJob extends Model
     public function payment()
     {
         return $this->hasOne(JobPayment::class  , 'job_id' , 'id');
+    }
+
+    public function awardedRequest()
+    {
+        return $this->hasOne(EditorRequest::class , 'job_id' , 'id' )->where( 'status' , 1 );
     }
 
 }

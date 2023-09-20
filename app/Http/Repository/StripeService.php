@@ -40,6 +40,10 @@ class StripeService{
 
             $jobId  = $request->job_id;
             $jobDetail = PersonalJob::with('awardedRequest.proposal')->where('id' , $jobId)->first();
+
+            if($jobDetail->status == "unawarded"){
+                return ["success" => false , 'msg' => "Something Went Wrong" , "error" => "Job Must Be Awarded First"];
+            }
             
             Stripe::setApiKey(env('STRIPE_SECRET'));
             $amount = $jobDetail->awardedRequest->proposal->bid_price * 100;

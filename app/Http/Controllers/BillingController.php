@@ -130,7 +130,9 @@ class BillingController extends Controller
             }else{
 
                 $response = $this->stripe->createPaymentIntent($request);
-                
+                if($response['success'] == false){
+                    return response()->json($response , 400);
+                }
                 return response()->json($response);
             }
 

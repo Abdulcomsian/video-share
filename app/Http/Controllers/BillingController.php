@@ -120,7 +120,8 @@ class BillingController extends Controller
     public function getPaymentIntent(Request $request){
         try{
             $validator = Validator::make($request->all() , [
-                'job_id' => 'required',
+                // 'job_id' => 'required',
+                'request_id' => 'required',
             ]);
 
             if($validator->fails())

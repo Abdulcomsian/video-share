@@ -3,14 +3,13 @@
 namespace app\Http\Repository;
 
 use App\Http\AppConst;
-use App\Models\JobProposal;
 use Stripe\Stripe;
 use Stripe\Charge;
 use Stripe\Token;
 use Stripe\Transfer;
 use Stripe\StripeClient;
 use Stripe\PaymentIntent;
-use App\Models\{JobPayment, PersonalJob};
+use App\Models\{JobPayment, PersonalJob, JobProposal};
 
 class StripeService{
 
@@ -38,15 +37,20 @@ class StripeService{
     public function createPaymentIntent($request){
         try{
 
-            $jobId  = $request->job_id;
-            $jobDetail = PersonalJob::with('awardedRequest.proposal')->where('id' , $jobId)->first();
+            // $jobId  = $request->job_id;
+            $requestId = $request->request_id;
 
-            if($jobDetail->status == "unawarded"){
-                return ["success" => false , 'msg' => "Something Went Wrong" , "error" => "Job Must Be Awarded First"];
-            }
+
+
+            // $jobDetail = PersonalJob::with('awardedRequest.proposal')->where('id' , $jobId)->first();
+
+            // if($jobDetail->status == "unawarded"){
+            //     return ["success" => false , 'msg' => "Something Went Wrong" , "error" => "Job Must Be Awarded First"];
+            // }
+            $jobProposal = JobProposal::where('id' , $requestId)->first();
             
             Stripe::setApiKey(env('STRIPE_SECRET'));
-            $amount = $jobDetail->awardedRequest->proposal->bid_price * 100;
+            $amount = $jobProposal->bid_price * 100;
             $currency = 'usd';
     
             $paymentIntent = PaymentIntent::create([

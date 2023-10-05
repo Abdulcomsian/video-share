@@ -45,6 +45,7 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::post('share-folder-files' , [FolderController::class , 'getShareFiles']);
     Route::post('delete-share-file' , [FileController::class , 'deleteShareFile']);
     Route::get('cancel-jobs' , [JobController::class , 'cancelJobs']);
+    Route::get('done-jobs' , [JobController::class , 'doneJobs']);
 });
 
 
@@ -72,5 +73,6 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('process-payment', [BillingController::class , 'processBilling']);
     Route::get('public-key' , [BillingController::class , 'getPublicKey']);
     Route::post('get-payment-intent' , [BillingController::class , 'getPaymentIntent']);
+    Route::post('complete-job' , [JobController::class , 'doneAwardedJob']);
     Route::post('cancel-job' , [JobController::class , 'cancelAwardedJob']);
 });

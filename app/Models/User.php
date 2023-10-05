@@ -117,5 +117,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(EditorRequest::class , 'editor_id', 'id')->where('status' , 2);
     }
 
+    public function doneJob()
+    {
+        return $this->hasMany(EditorRequest::class , 'editor_id', 'id')->where('status' , 3);
+    }
+
+
 
 }

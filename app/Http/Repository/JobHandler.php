@@ -227,11 +227,39 @@ class JobHandler{
     }
 
 
+    public function doneJob($request){
+        $jobId = $request->job_id;
+
+        PersonalJob::where('id' , $jobId)->update(['status' => 'completed']);
+
+        $editorRequest = EditorRequest::where('job_id' , $jobId)
+                                    ->where('status' , 1)
+                                    ->first();
+
+        JobProposal::where('id' , $editorRequest->request_id)
+                        ->where('status' , 1)
+                        ->update(['status' => 3]);
+
+        $editorRequest->status = 3;
+        $editorRequest->save();
+
+        return ['success' => true , 'msg' => 'Job Done Successfully'];
+    }
+
+
     public function cancelJobList()
     {
         $userId = auth()->user()->id;
         $cancelJobs = User::with('cancelJob.job')->where('id', $userId)->get();
         return ["success" => true , "cancelJobs" => $cancelJobs];
+    }
+
+
+    public function doneJobList()
+    {
+        $userId = auth()->user()->id;
+        $doneJobs = User::with('doneJob.job')->where('id', $userId)->get();
+        return ["success" => true , "doneJobs" => $doneJobs];
     }
 
 

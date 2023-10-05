@@ -206,5 +206,30 @@ class JobController extends Controller
     }
    }
 
+   public function doneAwardedJob(Request $request)
+   {
+        try{
+
+            $response = $this->jobHandler->doneJob($request);
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+   }
+
+
+   public function doneJobs(Request $request){
+        try{
+
+            $response = $this->jobHandler->doneJobList();
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+   }
+   
+
 
 }

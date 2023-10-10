@@ -4,8 +4,15 @@ namespace App\Http\Repository;
 use File;
 use Illuminate\Support\Facades\Storage;
 use App\Models\{ Files , Folder, PersonalJob , ShareFolderFiles};
-
+use App\Http\Repository\AwsHandler;
 class FilesHandler{
+
+    protected $aws;
+
+    function __construct(AwsHandler $aws)
+    {
+        $this->aws = $aws;
+    }
 
     public function uploadMedia($request)
     {
@@ -24,14 +31,14 @@ class FilesHandler{
                     $fileName = $file->getClientOriginalName();
                     $extension = $file->extension();
                     $name = time() . "-" . $fileName;
-                    Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
-
-                    // $fileName = $file->getClientOriginalName();
-                    // $extension = $file->extension();
-                    // $name = time()."-".$fileName;
-                    // $file->move(public_path('uploads'), $name);
-                    $type =in_array($extension , $videoExtension) ? 1 : 2;
-                    $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension];
+                    
+                    //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
+                    $check = $this->aws->uploadMedia( $folder->name , $name , $file);
+                    if($check['success']){
+                        $type =in_array($extension , $videoExtension) ? 1 : 2;
+                        $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension];
+                    }
+                
                 }
                 
                 Files::insert($fileList);    
@@ -51,16 +58,24 @@ class FilesHandler{
             $fileId = $request->file_id;
     
             $file = Files::where('id' , $fileId)->first();
-            $folder = Folder::find($file->folder_id);
-            $fileName = $folder->name.'/'.$file->path;
-    
-            //file path in s3
-            if(Storage::disk('s3')->exists($fileName))
-            {
-                Storage::disk('s3')->delete($fileName);
-                $file->delete();
-                return ["success" => true , "msg" => "File Deleted Successfully"];
-    
+            if($file){
+                $folder = Folder::find($file->folder_id);
+                $fileName = $folder->name.'/'.$file->path;
+                $check = $this->aws->deleteMedia($fileName);
+                if($check['success']){
+                    $file->delete(); 
+                }
+                return $check;
+                //file path in s3
+                // if(Storage::disk('s3')->exists($fileName))
+                // {
+                //     Storage::disk('s3')->delete($fileName);
+                //     $file->delete();
+                //     return ["success" => true , "msg" => "File Deleted Successfully"];
+        
+                // }else{
+                //     return ["success" => false , "msg" => "File Not Found"];
+                // }
             }else{
                 return ["success" => false , "msg" => "File Not Found"];
             }
@@ -92,14 +107,18 @@ class FilesHandler{
                     $fileName = $file->getClientOriginalName();
                     $extension = $file->extension();
                     $name = time() . "-" . $fileName;
-                    Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
+                    
+                    // Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
+                    $check = $this->aws->uploadMedia($folder->name , $name , $file );
 
-                    // $fileName = $file->getClientOriginalName();
-                    // $extension = $file->extension();
-                    // $name = time()."-".$fileName;
-                    // $file->move(public_path('uploads'), $name);
-                    $type =in_array($extension , $videoExtension) ? 1 : 2;
-                    $fileList[] = ['share_folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension];
+                    if($check['success']){
+                        // $fileName = $file->getClientOriginalName();
+                        // $extension = $file->extension();
+                        // $name = time()."-".$fileName;
+                        // $file->move(public_path('uploads'), $name);
+                        $type =in_array($extension , $videoExtension) ? 1 : 2;
+                        $fileList[] = ['share_folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension];
+                    }
                 }
                 
                 ShareFolderFiles::insert($fileList);    

@@ -118,9 +118,14 @@ class FolderController extends Controller
             
             } else {
                 
-                $response = $this->folderHandler->deleteFolder($request);
                 
-                return response()->json($response);
+                $response = $this->folderHandler->deleteFolder($request);
+                if($response['success']){
+                    return response()->json($response);
+                }else{
+                    return response()->json($response , 400);
+                }
+                
             }
 
         }catch(\Exception $e){
@@ -144,8 +149,13 @@ class FolderController extends Controller
             } else {
                 
                 $response = $this->folderHandler->updateFolder($request);
+
+                if($response['success']){
+                    return response()->json($response);
+                }else{
+                    return response()->json($response , 400);
+                }
                 
-                return response()->json($response);
             }
 
         }catch(\Exception $e){
@@ -208,6 +218,7 @@ class FolderController extends Controller
     {
         $validator = Validator::make($request->all() , [
             'job_id' => 'required',
+            'files' => 'required',
             'files.*' => 'file|mimes:mp4,avi,jpg,png,jpeg,mpeg|max:51200' 
         ]);
 

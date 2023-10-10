@@ -5,9 +5,15 @@ namespace App\Http\Repository;
 
 use App\Models\{ ShareFolder , Files , Folder, PersonalJob, ShareFolderFiles};
 use Illuminate\Support\Facades\Storage;
-
+use App\Http\Repository\AwsHandler;
 class FolderHandler
 {
+    protected $aws;
+
+        function __construct(AwsHandler $aws)
+        {
+            $this->aws = $aws;
+        }
 
         public function createFilesInFolder($request)
         {
@@ -62,9 +68,10 @@ class FolderHandler
 
                 if($folderCount == 0){
 
-                    $check = Storage::disk('s3')->makeDirectory($folderName);
-
-                    if($check)
+                   // $check = Storage::disk('s3')->makeDirectory($folderName);
+                    $check = $this->aws->createFolder($folderName);
+            
+                    if($check['success'])
                     {
                         Folder::create([
                             "client_id" => $clientId,
@@ -115,12 +122,23 @@ class FolderHandler
             $folderId = $request->folder_id;
 
             $folder = Folder::where('id' , $folderId)->first();
-            
-            Storage::disk('s3')->deleteDirectory($folder->name);
-            
-            $folder->delete();
 
-            return ["success" => true , "msg" => "Folder Deleted Successfully"];
+            if($folder){
+                //Storage::disk('s3')->deleteDirectory($folder->name);
+                $check = $this->aws->deleteFolder($folder->name);
+                
+                if($check['success']){
+    
+                    $folder->delete();
+                
+                }
+                return $check;
+            }else{
+                return ['success' => false , 'error' => "No Folder Found"];
+            }
+            
+            
+            
         }
 
         public function updateFolder($request)
@@ -135,30 +153,40 @@ class FolderHandler
 
             if($folderCount == 0)
             {
-                $files = Storage::disk('s3')->allFiles($folder->name);
 
-                $newFolder = Storage::disk('s3')->makeDirectory($folderName);
+                $check = $this->aws->updateFolder($folder->name , $folderName);
 
-                if($newFolder){
-                    
-                    foreach($files as $file)
-                    {
-                        $newKey = str_replace($folder->name, $folderName, $file);
-                        
-                        Storage::disk('s3')->copy($file, $newKey);
-                    }
-
-                    Storage::disk('s3')->deleteDirectory($folder->name);
-
+                if($check['success']){
                     $folder->name = $folderName;
-
                     $folder->save();
-
-                    return ["success" => true , "msg" => "Folder Updated Successfully"];
-                }else{
-
-                    return ["success" => false , "msg" => "Something Went Wrong"];
                 }
+
+                return $check;
+
+                // $files = Storage::disk('s3')->allFiles($folder->name);
+
+                // $newFolder = Storage::disk('s3')->makeDirectory($folderName);
+
+                // if($newFolder){
+                    
+                //     foreach($files as $file)
+                //     {
+                //         $newKey = str_replace($folder->name, $folderName, $file);
+                        
+                //         Storage::disk('s3')->copy($file, $newKey);
+                //     }
+
+                //     Storage::disk('s3')->deleteDirectory($folder->name);
+
+                //     $folder->name = $folderName;
+
+                //     $folder->save();
+
+                //     return ["success" => true , "msg" => "Folder Updated Successfully"];
+                // }else{
+
+                //     return ["success" => false , "msg" => "Something Went Wrong"];
+                // }
 
 
                 
@@ -223,9 +251,10 @@ class FolderHandler
 
                 $folderName = trim(str_replace(" " , "-" , $jobTitle).'-'.$editorId).'-'.strtotime(date('Y-m-d H:i:s'));
 
-                $check = Storage::disk('s3')->makeDirectory($folderName);
+                // $check = Storage::disk('s3')->makeDirectory($folderName);
+                $check = $this->aws->createFolder($folderName);
 
-                if($check)
+                if($check['success'])
                 {
                     ShareFolder::create([
                         "editor_id" => $editorId,

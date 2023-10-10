@@ -31,3 +31,6 @@ Route::middleware([ 'auth' , 'web.admin.verify'])->group(function(){
     //test routes ends here
 });
 
+Route::get('test' , function(){
+    dd("TEST");
+});

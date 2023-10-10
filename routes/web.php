@@ -32,5 +32,6 @@ Route::middleware([ 'auth' , 'web.admin.verify'])->group(function(){
 });
 
 Route::get('test' , function(){
-    dd("TEST");
+    \Storage::disk('s3')->makeDirectory("Hello-Mani2");
+    dd("folder created successfully");
 });

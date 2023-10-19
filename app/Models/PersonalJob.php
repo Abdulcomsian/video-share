@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\{User , Skill , ShareFolder , JobPayment , EditorRequest};
+use App\Models\{User , Skill , ShareFolder , JobPayment , EditorRequest , FavouriteRequest};
 
 class PersonalJob extends Model
 {
@@ -34,6 +34,11 @@ class PersonalJob extends Model
         return $this->hasOne(ShareFolder::class , 'job_id' , 'id');
     }
 
+    public function requestList()
+    {
+        return $this->hasMany(EditorRequest::class, 'job_id' , 'id');
+    }
+
     public function payment()
     {
         return $this->hasOne(JobPayment::class  , 'job_id' , 'id');
@@ -42,6 +47,11 @@ class PersonalJob extends Model
     public function awardedRequest()
     {
         return $this->hasOne(EditorRequest::class , 'job_id' , 'id' )->where( 'status' , 1 );
+    }
+
+    public function favouriteRequest()
+    {
+        return $this->hasMany(FavouriteRequest::class , 'job_id' , 'id');
     }
 
 }

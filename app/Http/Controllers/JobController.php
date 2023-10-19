@@ -229,6 +229,44 @@ class JobController extends Controller
             return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
    }
+
+   public function postJobList(){
+        try{
+
+            $response = $this->jobHandler->clientPostedJobList();
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+   }
+
+   public function awardJobList(){
+        try{
+
+            $response = $this->jobHandler->clientAwardedJobList();
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+   }
+
+   public function jobRequestList(Request $request){
+
+        $validator = Validator::make( $request->all() , [
+            'job_id' => 'required|numeric',
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
+        }else{
+            $response = $this->jobHandler->jobEditorRequest($request);
+            return response()->json($response);
+        }
+
+   }
    
 
 

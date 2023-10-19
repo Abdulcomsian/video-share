@@ -262,6 +262,38 @@ class JobHandler{
         return ["success" => true , "doneJobs" => $doneJobs];
     }
 
+    public function clientPostedJobList()
+    {
+        $userId = auth()->user()->id;
+
+        $postedJobs = PersonalJob::where('client_id' , $userId)->where('status' , 'unawarded')->get();
+
+        return ["success" => true , 'postedJobs' => $postedJobs];
+
+    }
+
+    public function clientAwardedJobList()
+    {
+        $userId = auth()->user()->id;
+
+        $awardedJobs = PersonalJob::where('client_id' , $userId)->where('status' , 'awarded')->get();
+
+        return ["success" => true , 'awarededJobs' => $awardedJobs];
+
+    }
+
+    public function jobEditorRequest($request)
+    {
+        $jobId = $request->job_id;
+
+        $jobRequest = PersonalJob::with('requestList.proposal','requestList.favourite')->where('id' , $jobId)->first();
+
+        return ["success" => true , 'jobRequest' => $jobRequest];
+        
+    }
+
+
+
 
 }
 

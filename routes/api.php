@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{ AuthController ,  UserController , FolderController , JobController , BillingController , FileController};
+use App\Http\Controllers\{ AuthController ,  UserController , FolderController , JobController , BillingController , FileController , FavouriteRequestController};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -70,10 +70,19 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('update-folder' , [FolderController::class, 'updateClientFolder']);
     Route::post('delete-folder' , [FolderController::class , 'deleteClientFolder']);
     Route::post('get-folder-files' , [FolderController::class , 'getFolderFiles']);
-    Route::post('share-folder-files' , [FolderController::class , 'getShareFiles']);
+    Route::post('client-share-folder-files' , [FolderController::class , 'getShareFiles']);
     Route::post('process-payment', [BillingController::class , 'processBilling']);
     Route::get('public-key' , [BillingController::class , 'getPublicKey']);
     Route::post('get-payment-intent' , [BillingController::class , 'getPaymentIntent']);
     Route::post('complete-job' , [JobController::class , 'doneAwardedJob']);
     Route::post('cancel-job' , [JobController::class , 'cancelAwardedJob']);
+    //new apis starts here
+    Route::post('add-favourite-request' , [FavouriteRequestController::class , 'addFavouriteRequest']);
+    Route::post('get-favourite-request' , [FavouriteRequestController::class , 'getFavouriteRequest']);
+    Route::post('delete-favourite-request' , [FavouriteRequestController::class , 'deleteFavouriteRequest']);
+    Route::get('posted-jobs' , [JobController::class , 'postJobList']);
+    Route::get('awarded-jobs' , [JobController::class , 'awardJobList']);
+    Route::post('job-request-list' , [JobController::class , 'jobRequestList']);
 });
+
+

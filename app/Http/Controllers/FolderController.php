@@ -248,7 +248,7 @@ class FolderController extends Controller
         }
     }
 
-    public function getShareFiles(Request $request)
+    public function getshares(Request $request)
     {
         try{
 

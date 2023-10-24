@@ -297,6 +297,16 @@ class FolderHandler
         }
 
 
+        public function jobFolder($request)
+        {
+        
+            $folder = Folder::with('files')->where('id' , $request->folder_id)->first();
+
+            return ["success" => true , "folder" => $folder];
+
+        }
+
+
 }
 
 

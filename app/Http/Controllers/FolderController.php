@@ -273,4 +273,24 @@ class FolderController extends Controller
     }
 
 
+    public function getJobFolder(Request $request)
+   {
+        try{
+            $validator = Validator::make( $request->all() , [
+                'folder_id' => 'required|numeric',
+            ]);
+
+            if($validator->fails())
+            {
+                return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
+            }else{
+                $response = $this->folderHandler->jobFolder($request);
+                return response()->json($response);
+            }
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $e->getMessage()] ,400);
+        }
+   }
+
+
 }

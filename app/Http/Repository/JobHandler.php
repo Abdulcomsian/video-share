@@ -3,7 +3,7 @@
 namespace App\Http\Repository;
 
 use App\Http\AppConst;
-use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal, JobPayment , User};
+use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal, JobPayment , User , Folder };
 use Illuminate\Support\Facades\DB;
 
 class JobHandler{
@@ -148,7 +148,7 @@ class JobHandler{
     {
         $jobId = $request->job_id;
         
-        $personalJob = PersonalJob::with('skills')->where('id' , $jobId)->first();
+        $personalJob = PersonalJob::with('skills' , 'jobFolder.files')->where('id' , $jobId)->first();
 
         return ["success" => true , "jobDetail" => $personalJob];
     }
@@ -185,11 +185,12 @@ class JobHandler{
     
         $jobs = DB::table('personal_jobs')
                     ->join('job_editor_request', 'job_id' ,'=' , 'personal_jobs.id'  )
+                    ->join('folders' , 'folders.id' , '=' , 'personal_jobs.folder_id' )
                     ->join('users' , 'job_editor_request.editor_id' ,'=' ,'users.id')
                     ->join('requests' , 'job_editor_request.request_id' , '=' , 'requests.id')
                     ->where('job_editor_request.status' ,'=' , 1)
                     ->where('job_editor_request.editor_id' , '=' , auth()->user()->id)
-                    ->selectRaw('personal_jobs.id as job_id, personal_jobs.title as job_title,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price')
+                    ->selectRaw('personal_jobs.id as job_id, personal_jobs.title as job_title,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price , folders.id')
                     ->get();       
 
       return $jobs;
@@ -276,7 +277,7 @@ class JobHandler{
     {
         $userId = auth()->user()->id;
 
-        $awardedJobs = PersonalJob::where('client_id' , $userId)->where('status' , 'awarded')->get();
+        $awardedJobs = PersonalJob::with('awardedRequest.editor')->where('client_id' , $userId)->where('status' , 'awarded')->get();
 
         return ["success" => true , 'awarededJobs' => $awardedJobs];
 
@@ -286,11 +287,13 @@ class JobHandler{
     {
         $jobId = $request->job_id;
 
-        $jobRequest = PersonalJob::with('requestList.proposal','requestList.favourite')->where('id' , $jobId)->first();
+        $jobRequest = PersonalJob::with('requestList.proposal','requestList.favourite' , 'requestList.editor.skills')->where('id' , $jobId)->first();
 
         return ["success" => true , 'jobRequest' => $jobRequest];
         
     }
+
+    
 
 
 

@@ -347,6 +347,25 @@ class UserController extends Controller
         }
     }
 
+    public function updateProfileImage(Request $request){
+        try{
+            $validator = Validator::make( $request->all() , [
+             'file' => 'required|max:10000|mimes:jfif,jpef,jpg,png'
+            ]);
+     
+            if($validator->fails()){
+                 return response()->json(['success' => false , 'msg' => "Something Went Wrong" , "error" => $validator->getMessageBag()] , 400);
+            }else{
+                $response = $this->userHandler->updateProfileImage($request);
+
+                return response()->json($response);
+            }
+        }catch(\Exception $e){
+            return response()->json(['success' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
+        }
+    }
+
+
 
     public function getDashboardClientList()
     {
@@ -410,5 +429,6 @@ class UserController extends Controller
         }
     }
 
+   
 
 }

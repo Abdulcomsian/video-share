@@ -24,6 +24,10 @@ Route::post('register' ,[AuthController::class , 'register']);
 Route::post('verify-code',[AuthController::class , 'verifyUser']);
 Route::post('logout' , [AuthController::class , 'logout']);
 
+Route::middleware(['auth:api'])->group(function(){
+    Route::post('update-profile-image' , [UserController::class , 'updateProfileImage']);
+});
+
 /* Editor Routes*/
 Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::post('update-editor-profile' , [UserController::class , 'updateEditorProfile']);
@@ -46,6 +50,7 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::post('delete-share-file' , [FileController::class , 'deleteShareFile']);
     Route::get('cancel-jobs' , [JobController::class , 'cancelJobs']);
     Route::get('done-jobs' , [JobController::class , 'doneJobs']);
+    Route::post('job-folder' , [FolderController::class , 'getJobFolder']);
 });
 
 

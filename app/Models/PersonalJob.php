@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\{User , Skill , ShareFolder , JobPayment , EditorRequest , FavouriteRequest};
+use App\Models\{User , Skill , ShareFolder , JobPayment , EditorRequest , FavouriteRequest , Folder};
 
 class PersonalJob extends Model
 {
@@ -12,7 +12,7 @@ class PersonalJob extends Model
 
     protected $table = "personal_jobs";
     protected $primaryKey = "id";
-    protected $fillable = ['client_id' , 'title'  , 'description' , 'budget' , 'deadline', 'status', 'awarded_date'];
+    protected $fillable = ['client_id' , 'title'  , 'description' , 'budget' , 'deadline', 'status', 'awarded_date' , 'folder_id'];
 
     public function user()
     {
@@ -52,6 +52,11 @@ class PersonalJob extends Model
     public function favouriteRequest()
     {
         return $this->hasMany(FavouriteRequest::class , 'job_id' , 'id');
+    }
+
+    public function jobFolder()
+    {
+        return $this->belongsTo(Folder::class , 'folder_id' , 'id');
     }
 
 }

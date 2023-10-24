@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\{ JobProposal , PersonalJob , FavouriteRequest };
+use App\Models\{ JobProposal , PersonalJob , FavouriteRequest , User };
 
 class EditorRequest extends Model
 {
@@ -27,6 +27,11 @@ class EditorRequest extends Model
     public function favourite()
     {
         return $this->hasOne(FavouriteRequest::class , 'editor_request_id' , 'id');
+    }
+
+    public function editor()
+    {
+        return $this->belongsTo(User::class , 'editor_id' , 'id');
     }
 
 }

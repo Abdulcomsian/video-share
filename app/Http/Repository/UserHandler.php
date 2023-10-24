@@ -31,8 +31,9 @@ class UserHandler{
                 $msg = "User Signed In Successfully";
             }
 
+            $baseUrl = public_path("uploads");
 
-            return response()->json(["success" => true , "msg" => $msg , 'token' => $jwt]);
+            return response()->json(["success" => true , "msg" => $msg , 'token' => $jwt , 'baseUrl' => $baseUrl ]);
         }
     }
 
@@ -88,6 +89,16 @@ class UserHandler{
     {
         $clientList = User::where('type' , AppConst::CLIENT)->orderBy('id' , 'desc')->get();
         return ['success' => true , 'clientList' => $clientList];
+    }
+
+    public function updateProfileImage($request)
+    {
+        $file = $request->file('file');
+        $fileName = str_replace(' ' , '', $file->getClientOriginalName());
+        $newName = time()."-".$fileName;
+        $file->move(public_path("uploads") , $newName );
+        User::where('id' , auth()->user()->id)->update(['profile_image' => $newName]);
+        return ['success' => true , 'msg' => 'Profile Image Updated Successfully'];
     }
 
 }

@@ -267,6 +267,22 @@ class JobController extends Controller
         }
 
    }
+   
+   public function awardedJobRequest(Request $request){
+
+    $validator = Validator::make( $request->all() , [
+        'job_id' => 'required|numeric',
+    ]);
+
+    if($validator->fails())
+    {
+        return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
+    }else{
+        $response = $this->jobHandler->awardedJobEditorRequest($request);
+        return response()->json($response);
+    }
+
+}
 
    
 

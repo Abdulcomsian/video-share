@@ -88,6 +88,7 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::get('posted-jobs' , [JobController::class , 'postJobList']);
     Route::get('awarded-jobs' , [JobController::class , 'awardJobList']);
     Route::post('job-request-list' , [JobController::class , 'jobRequestList']);
+    Route::post('award-job-request' , [JobController::class , 'awardedJobRequest']);
 });
 
 

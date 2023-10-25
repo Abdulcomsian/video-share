@@ -293,6 +293,16 @@ class JobHandler{
         
     }
 
+    public function awardedJobEditorRequest($request)
+    {
+        $jobId = $request->job_id;
+
+        $jobRequest = PersonalJob::with('awardedRequest.proposal','awardedRequest.favourite' , 'awardedRequest.editor.skills')->where('id' , $jobId)->first();
+
+        return ["success" => true , 'jobRequest' => $jobRequest];
+        
+    }
+
     
 
 

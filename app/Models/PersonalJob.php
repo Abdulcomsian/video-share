@@ -49,6 +49,11 @@ class PersonalJob extends Model
         return $this->hasOne(EditorRequest::class , 'job_id' , 'id' )->where( 'status' , 1 );
     }
 
+    public function unawardedRequest()
+    {
+        return $this->hasMany(EditorRequest::class, 'job_id' , 'id')->where('status' , 0);
+    }
+
     public function favouriteRequest()
     {
         return $this->hasMany(FavouriteRequest::class , 'job_id' , 'id');

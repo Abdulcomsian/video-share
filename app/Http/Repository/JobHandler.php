@@ -303,6 +303,15 @@ class JobHandler{
         
     }
 
+    public function unawardedJobRequest($request){
+
+        $jobId = $request->job_id;
+
+        $jobRequest = PersonalJob::with('unawardedRequest.proposal','unawardedRequest.favourite' , 'unawardedRequest.editor.skills')->where('id' , $jobId)->first();
+
+        return ["success" => true , 'unawardedJobRequest' => $jobRequest];
+    }
+
     
 
 

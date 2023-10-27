@@ -284,7 +284,7 @@ class FolderHandler
             $bucketName = config('filesystems.disks.s3.bucket');
             
             $personalJob = PersonalJob::with('folder')->where('id' , $jobId)->first();
-
+        if($personalJob->folder){
             $folder = $personalJob->folder;
             
             $folderPath = $folder->name;
@@ -292,8 +292,14 @@ class FolderHandler
             $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
             
             $files = ShareFolderFiles::with('folder')->where('share_folder_id' , $folder->id)->get();
-
             return ["success" => true , "files" => $files , "bucket_address" => $bucketAddress ];
+        }else{
+            return ["success" => false ,  "msg"=>"Sorry, No Folder/Files Found" ];
+        }
+        
+            
+
+            
         }
 
 

@@ -74,7 +74,7 @@ class UserHandler{
     {
         $userId = auth()->user()->id;
 
-        $profile = User::with('editorProfile' ,'skills')->where('id' , $userId)->first();
+        $profile = User::with('address','editorProfile' ,'skills' , 'education' )->where('id' , $userId)->first();
 
         return ['success' => true , 'profile' => $profile];
     }

@@ -84,7 +84,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function portfolio()
     {
-        return $this->hasMany(EditorPortfolio::class , 'user_id' , 'id');
+        return $this->hasMany(EditorPortfolio::class , 'editor_id' , 'id');
     }
 
     public function education()

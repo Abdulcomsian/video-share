@@ -74,9 +74,17 @@ class UserHandler{
     {
         $userId = auth()->user()->id;
 
-        $profile = User::with('address','editorProfile' ,'skills' , 'education' )->where('id' , $userId)->first();
+        $profile = User::with('address','editorProfile' ,'skills' , 'education' , 'portfolio' )->where('id' , $userId)->first();
+        
+        $editorProfileAndSkill = ( isset($profile->editorProfile) && !is_null($profile->editorProfile)) && count($profile->skills) ? true :  false;
 
-        return ['success' => true , 'profile' => $profile];
+        $editorPortfolio = count($profile->portfolio) ? true : false;
+
+        $editorEducation = count($profile->education) ? true : false;
+
+        $editorPerHourRate = ( isset($profile->editorProfile) && !is_null($profile->editorProfile) ) && (isset($profile->editorProfile->amount_per_hour) && !is_null($profile->editorProfile->amount_per_hour)) ? true : false; 
+
+        return ['success' => true , 'profile' => $profile , 'editorProfileAndSkill' => $editorProfileAndSkill , 'editorPortfolio' => $editorPortfolio, 'editorEducation' => $editorEducation, 'editorPerHourRate' => $editorPerHourRate];
     }
 
     public function editorList()

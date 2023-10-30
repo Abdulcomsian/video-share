@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{ AuthController ,  UserController , FolderController , JobController , BillingController , FileController , FavouriteRequestController};
+use App\Http\Controllers\{ AuthController ,  UserController , FolderController , JobController , BillingController , FileController , FavouriteRequestController , ReviewController};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -30,6 +30,7 @@ Route::middleware(['auth:api'])->group(function(){
 
 /* Editor Routes*/
 Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
+    Route::post('update-profile' , [UserController::class , 'updateProfile']);
     Route::post('update-editor-profile' , [UserController::class , 'updateEditorProfile']);
     Route::post('update-editor-portfolio' , [UserController::class , 'updateEditorPortfolio']);
     Route::post('update-editor-education' , [UserController::class , 'updateEditorEducation']);
@@ -81,7 +82,6 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('get-payment-intent' , [BillingController::class , 'getPaymentIntent']);
     Route::post('complete-job' , [JobController::class , 'doneAwardedJob']);
     Route::post('cancel-job' , [JobController::class , 'cancelAwardedJob']);
-    //new apis starts here
     Route::post('add-favourite-request' , [FavouriteRequestController::class , 'addFavouriteRequest']);
     Route::post('get-favourite-request' , [FavouriteRequestController::class , 'getFavouriteRequest']);
     Route::post('delete-favourite-request' , [FavouriteRequestController::class , 'deleteFavouriteRequest']);
@@ -90,6 +90,7 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('job-request-list' , [JobController::class , 'jobRequestList']);
     Route::post('award-job-request' , [JobController::class , 'awardedJobRequest']);
     Route::post('unawarded-job-request' , [JobController::class ,'unawardedJobRequest']);
+    Route::post('add-job-review' , [ReviewController::class ,'addUpdateReview']);
 });
 
 

@@ -72,6 +72,40 @@ class UserController extends Controller
         }
     }
 
+    public function updateProfile(Request $request)
+    {
+        try{
+
+            if($request->title || $request->bio || $request->service_offering || $request->amount_per_hour || $request->language){
+                $this->editorHandler->updateEditorDetail($request);
+            }
+
+            if($request->skills){
+                $this->editorHandler->updateEditorSkills($request);
+            }
+           
+            if($request->link){
+                $this->editorHandler->editorPortfolio($request);
+            }
+
+            if($request->language){
+                $this->editorHandler->updateEditorLanguage($request);
+            }
+          
+            if($request->education){
+                $this->editorHandler->editorEducation($request);
+            }
+
+
+            return response()->json(['success' => true , 'msg' => 'Profile Updated Successfully']);
+
+
+        }catch(\Exception $e){
+
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
+        
+        }
+    }
 
     public function updateEditorEducation(Request $request)
     {

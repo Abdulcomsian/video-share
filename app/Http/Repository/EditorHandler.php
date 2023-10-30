@@ -43,11 +43,65 @@ class EditorHandler{
 
     }
 
+    public function updateEditorSkills($request){
+
+        $skills =json_decode($request->skills);
+        $skillable ="App\Models\User";
+        $skillList = [];
+
+        Skill::where('skillable_type' , $skillable)->where('skillable_id' , auth()->user()->id)->delete();
+
+        foreach($skills as $skill)
+        {
+            array_push($skillList , ["title" => $skill , "skillable_id" => auth()->user()->id , "skillable_type" => $skillable ]);
+        }
+
+        if(sizeof($skillList) > 0)
+        {
+            Skill::insert($skillList);
+        }
+
+        return ["success" => true , "msg" => "Skills Updated" ];      
+    }
+
+    public function updateEditorDetail($request)
+    {
+        $title = $request->title;
+        $bio = $request->bio;
+        $serviceOffer = $request->service_offering;
+        $amountPerHour = $request->amount_per_hour;
+
+        $editorProfile = EditorProfile::where('editor_id' , auth()->user()->id)->first();
+        
+        if(isset($title) && !is_null($title)){
+            $editorProfile->title = $title;
+        }
+
+        if(isset($bio) && !is_null($bio)){
+            $editorProfile->bio = $bio;
+        }
+
+        if(isset($serviceOffer) && !is_null($serviceOffer)){
+            $editorProfile->service_offering = $serviceOffer;
+        }
+
+        if(isset($amountPerHour) && !is_null($amountPerHour)){
+            $editorProfile->amount_per_hour = $amountPerHour;
+        }
+
+        $editorProfile->save();
+
+        return ["success" => true , "msg" => "Editor Detail Updated" ]; 
+
+    }
+
 
     public function editorPortfolio($request)
     {
         $links = json_decode($request->link);
+        
         $portfolio = [];
+
         foreach($links as $link)
         {
             $portfolio[] = [ "editor_id" => auth()->user()->id , "link" => $link ]; 
@@ -65,6 +119,8 @@ class EditorHandler{
         $degrees = json_decode($request->education);
           
         $degreeList = [];
+
+        Education::where('user_id' , auth()->user()->id)->delete();
         
         foreach($degrees as $degree)
         {

@@ -259,7 +259,9 @@ class JobHandler{
     public function doneJobList()
     {
         $userId = auth()->user()->id;
-        $doneJobs = User::with('doneJob.job')->where('id', $userId)->get();
+
+        $doneJobs = User::with('doneJob.job.review')->where('id', $userId)->get();
+        
         return ["success" => true , "doneJobs" => $doneJobs];
     }
 

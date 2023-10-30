@@ -263,10 +263,15 @@ class FolderController extends Controller
             } else {
                 
                 $response = $this->folderHandler->getShareFolderFiles($request);
+
                 if($response['success']){
-                return response()->json($response);
+                    
+                    return response()->json($response);
+
                 }else{
-                return response()->json($response,400 );
+
+                    return response()->json($response , 400);
+                    
                 }
             }
 

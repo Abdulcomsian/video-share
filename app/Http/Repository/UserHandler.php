@@ -30,10 +30,30 @@ class UserHandler{
             }else{
                 $msg = "User Signed In Successfully";
             }
+ 
 
             $baseUrl = public_path("uploads");
 
-            return response()->json(["success" => true , "msg" => $msg , 'token' => $jwt , 'baseUrl' => $baseUrl ]);
+            if(auth()->user()->type == AppConst::EDITOR){
+
+                $profile = User::with('editorProfile' ,'skills' , 'education' , 'portfolio' )->where('id' , auth()->user()->id)->first();
+            
+                $editorProfileAndSkill = ( isset($profile->editorProfile) && !is_null($profile->editorProfile)) && count($profile->skills) ? true :  false;
+        
+                $editorPortfolio = count($profile->portfolio) ? true : false;
+        
+                $editorEducation = count($profile->education) ? true : false;
+        
+                $editorPerHourRate = ( isset($profile->editorProfile) && !is_null($profile->editorProfile) ) && (isset($profile->editorProfile->amount_per_hour) && !is_null($profile->editorProfile->amount_per_hour)) ? true : false; 
+                
+                return response()->json(["success" => true , "msg" => $msg , 'token' => $jwt , 'baseUrl' => $baseUrl , "editorProfileAndSkill" => $editorProfileAndSkill , "editorPortfolio" => $editorPortfolio , "editorEducation" => $editorEducation, "editorPerHourRate" => $editorPerHourRate]);
+
+            }else{
+
+                return response()->json(["success" => true , "msg" => $msg , 'token' => $jwt , 'baseUrl' => $baseUrl]);
+            }
+
+
         }
     }
 

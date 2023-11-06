@@ -18,7 +18,8 @@ class ReviewController extends Controller
         try{
             $validator = Validator::make($request->all() , [
                                             'job_id' => 'required|numeric',
-                                            'rating' => 'required|numeric'
+                                            'rating' => 'required|numeric',
+                                            'comment' => 'required|string'
                                         ]);
             
             if($validator->fails()){
@@ -30,6 +31,19 @@ class ReviewController extends Controller
 
                 return response()->json($response);
             }
+
+        }catch(\Exception $e){
+
+            return response()->json(['success' => false , 'msg' => 'Something Went Wrong' , 'error' => $e->getMessage()]);
+        
+        }
+    }
+
+    function getReviewList(){
+        try{
+                $response = $this->reviewHandler->reviewList();
+
+                return response()->json($response);
 
         }catch(\Exception $e){
 

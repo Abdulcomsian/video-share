@@ -95,13 +95,17 @@ class UserHandler{
         $userId = auth()->user()->id;
 
         $reviews = Review::whereHas('job' , function($query) use ($userId){
-                        $query->whereHas('awardedRequest' , function($query1) use ($userId){
-                            $query1->where('editor_id' , $userId);
-                        });
-                    })->get();
-
+                            $query->whereHas('awardedRequest' , function($query1) use ($userId){
+                                $query1->where('editor_id' , $userId);
+                            });
+                        })
+                        ->with('job.user')
+                        ->orderBy('id' , 'desc')
+                        ->get();
+                    
         $totalReview = $reviews->count();
-
+       
+        $lastReviewComment = $totalReview > 0 ? $reviews[0] : null;
 
         $averageReviewRating =  $totalReview > 0 ? $reviews->pluck('rating')->sum()/$totalReview : 0;
 
@@ -131,7 +135,8 @@ class UserHandler{
                  'cancelJobCount' => $cancelJobCount,
                  'timelyDiliveredJobCount' => $doneJobCount,
                  'totalReview' => $totalReview,
-                 'averageReviewRating' => $averageReviewRating
+                 'averageReviewRating' => $averageReviewRating,
+                 'lastReview' => $lastReviewComment
                ];
     }
 

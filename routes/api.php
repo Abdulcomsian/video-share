@@ -53,6 +53,7 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::get('cancel-jobs' , [JobController::class , 'cancelJobs']);
     Route::get('done-jobs' , [JobController::class , 'doneJobs']);
     Route::post('job-folder' , [FolderController::class , 'getJobFolder']);
+    Route::get('review-list' , [ReviewController::class , 'getReviewList']);
 });
 
 

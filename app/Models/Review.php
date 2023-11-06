@@ -14,10 +14,12 @@ class Review extends Model
 
     protected $primaryKey = 'id';
 
-    protected $fillable = ['job_id' , 'rating'];
+    protected $fillable = ['job_id' , 'rating' , 'comment'];
 
     public function job()
     {
         return $this->belongsTo(PersonalJob::class , 'job_id' , 'id');
     }
+
+
 }

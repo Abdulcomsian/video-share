@@ -3,7 +3,7 @@
 namespace App\Http\Repository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
-use App\Models\{ User , Favourite };
+use App\Models\{ User , Favourite, Review};
 use App\Mail\VerificationMail;
 use App\Http\AppConst;
 
@@ -94,6 +94,17 @@ class UserHandler{
     {
         $userId = auth()->user()->id;
 
+        $reviews = Review::whereHas('job' , function($query) use ($userId){
+                        $query->whereHas('awardedRequest' , function($query1) use ($userId){
+                            $query1->where('editor_id' , $userId);
+                        });
+                    })->get();
+
+        $totalReview = $reviews->count();
+
+
+        $averageReviewRating =  $totalReview > 0 ? $reviews->pluck('rating')->sum()/$totalReview : 0;
+
         $profile = User::with('address','editorProfile' ,'skills' , 'education' , 'portfolio' )->where('id' , $userId)->first();
         
         $editorProfileAndSkill = ( isset($profile->editorProfile) && !is_null($profile->editorProfile)) && count($profile->skills) ? true :  false;
@@ -104,7 +115,24 @@ class UserHandler{
 
         $editorPerHourRate = ( isset($profile->editorProfile) && !is_null($profile->editorProfile) ) && (isset($profile->editorProfile->amount_per_hour) && !is_null($profile->editorProfile->amount_per_hour)) ? true : false; 
 
-        return ['success' => true , 'profile' => $profile , 'editorProfileAndSkill' => $editorProfileAndSkill , 'editorPortfolio' => $editorPortfolio, 'editorEducation' => $editorEducation, 'editorPerHourRate' => $editorPerHourRate];
+        $doneJobCount = User::with('doneJob')->where('id' , $userId)->count();
+
+        $cancelJobCount = User::with('cancelJob')->where('id' , $userId)->count();
+
+        
+        return [ 
+                 'success' => true , 
+                 'profile' => $profile , 
+                 'editorProfileAndSkill' => $editorProfileAndSkill , 
+                 'editorPortfolio' => $editorPortfolio, 
+                 'editorEducation' => $editorEducation, 
+                 'editorPerHourRate' => $editorPerHourRate,
+                 'doneJobsCount' => $doneJobCount,
+                 'cancelJobCount' => $cancelJobCount,
+                 'timelyDiliveredJobCount' => $doneJobCount,
+                 'totalReview' => $totalReview,
+                 'averageReviewRating' => $averageReviewRating
+               ];
     }
 
     public function editorList()

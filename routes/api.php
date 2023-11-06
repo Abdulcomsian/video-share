@@ -26,6 +26,7 @@ Route::post('logout' , [AuthController::class , 'logout']);
 
 Route::middleware(['auth:api'])->group(function(){
     Route::post('update-profile-image' , [UserController::class , 'updateProfileImage']);
+    Route::post('job-detail', [JobController::class, 'getJobDetail']);
 });
 
 /* Editor Routes*/
@@ -66,7 +67,6 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post("add-favourite" , [UserController::class , 'addFavourite']);
     Route::get('favourite-list' , [UserController::class , 'getFavouriteList']);
     Route::post('add-folder-file', [FolderController::class, 'addFolderFile']);
-    Route::post('job-detail', [JobController::class, 'getJobDetail']);
     Route::get('editor-list' , [UserController::class , 'getEditorList']);
     Route::post('pay-bill' , [BillingController::class , 'payBill']);
     Route::get('folder-list' , [FolderController::class , 'getClientFolders']);

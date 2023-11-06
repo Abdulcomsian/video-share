@@ -116,8 +116,8 @@ class JobHandler{
                                 ->join('requests' , 'requests.id' , '=' , 'job_editor_request.request_id')
                                 ->where('personal_jobs.client_id' , $clientId)
                                 ->where('personal_jobs.status' ,  'awarded')
-                                ->where('job_editor_request.status' , 1)
-                                ->where('requests.status' , 1)
+                                ->whereIn('job_editor_request.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB])
+                                ->whereIn('requests.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB])
                                 ->selectRaw('personal_jobs.id as job_id, job_editor_request.id as proposal_id, personal_jobs.deadline, personal_jobs.title, personal_jobs.budget, personal_jobs.description as job_description, requests.bid_price, requests.description as proposal_detail, personal_jobs.awarded_date')
                                 ->get();
                                 // ->unique('job_id')
@@ -269,7 +269,9 @@ class JobHandler{
     {
         $userId = auth()->user()->id;
 
-        $postedJobs = PersonalJob::where('client_id' , $userId)->where('status' , 'unawarded')->get();
+        $postedJobs = PersonalJob::withCount('requestList')->where('client_id' , $userId)->where('status' , 'unawarded')->get();
+
+        dd($postedJobs);
 
         return ["success" => true , 'postedJobs' => $postedJobs];
 

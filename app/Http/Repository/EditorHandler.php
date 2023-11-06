@@ -124,7 +124,7 @@ class EditorHandler{
         
         foreach($degrees as $degree)
         {
-            $degreeList[] = [ "user_id" => auth()->user()->id , "institution" => $degree->institute , "degree" => $degree->degree , "start_date" => $degree->start_date, "end_date" => $degree->end_date ];
+            $degreeList[] = [ "user_id" => auth()->user()->id , "institution" => $degree->institution , "degree" => $degree->degree , "start_date" => $degree->start_date, "end_date" => $degree->end_date ];
         }
 
         Education::insert($degreeList);

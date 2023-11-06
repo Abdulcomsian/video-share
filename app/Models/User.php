@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\AppConst;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -114,12 +115,12 @@ class User extends Authenticatable implements JWTSubject
 
     public function cancelJob()
     {
-        return $this->hasMany(EditorRequest::class , 'editor_id', 'id')->where('status' , 2);
+        return $this->hasMany(EditorRequest::class , 'editor_id', 'id')->where('status' , AppConst::CANCEL_JOB);
     }
 
     public function doneJob()
     {
-        return $this->hasMany(EditorRequest::class , 'editor_id', 'id')->where('status' , 3);
+        return $this->hasMany(EditorRequest::class , 'editor_id', 'id')->where('status' , AppConst::DONE_JOB);
     }
 
 

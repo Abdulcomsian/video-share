@@ -234,14 +234,14 @@ class JobHandler{
         PersonalJob::where('id' , $jobId)->update(['status' => 'completed']);
 
         $editorRequest = EditorRequest::where('job_id' , $jobId)
-                                    ->where('status' , 1)
+                                    ->where('status' , AppConst::AWARDED_JOB)
                                     ->first();
 
         JobProposal::where('id' , $editorRequest->request_id)
                         ->where('status' , 1)
-                        ->update(['status' => 3]);
+                        ->update(['status' => AppConst::DONE_JOB]);
 
-        $editorRequest->status = 3;
+        $editorRequest->status = AppConst::DONE_JOB;
         $editorRequest->save();
 
         return ['success' => true , 'msg' => 'Job Done Successfully'];

@@ -3,9 +3,10 @@
 namespace App\Http\Repository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
-use App\Models\{ User , Favourite, Review};
+use App\Models\{ User , Favourite, Review , PersonalJob};
 use App\Mail\VerificationMail;
 use App\Http\AppConst;
+
 
 class UserHandler{
     
@@ -93,15 +94,16 @@ class UserHandler{
     public function profileDetail()
     {
         $userId = auth()->user()->id;
-
+    
         $reviews = Review::whereHas('job' , function($query) use ($userId){
-                            $query->whereHas('awardedRequest' , function($query1) use ($userId){
-                                $query1->where('editor_id' , $userId);
+                            $query->whereHas('doneRequest' , function($query1) use ($userId){
+                                 $query1->where('editor_id' , $userId);
                             });
                         })
                         ->with('job.user')
                         ->orderBy('id' , 'desc')
                         ->get();
+
                     
         $totalReview = $reviews->count();
        
@@ -133,7 +135,7 @@ class UserHandler{
                  'editorPerHourRate' => $editorPerHourRate,
                  'doneJobsCount' => $doneJobCount,
                  'cancelJobCount' => $cancelJobCount,
-                 'timelyDiliveredJobCount' => $doneJobCount,
+                 'timelyDeliveredJobCount' => $doneJobCount,
                  'totalReview' => $totalReview,
                  'averageReviewRating' => $averageReviewRating,
                  'lastReview' => $lastReviewComment

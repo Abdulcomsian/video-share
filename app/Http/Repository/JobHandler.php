@@ -271,8 +271,6 @@ class JobHandler{
 
         $postedJobs = PersonalJob::withCount('requestList')->where('client_id' , $userId)->where('status' , 'unawarded')->get();
 
-        dd($postedJobs);
-
         return ["success" => true , 'postedJobs' => $postedJobs];
 
     }

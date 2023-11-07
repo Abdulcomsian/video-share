@@ -31,7 +31,7 @@ Route::middleware(['auth:api'])->group(function(){
 
 /* Editor Routes*/
 Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
-    Route::post('update-profile' , [UserController::class , 'updateProfile']);
+    // Route::post('update-profile' , [UserController::class , 'updateProfile']);
     Route::post('update-editor-profile' , [UserController::class , 'updateEditorProfile']);
     Route::post('update-editor-portfolio' , [UserController::class , 'updateEditorPortfolio']);
     Route::post('update-editor-education' , [UserController::class , 'updateEditorEducation']);
@@ -93,5 +93,9 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('unawarded-job-request' , [JobController::class ,'unawardedJobRequest']);
     Route::post('add-job-review' , [ReviewController::class ,'addUpdateReview']);
 });
+
+
+// Route::post('add-links' , [UserController::class , 'addLinks']);
+Route::post('update-profile' , [UserController::class , 'updateProfile']);
 
 

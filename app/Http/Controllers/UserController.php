@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Repository\{ EditorHandler , UserHandler };
+use App\Models\EditorPortfolio;
 use DataTables;
 use PhpParser\Node\Expr\AssignOp\Div;
 
@@ -84,7 +85,7 @@ class UserController extends Controller
                 $this->editorHandler->updateEditorSkills($request);
             }
            
-            if($request->link){
+            if(count($request->links) > 0){
                 $this->editorHandler->editorPortfolio($request);
             }
 
@@ -461,6 +462,41 @@ class UserController extends Controller
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
         }
+    }
+
+    public function updateLinkPage()
+    {
+        return view('update-link');
+    }
+
+    public function addLinks(Request $request){
+
+        $fileName = [];
+        $files = $request->input("files");
+       
+        foreach($files as $index => $file){
+            if($file == "null")
+            {
+                $fileName[] = null;
+            }else{
+                $imageUrl = substr($file, strpos($file, ',') + 1);
+                $image = base64_decode($imageUrl);
+                $imageName = time().$index."-portfolio-thumbnail".".png";
+                file_put_contents(public_path()."/test/".$imageName , $image);
+                $fileName[] = $imageName;
+            }
+        }
+
+        EditorPortfolio::where('editor_id', 2)->delete();
+        $links = [];
+        foreach($request->links as $index => $link){
+            $links[] = ["editor_id" => 2 , "link" => $link , "thumbnail" => $fileName[$index]];
+        }
+
+        EditorPortfolio::insert($links);
+
+        return response()->json(["success" => true , "msg" => "Editor Portfolio Added Successfully"]);
+
     }
 
    

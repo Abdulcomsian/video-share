@@ -98,18 +98,43 @@ class EditorHandler{
 
     public function editorPortfolio($request)
     {
-        $links = json_decode($request->link);
-        
-        $portfolio = [];
-
-        foreach($links as $link)
-        {
-            $portfolio[] = [ "editor_id" => auth()->user()->id , "link" => $link ]; 
+        $fileName = [];
+        $files = $request->input("files");
+       
+        foreach($files as $index => $file){
+            if($file == "null")
+            {
+                $fileName[] = null;
+            }else{
+                $imageUrl = substr($file, strpos($file, ',') + 1);
+                $image = base64_decode($imageUrl);
+                $imageName = time().$index."-portfolio-thumbnail".".png";
+                file_put_contents(public_path()."/uploads/".$imageName , $image);
+                $fileName[] = $imageName;
+            }
         }
 
-        EditorPortfolio::insert($portfolio);
+        EditorPortfolio::where('editor_id', auth()->user()->id )->delete();
+        $links = [];
+        foreach($request->links as $index => $link){
+            $links[] = ["editor_id" => auth()->user()->id  , "link" => $link , "thumbnail" => $fileName[$index]];
+        }
 
-        return ["success"=> true , "msg" => "Editor Portfolio Updated Successfully"];
+        EditorPortfolio::insert($links);
+
+        return response()->json(["success" => true , "msg" => "Editor Portfolio Added Successfully"]);
+        // $links = json_decode($request->link);
+        
+        // $portfolio = [];
+
+        // foreach($links as $link)
+        // {
+        //     $portfolio[] = [ "editor_id" => auth()->user()->id , "link" => $link ]; 
+        // }
+
+        // EditorPortfolio::insert($portfolio);
+
+        // return ["success"=> true , "msg" => "Editor Portfolio Updated Successfully"];
 
     }
 

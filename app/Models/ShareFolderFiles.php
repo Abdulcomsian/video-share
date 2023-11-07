@@ -12,7 +12,7 @@ class ShareFolderFiles extends Model
 
     protected $table = "share_folder_files";
     protected $primaryKey = "id";
-    protected $fillable = ['share_folder_id' , 'path' , 'extension' , 'type'];
+    protected $fillable = ['share_folder_id' , 'path' , 'extension' , 'type' , 'files'];
 
 
 

@@ -12,7 +12,7 @@ class Files extends Model
 
     protected $table = "files";
     protected $primaryKey = "id";
-    protected $fillable = ['folder_id' , 'path' , 'extension' , 'type' ];
+    protected $fillable = ['folder_id' , 'path' , 'extension' , 'type' ,'thumbnail' ];
 
     public function folder()
     {

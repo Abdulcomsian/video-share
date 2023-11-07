@@ -35,3 +35,6 @@ Route::get('test' , function(){
     \Storage::disk('s3')->makeDirectory("Hello-Mani2");
     dd("folder created successfully");
 });
+
+
+Route::get("test-update-link" , [UserController::class ,'updateLinkPage']);

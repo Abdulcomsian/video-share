@@ -16,10 +16,9 @@ class CreateCommentsTable extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("user_id");
-            $table->unsignedBigInteger("file_id");
-            $table->longText("description");
-            $table->foreign("user_id")->references("id")->on("users")->onDelete('cascade');
-            $table->foreign("file_id")->references("id")->on("files")->onDelete('cascade');
+            $table->unsignedBigInteger("commentable_id");
+            $table->string("commentable_type");
+            $table->longText('comment_text');
             $table->timestamps();
         });
     }

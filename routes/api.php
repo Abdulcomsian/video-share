@@ -2,7 +2,16 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{ AuthController ,  UserController , FolderController , JobController , BillingController , FileController , FavouriteRequestController , ReviewController};
+use App\Http\Controllers\{ AuthController ,  
+                            UserController , 
+                            FolderController , 
+                            JobController , 
+                            BillingController , 
+                            CommentController, 
+                            FileController , 
+                            FavouriteRequestController , 
+                            ReviewController
+                        };
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,11 +36,15 @@ Route::post('logout' , [AuthController::class , 'logout']);
 Route::middleware(['auth:api'])->group(function(){
     Route::post('update-profile-image' , [UserController::class , 'updateProfileImage']);
     Route::post('job-detail', [JobController::class, 'getJobDetail']);
+    Route::post('add-file-comment', [CommentController::class, 'addFileComment']);
+    Route::post('add-share-file-comment', [CommentController::class, 'addShareFileComment']);
+    Route::post('get-file-detail' , [FileController::class , 'getFile']);
+    Route::post('get-share-file-detail' , [FileController::class , 'getShareFile']);
 });
 
 /* Editor Routes*/
 Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
-    // Route::post('update-profile' , [UserController::class , 'updateProfile']);
+    Route::post('update-profile' , [UserController::class , 'updateProfile']);
     Route::post('update-editor-profile' , [UserController::class , 'updateEditorProfile']);
     Route::post('update-editor-portfolio' , [UserController::class , 'updateEditorPortfolio']);
     Route::post('update-editor-education' , [UserController::class , 'updateEditorEducation']);
@@ -96,6 +109,6 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
 
 
 // Route::post('add-links' , [UserController::class , 'addLinks']);
-Route::post('update-profile' , [UserController::class , 'updateProfile']);
+// Route::post('update-profile' , [UserController::class , 'updateProfile']);
 
 

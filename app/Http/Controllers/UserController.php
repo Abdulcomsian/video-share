@@ -77,6 +77,10 @@ class UserController extends Controller
     {
         try{
 
+            if(isset($request->links)){
+                $this->editorHandler->editorPortfolio($request);
+            }
+
             if($request->title || $request->bio || $request->service_offering || $request->amount_per_hour || $request->language){
                 $this->editorHandler->updateEditorDetail($request);
             }
@@ -85,9 +89,6 @@ class UserController extends Controller
                 $this->editorHandler->updateEditorSkills($request);
             }
            
-            if(count($request->links) > 0){
-                $this->editorHandler->editorPortfolio($request);
-            }
 
             if($request->language){
                 $this->editorHandler->updateEditorLanguage($request);

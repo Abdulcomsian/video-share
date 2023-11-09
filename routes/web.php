@@ -37,4 +37,4 @@ Route::get('test' , function(){
 });
 
 
-Route::get("test-update-link" , [UserController::class ,'updateLinkPage']);
+// Route::get("test-update-link" , [UserController::class ,'updateLinkPage']);

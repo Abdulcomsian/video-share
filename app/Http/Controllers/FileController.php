@@ -93,4 +93,50 @@ class FileController extends Controller
         }
     }
 
+    public function getFile(Request $request){
+        try{
+
+            $validator = Validator::make($request->all(), [
+                'file_id' => 'required',
+            ]);   
+            
+            if ($validator->fails()) {
+
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
+            
+            } else {
+                
+                $response = $this->filesHandler->getFile($request);
+                
+                return response()->json($response);
+            }
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
+
+    public function getShareFile(Request $request){
+        try{
+
+            $validator = Validator::make($request->all(), [
+                'file_id' => 'required',
+            ]);   
+            
+            if ($validator->fails()) {
+
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
+            
+            } else {
+                
+                $response = $this->filesHandler->getShareFile($request);
+                
+                return response()->json($response);
+            }
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
+
 }

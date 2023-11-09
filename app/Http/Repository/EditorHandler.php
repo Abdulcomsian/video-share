@@ -99,8 +99,8 @@ class EditorHandler{
     public function editorPortfolio($request)
     {
         $fileName = [];
-        $files = $request->input("files");
-       
+        $files = json_decode($request->input("files"));
+        
         foreach($files as $index => $file){
             if($file == "null")
             {
@@ -115,12 +115,13 @@ class EditorHandler{
         }
 
         EditorPortfolio::where('editor_id', auth()->user()->id )->delete();
-        $links = [];
-        foreach($request->links as $index => $link){
-            $links[] = ["editor_id" => auth()->user()->id  , "link" => $link , "thumbnail" => $fileName[$index]];
+        $portfolio = [];
+        $links = json_decode($request->links);
+        foreach($links as $index => $link){
+            $portfolio[] = ["editor_id" => auth()->user()->id  , "link" => $link , "thumbnail" => $fileName[$index]];
         }
 
-        EditorPortfolio::insert($links);
+        EditorPortfolio::insert($portfolio);
 
         return response()->json(["success" => true , "msg" => "Editor Portfolio Added Successfully"]);
         // $links = json_decode($request->link);

@@ -220,6 +220,8 @@ class FolderHandler
             
             $files = Files::with('folder')->where('folder_id' , $folderId)->get();
 
+            $thumbnailPath = public_path('uploads');
+
 
 
             // $filesList = Storage::disk('s3')->files($folderPath);
@@ -230,7 +232,7 @@ class FolderHandler
 
             // dd($files);
 
-            return ["success" => true , "files" => $files , "bucket_address" => $bucketAddress ];
+            return ["success" => true , "files" => $files , "bucket_address" => $bucketAddress , 'thumbnailPath' =>$thumbnailPath ];
         }
 
 
@@ -294,8 +296,10 @@ class FolderHandler
             $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
             
             $files = ShareFolderFiles::with('folder')->where('share_folder_id' , $folder->id)->get();
+
+            $thumbnailPath = public_path('uploads');
            
-            return ["success" => true , "files" => $files , "bucket_address" => $bucketAddress ];
+            return ["success" => true , "files" => $files , "bucket_address" => $bucketAddress , 'thumbnailPath' => $thumbnailPath];
         
         }else{
 
@@ -310,10 +314,15 @@ class FolderHandler
 
         public function jobFolder($request)
         {
-        
+            $bucketName = config('filesystems.disks.s3.bucket');
+            
             $folder = Folder::with('files')->where('id' , $request->folder_id)->first();
+            
+            $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folder->name;
 
-            return ["success" => true , "folder" => $folder];
+            $thumbnailPath = public_path('uploads');
+
+            return ["success" => true , "folder" => $folder , 'bucketAddress' => $bucketAddress , 'thumbnailPath' => $thumbnailPath];
 
         }
 

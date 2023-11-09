@@ -20,13 +20,14 @@ class FilesHandler{
             $folderId = $request->folder_id;
             $fileList = [];
             $videoExtension = ['mp4' , 'webm'];
+            $thumbnails = json_decode($request->thumbnail);
             // dd("inside file");
 
             $folder = Folder::find($folderId);
 
             if($request->hasFile('files'))
             {
-                foreach($request->file('files') as $file){
+                foreach($request->file('files') as $index => $file){
 
                     $fileName = $file->getClientOriginalName();
                     $extension = $file->extension();
@@ -36,7 +37,16 @@ class FilesHandler{
                     $check = $this->aws->uploadMedia( $folder->name , $name , $file);
                     if($check['success']){
                         $type =in_array($extension , $videoExtension) ? 1 : 2;
-                        $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension];
+                        $thumbnailName  = null;
+
+                        if( isset($thumbnails[$index]) && !is_null($thumbnails[$index]) ){
+                            $imageUrl = substr($thumbnails[$index], strpos($thumbnails[$index], ',') + 1);
+                            $image = base64_decode($imageUrl);
+                            $thumbnailName = time().$index."-job-file-thumbnail".".png";
+                            file_put_contents(public_path()."/uploads/".$thumbnailName , $image);
+                        }
+
+                        $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];
                     }
                 
                 }
@@ -96,13 +106,14 @@ class FilesHandler{
             $folderId = $personalJob->folder->id;
             $fileList = [];
             $videoExtension = ['mp4' , 'webm'];
+            $thumbnails = json_decode($request->thumbnail);
             // dd("inside file");
 
             $folder = $personalJob->folder;
 
             if($request->hasFile('files'))
             {
-                foreach($request->file('files') as $file){
+                foreach($request->file('files') as $index => $file){
 
                     $fileName = $file->getClientOriginalName();
                     $extension = $file->extension();
@@ -117,9 +128,18 @@ class FilesHandler{
                         // $name = time()."-".$fileName;
                         // $file->move(public_path('uploads'), $name);
                         $type =in_array($extension , $videoExtension) ? 1 : 2;
-                        $fileList[] = ['share_folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension];
+                        $thumbnailName  = null;
+                        if( isset($thumbnails[$index]) && !is_null($thumbnails[$index]) ){
+                            $imageUrl = substr($thumbnails[$index], strpos($thumbnails[$index], ',') + 1);
+                            $image = base64_decode($imageUrl);
+                            $thumbnailName = time().$index."-share-file-thumbnail".".png";
+                            file_put_contents(public_path()."/uploads/".$thumbnailName , $image);
+                        }
+
+                        $fileList[] = ['share_folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName ];
                     }
                 }
+
                 
                 ShareFolderFiles::insert($fileList);    
             }
@@ -157,6 +177,38 @@ class FilesHandler{
             return ["success" => false , "msg" => $e->getMessage()];
         }
 
+    }
+
+    public function getFile($request){
+
+        $file = Files::with('comments' ,'folder')->where('id' , $request->file_id)->first();
+
+        $bucketName = config('filesystems.disks.s3.bucket');
+        
+        $folderPath = $file->folder->name;
+        
+        $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
+
+        $thumbnailPath = public_path('uploads');
+        
+        return response()->json(['success' => true ,  'file'  => $file , 'bucketAddress' => $bucketAddress , 'thumbnailPath' => $thumbnailPath]);
+    
+    }
+
+    public function getShareFile($request){
+
+        $file = ShareFolderFiles::with('comments' , 'folder')->where('id' , $request->file_id)->first();
+
+        $bucketName = config('filesystems.disks.s3.bucket');
+        
+        $folderPath = $file->folder->name;
+        
+        $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
+
+        $thumbnailPath = public_path('uploads');
+        
+        return response()->json(['success' => true ,  'file'  => $file , 'bucketAddress' => $bucketAddress , 'thumbnailPath' => $thumbnailPath]);
+    
     }
 
 }

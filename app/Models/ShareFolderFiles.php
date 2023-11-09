@@ -21,5 +21,9 @@ class ShareFolderFiles extends Model
         return $this->belongsTo(ShareFolder::class , 'share_folder_id' , 'id');
     }
 
+    public function comments(){
+        return $this->morphMany(Comment::class , 'commentable');
+    }
+
 
 }

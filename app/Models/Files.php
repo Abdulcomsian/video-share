@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\{Folder};
+use App\Models\{ Folder , Comment };
 
 class Files extends Model
 {
@@ -17,5 +17,9 @@ class Files extends Model
     public function folder()
     {
         return $this->belongsTo(Folder::class , 'folder_id' , 'id');
+    }
+
+    public function comments(){
+        return $this->morphMany(Comment::class , 'commentable');
     }
 }

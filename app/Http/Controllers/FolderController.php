@@ -25,7 +25,7 @@ class FolderController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'folder_id' => 'required',
-                'files.*' => 'file|mimes:mp4,avi,jpg,png,jpeg,mpeg|max:51200' // Maximum file size of 50MB (50 * 1024 = 51200 kilobytes)
+                // 'files.*' => 'file|mimes:mp4,avi,jpg,png,jpeg,mpeg|max:51200' // Maximum file size of 50MB (50 * 1024 = 51200 kilobytes)
             ]);
 
             if ($validator->fails()) {
@@ -219,7 +219,7 @@ class FolderController extends Controller
         $validator = Validator::make($request->all() , [
             'job_id' => 'required',
             'files' => 'required',
-            'files.*' => 'file|mimes:mp4,avi,jpg,png,jpeg,mpeg|max:51200' 
+            // 'files.*' => 'file|mimes:mp4,avi,jpg,png,jpeg,mpeg|max:51200' 
         ]);
 
         if($validator->fails()){

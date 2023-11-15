@@ -218,7 +218,7 @@ class FolderController extends Controller
     {
         $validator = Validator::make($request->all() , [
             'job_id' => 'required',
-            'files' => 'required',
+            // 'files' => 'required|array|min:1',
             // 'files.*' => 'file|mimes:mp4,avi,jpg,png,jpeg,mpeg|max:51200' 
         ]);
 

@@ -25,7 +25,7 @@ class FilesHandler{
 
             $folder = Folder::find($folderId);
 
-            if(count($request->file('files')))
+            if($request->file('files') && count($request->file('files')))
             {
                 foreach($request->file('files') as $index => $file){
 
@@ -111,7 +111,7 @@ class FilesHandler{
 
             $folder = $personalJob->folder;
 
-            if(count($request->file('files')))
+            if($request->file('files') && count($request->file('files')))
             {
                 foreach($request->file('files') as $index => $file){
                     $fileName = $file->getClientOriginalName();

@@ -25,7 +25,7 @@ class FilesHandler{
 
             $folder = Folder::find($folderId);
 
-            if($request->hasFile('files'))
+            if(count($request->file('files')))
             {
                 foreach($request->file('files') as $index => $file){
 
@@ -111,35 +111,31 @@ class FilesHandler{
 
             $folder = $personalJob->folder;
 
-            if($request->hasFile('files'))
+            if(count($request->file('files')))
             {
                 foreach($request->file('files') as $index => $file){
-
                     $fileName = $file->getClientOriginalName();
-                    $extension = $file->extension();
+                    $extension = $file->getClientOriginalExtension();
                     $name = time() . "-" . $fileName;
-                    
-                    // Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
+                    // $check = Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
+                    // dd($folder->name , $name );
+                    // dd($file);
                     $check = $this->aws->uploadMedia($folder->name , $name , $file );
-
+                    
                     if($check['success']){
-                        // $fileName = $file->getClientOriginalName();
-                        // $extension = $file->extension();
-                        // $name = time()."-".$fileName;
-                        // $file->move(public_path('uploads'), $name);
+                        
                         $type =in_array($extension , $videoExtension) ? 1 : 2;
                         $thumbnailName  = null;
                         if( isset($thumbnails[$index]) && !is_null($thumbnails[$index]) ){
                             $imageUrl = substr($thumbnails[$index], strpos($thumbnails[$index], ',') + 1);
                             $image = base64_decode($imageUrl);
-                            $thumbnailName = time().$index."-share-file-thumbnail".".png";
+                            $thumbnailName = time().$index."-share-file-thumbnail".".png"; 
                             file_put_contents(public_path()."/uploads/".$thumbnailName , $image);
                         }
-
+                    
                         $fileList[] = ['share_folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName ];
                     }
                 }
-
                 
                 ShareFolderFiles::insert($fileList);    
             }

@@ -100,7 +100,7 @@ class EditorHandler{
     {
         $fileName = [];
         $files = json_decode($request->input("files"));
-        
+       
         foreach($files as $index => $file){
             if($file == "null")
             {
@@ -113,7 +113,7 @@ class EditorHandler{
                 $fileName[] = $imageName;
             }
         }
-
+     
         EditorPortfolio::where('editor_id', auth()->user()->id )->delete();
         $portfolio = [];
         $links = json_decode($request->links);
@@ -124,18 +124,7 @@ class EditorHandler{
         EditorPortfolio::insert($portfolio);
 
         return response()->json(["success" => true , "msg" => "Editor Portfolio Added Successfully"]);
-        // $links = json_decode($request->link);
         
-        // $portfolio = [];
-
-        // foreach($links as $link)
-        // {
-        //     $portfolio[] = [ "editor_id" => auth()->user()->id , "link" => $link ]; 
-        // }
-
-        // EditorPortfolio::insert($portfolio);
-
-        // return ["success"=> true , "msg" => "Editor Portfolio Updated Successfully"];
 
     }
 

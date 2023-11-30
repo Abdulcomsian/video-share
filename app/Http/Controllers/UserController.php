@@ -52,7 +52,7 @@ class UserController extends Controller
     {
         try{
             $validator = Validator::make( $request->all(), [
-                "link" => "required|string",
+                "links" => "required|string",
             ]);
 
             if($validator->fails())
@@ -61,9 +61,7 @@ class UserController extends Controller
             
             }else{
 
-                $response = $this->editorHandler->editorPortfolio($request);
-
-                return response()->json($response);
+                return $this->editorHandler->editorPortfolio($request);
             }
 
         

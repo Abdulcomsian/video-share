@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{BillingController, DashboardController, UserController , FolderController}; 
+use App\Http\Controllers\{BillingController, DashboardController, UserController , FolderController, HomeController}; 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,6 +12,8 @@ use App\Http\Controllers\{BillingController, DashboardController, UserController
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get('/terms-and-condition' , [HomeController::class , 'termsAndConditionPage'])->name('get.temsAndCondition.page');
 
 Auth::routes(['except' => ['register']]);
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

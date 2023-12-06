@@ -81,7 +81,13 @@ class JobController extends Controller
                 return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
             }else{
                 $response = $this->jobHandler->addJobProposal($request);
-                return response()->json($response);
+
+                if(!$response['success']){
+                    return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $response["msg"] ] ,400);
+                }else{
+                    return response()->json($response);
+                }
+
             }
     
         }catch(\Exception $e){

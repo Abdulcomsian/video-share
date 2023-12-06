@@ -121,10 +121,11 @@ class UserHandler{
 
         $editorPerHourRate = ( isset($profile->editorProfile) && !is_null($profile->editorProfile) ) && (isset($profile->editorProfile->amount_per_hour) && !is_null($profile->editorProfile->amount_per_hour)) ? true : false; 
 
-        $doneJobCount = User::with('doneJob')->where('id' , $userId)->count();
+        $userDetails = User::with('doneJob' , 'cancelJob')->where('id' , $userId)->first();
 
-        $cancelJobCount = User::with('cancelJob')->where('id' , $userId)->count();
+        $doneJobCount = $userDetails->doneJob->count();
 
+        $cancelJobCount = $userDetails->cancelJob->count();
         
         return [ 
                  'success' => true , 

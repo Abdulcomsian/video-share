@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Repository;
+use App\Models\{Country , City};
 
 class HomeHandler{
     public function termAndConditionText(){
@@ -54,5 +55,16 @@ class HomeHandler{
         These Terms are governed by the laws of [Your Jurisdiction].
         
         By using the Application, you agree to these Terms. If you have any questions or concerns, please contact us at OpenEdit.dev.com.';
+    }
+
+
+    public function getCountriesList(){
+        $countriesList = Country::get();
+        return $countriesList;
+    }
+
+    public function getCitiesList($request){
+        $citiesList = City::where('country_id' , $request->country_id)->get();
+        return $citiesList;
     }
 }

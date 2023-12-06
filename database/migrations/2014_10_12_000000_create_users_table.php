@@ -26,6 +26,7 @@ class CreateUsersTable extends Migration
             $table->string('verification_code')->nullable();
             $table->longText('profile_image')->nullable();
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -102,7 +102,7 @@ class FolderHandler
         {
             $userId = auth()->user()->id;
 
-            $folders = Folder::where('client_id' , $userId)->get();
+            $folders = Folder::with('files')->where('client_id' , $userId)->get();
 
             return ["success" => true , "msg" => "Folder Fetched Successfully" , "folders" => $folders];
         }

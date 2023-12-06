@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Database\Seeders\{ UserSeeder , FolderSeeder , JobSeeder} ;
+use Database\Seeders\{ UserSeeder , FolderSeeder , JobSeeder , CountrySeeder} ;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->call(FolderSeeder::class);
         $this->call(JobSeeder::class);
+        $this->call(CountrySeeder::class);
 
     }
 }

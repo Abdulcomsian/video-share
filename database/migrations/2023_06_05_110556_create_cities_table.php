@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class CreateAddressTable extends Migration
+class CreateCitiesTable extends Migration
 {
     use SoftDeletes;
     /**
@@ -15,16 +15,11 @@ class CreateAddressTable extends Migration
      */
     public function up()
     {
-        Schema::create('address', function (Blueprint $table) {
+        Schema::create('cities', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('country_id');
-            $table->unsignedBigInteger('city_id');
-            $table->string('language');
-            $table->longText('address');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->string('name');
             $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
-            $table->foreign('city_id')->references('id')->on('cities')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -37,6 +32,6 @@ class CreateAddressTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('address');
+        Schema::dropIfExists('cities');
     }
 }

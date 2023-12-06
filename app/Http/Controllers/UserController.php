@@ -161,9 +161,9 @@ class UserController extends Controller
     {
         try{
             $validator = Validator::make( $request->all(), [
-                "country" => "required|string",
+                "country" => "required|numeric",
                 "address" => "required|string",
-                "city"    => "required|string",
+                "city"    => "required|numeric",
                 "language"=> "required|string"
             ]);
 

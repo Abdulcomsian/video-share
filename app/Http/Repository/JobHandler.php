@@ -87,6 +87,12 @@ class JobHandler{
         $description = $request->description;
         $bidPrice = $request->bid_price;
 
+        $previousProposal = EditorRequest::where(["job_id" => $jobId , "editor_id" => $editorId , "status" => AppConst::UN_AWARDED_JOB ])->count();
+
+        if($previousProposal){
+            return response()->json(["success" => false , "msg" => "You have already added a proposal"]);
+        }
+
         $requestId = JobProposal::insertGetId([
                         "description" => $description,
                         "bid_price" => $bidPrice

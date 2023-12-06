@@ -174,8 +174,8 @@ class EditorHandler{
         Address::updateOrCreate(
             [ "user_id" => auth()->user()->id],
             [ 
-                "country" => $country,
-                "city"   => $city,
+                "country_id" => $country,
+                "city_id"   => $city,
                 "address" => $address,
                 "language"=> $language,
                 "user_id" => auth()->user()->id
@@ -190,7 +190,7 @@ class EditorHandler{
             User::where('id',auth()->user()->id)->update(['profile_image' => $fileName]);
         }
 
-        return ["success"=> true , "msg" => "Editor Profile Image Updated Successfully"];
+        return ["success"=> true , "msg" => "Editor Address Updated Successfully"];
 
 
     }

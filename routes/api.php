@@ -9,8 +9,9 @@ use App\Http\Controllers\{ AuthController ,
                             BillingController , 
                             CommentController, 
                             FileController , 
-                            FavouriteRequestController , 
-                            ReviewController
+                            FavouriteRequestController ,
+    HomeController,
+    ReviewController
                         };
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,7 @@ Route::middleware(['auth:api'])->group(function(){
     Route::post('add-share-file-comment', [CommentController::class, 'addShareFileComment']);
     Route::post('get-file-detail' , [FileController::class , 'getFile']);
     Route::post('get-share-file-detail' , [FileController::class , 'getShareFile']);
+    Route::get('get-frequently-ask-questions' , [HomeController::class , 'getFrequentlyAskQuestion']);
 });
 
 /* Editor Routes*/
@@ -56,6 +58,7 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::post('add-editor-skill' , [UserController::class ,'addEditorSkill']);
     Route::post('update-education' , [UserController::class ,'updateEducation']);
     Route::post('add-job-request' , [JobController::class , 'addJobRequest']);
+    Route::post('city-list' , [HomeController::class , 'getCities']);
     Route::get('profile-detail' , [UserController::class , 'getProfileDetail']);
     Route::get('proposal-list' , [JobController::class , 'getProposalList']);
     Route::get('job-list' , [JobController::class , 'getJobList']);
@@ -67,6 +70,7 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::get('done-jobs' , [JobController::class , 'doneJobs']);
     Route::post('job-folder' , [FolderController::class , 'getJobFolder']);
     Route::get('review-list' , [ReviewController::class , 'getReviewList']);
+    Route::get('country-list' , [HomeController::class , 'getCountries']);
 });
 
 

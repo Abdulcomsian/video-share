@@ -83,7 +83,7 @@ class JobController extends Controller
                 $response = $this->jobHandler->addJobProposal($request);
 
                 if(!$response['success']){
-                    return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $response["msg"] ] ,400);
+                    return response()->json($response , 400);
                 }else{
                     return response()->json($response);
                 }
@@ -305,6 +305,47 @@ class JobController extends Controller
         }  
     }
 
+    public function ongoingJob(){
+        try{
+
+            $response = $this->jobHandler->getOngoingJob();
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
+
+    public function completedJob(){
+        try{
+
+            $response = $this->jobHandler->getCompletedJob();
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
+
+    public function jobReview(Request $request){
+        $validator = Validator::make( $request->all() , [
+            'job_id' => 'required|numeric',
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
+        }
+
+        try{
+
+            $response = $this->jobHandler->getJobReview($request);
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
    
 
 

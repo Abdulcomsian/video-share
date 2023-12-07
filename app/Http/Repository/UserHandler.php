@@ -4,9 +4,9 @@ namespace App\Http\Repository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
 use App\Models\{ User , Favourite, Review , PersonalJob};
-use App\Mail\VerificationMail;
+use App\Mail\ {VerificationMail , TokenMail};
 use App\Http\AppConst;
-
+use Illuminate\Support\Facades\Hash;
 
 class UserHandler{
     
@@ -111,7 +111,7 @@ class UserHandler{
 
         $averageReviewRating =  $totalReview > 0 ? $reviews->pluck('rating')->sum()/$totalReview : 0;
 
-        $profile = User::with('address','editorProfile' ,'skills' , 'education' , 'portfolio' )->where('id' , $userId)->first();
+        $profile = User::with('address.country', 'address.city' , 'editorProfile' ,'skills' , 'education' , 'portfolio' )->where('id' , $userId)->first();
         
         $editorProfileAndSkill = ( isset($profile->editorProfile) && !is_null($profile->editorProfile)) && count($profile->skills) ? true :  false;
 
@@ -163,6 +163,64 @@ class UserHandler{
         $file->move(public_path("uploads") , $newName );
         User::where('id' , auth()->user()->id)->update(['profile_image' => $newName]);
         return ['success' => true , 'msg' => 'Profile Image Updated Successfully'];
+    }
+
+    public function changePassword($request){
+        $oldPassword = $request->old_password;
+        $newPassword = $request->new_password;
+
+        if(!Hash::check($oldPassword, auth()->user()->password)){
+            return ['status' => false , 'msg' => 'Please Add Correct Password'];
+        }
+
+        $user = User::where('id' , auth()->user()->id)->first();
+        $user->password = Hash::make($newPassword);
+        $user->save();
+
+        return ['status' => true , 'msg' => 'Password Changed Successfully'];
+
+    }
+
+    public function forgetPassword($request){
+        $email = $request->email;
+        $user = User::where('email' , $email)->first();
+
+        if(!$user){
+            return ['status' => false , 'msg' => 'No User Found With This Email'];
+        }
+
+        $verificationToken = rand(111111 , 999999);
+
+        $user->token = $verificationToken;
+        $user->save();
+
+        Mail::to($email)->send(new TokenMail($verificationToken));
+
+        return ['status' => true , 'msg' => 'A verification code has been sent to your mail please check'];
+
+    }
+
+    public function updatePassword($request){
+        $email = $request->email;
+        $verificationCode = $request->verification_code;
+        $newPassword = $request->new_password;
+
+        $user = User::where(['email' => $email])->first();
+        
+        if(!$user){
+            return ['status' => false , 'msg' => 'No User Found With This Email'];
+        }
+
+        if($verificationCode != $user->token){
+            return ['status' => false , 'msg' => "Verification Code Doesn't match"];
+        }
+
+
+        $user->password = Hash::make($newPassword);
+        $user->save();
+
+        return ['status' => true , 'msg' => 'Password has been updated'];
+
     }
 
 }

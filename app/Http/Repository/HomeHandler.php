@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Repository;
-use App\Models\{Country , City};
+use App\Models\{Country , City , SuggestedSkills};
 
 class HomeHandler{
     public function termAndConditionText(){
@@ -66,5 +66,10 @@ class HomeHandler{
     public function getCitiesList($request){
         $citiesList = City::where('country_id' , $request->country_id)->get();
         return $citiesList;
+    }
+
+    public function getSuggestedSkills(){
+        $skillList = SuggestedSkills::get();
+        return $skillList;
     }
 }

@@ -497,6 +497,89 @@ class UserController extends Controller
         return response()->json(["success" => true , "msg" => "Editor Portfolio Added Successfully"]);
 
     }
+    
+    
+    public function changePassword(Request $request){
+
+        $validator = Validator::make($request->all() , [
+            'old_password' => 'required|string',
+            'new_password' => 'required|string',
+            'confirm_password' => 'required|same:new_password'
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $validator->getMessageBag()] ,400);
+        }
+
+
+        try{
+
+            $response = $this->userHandler->changePassword($request);
+
+            if(!$response['status']){
+                return response()->json( $response , 400);
+            }
+
+            return response()->json($response);
+
+        }catch(\Exception $e)
+        {
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
+        } 
+    }
+
+    public function forgetPassword(Request $request){
+        $validator = Validator::make($request->all() , [
+            'email' => 'required|email',
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $validator->getMessageBag()] ,400);
+        }
+
+        try{
+
+            $response = $this->userHandler->forgetPassword($request);
+
+            if(!$response['status']){
+                return response()->json( $response , 400);
+            }
+
+            return response()->json($response);
+
+        }catch(\Exception $e)
+        {
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
+        } 
+    }
+
+    public function updatePassword(Request $request){
+        $validator = Validator::make($request->all() , [
+            'email' => 'required|email',
+            'verification_code' => 'required|string',
+            'new_password' => 'required|string',
+            'confirm_password' => 'required|same:new_password'
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $validator->getMessageBag()] ,400);
+        }
+
+        try{
+
+            $response = $this->userHandler->updatePassword($request);
+
+            if(!$response['status']){
+                return response()->json( $response , 400);
+            }
+
+            return response()->json($response);
+
+        }catch(\Exception $e)
+        {
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
+        } 
+    }
 
    
 

@@ -42,6 +42,10 @@ Route::middleware(['auth:api'])->group(function(){
     Route::post('get-file-detail' , [FileController::class , 'getFile']);
     Route::post('get-share-file-detail' , [FileController::class , 'getShareFile']);
     Route::get('get-frequently-ask-questions' , [HomeController::class , 'getFrequentlyAskQuestion']);
+    Route::get('suggested-skills' , [HomeController::class , 'suggestedSkills']);
+    Route::post('change-password' , [UserController::class , 'changePassword']);
+    Route::post('forget-password' , [UserController::class , 'forgetPassword']);
+    Route::post('update-password' , [UserController::class , 'updatePassword']);
 });
 
 /* Editor Routes*/
@@ -109,6 +113,9 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('award-job-request' , [JobController::class , 'awardedJobRequest']);
     Route::post('unawarded-job-request' , [JobController::class ,'unawardedJobRequest']);
     Route::post('add-job-review' , [ReviewController::class ,'addUpdateReview']);
+    Route::get('ongoing-jobs' , [JobController::class , 'ongoingJob']);
+    Route::get('completed-jobs' , [JobController::class , 'completedJob']);
+    Route::post('get-job-review' , [JobController::class , 'jobReview']);
 });
 
 

@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->boolean('onboarding')->default(0);
             $table->string('stripe_account_id')->nullable();
             $table->string('verification_code')->nullable();
+            $table->string('token')->nullable();
             $table->longText('profile_image')->nullable();
             $table->rememberToken();
             $table->softDeletes();

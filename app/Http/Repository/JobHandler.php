@@ -3,7 +3,7 @@
 namespace App\Http\Repository;
 
 use App\Http\AppConst;
-use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal, JobPayment , User , Folder };
+use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal, JobPayment , User , Folder, Review};
 use Illuminate\Support\Facades\DB;
 
 class JobHandler{
@@ -90,7 +90,7 @@ class JobHandler{
         $previousProposal = EditorRequest::where(["job_id" => $jobId , "editor_id" => $editorId , "status" => AppConst::UN_AWARDED_JOB ])->count();
 
         if($previousProposal){
-            return response()->json(["success" => false , "msg" => "You have already added a proposal"]);
+            return ["success" => false , "msg" => "You have already added a proposal"];
         }
 
         $requestId = JobProposal::insertGetId([
@@ -154,7 +154,7 @@ class JobHandler{
     {
         $jobId = $request->job_id;
         
-        $personalJob = PersonalJob::with('skills' , 'jobFolder.files')->where('id' , $jobId)->first();
+        $personalJob = PersonalJob::with('skills' , 'jobFolder.files' , 'review')->where('id' , $jobId)->first();
 
         return ["success" => true , "jobDetail" => $personalJob];
     }
@@ -285,7 +285,14 @@ class JobHandler{
     {
         $userId = auth()->user()->id;
 
-        $awardedJobs = PersonalJob::with('awardedRequest.editor')->where('client_id' , $userId)->where('status' , 'awarded')->get();
+        $awardedJobs = PersonalJob::with(['requestList' => function($query){
+                                            return $query->with('editor')->whereIn('status' , [AppConst::DONE_JOB , AppConst::AWARDED_JOB]);
+                                        }])
+                                        ->whereIn('status' , ['awarded' , 'completed'])
+                                        ->where('client_id' , $userId)
+                                        ->get();
+
+        // $awardedJobs = PersonalJob::with('awardedRequest.editor', 'review')->where('client_id' , $userId)->where('status' , 'awarded')->get();
 
         return ["success" => true , 'awarededJobs' => $awardedJobs];
 
@@ -320,8 +327,30 @@ class JobHandler{
         return ["success" => true , 'unawardedJobRequest' => $jobRequest];
     }
 
-    
+    public function getOngoingJob(){
+        
+      $ongoingJobs =  PersonalJob::with('awardedRequest.editor' , 'review' )->where('client_id' , auth()->user()->id)->where('status' , 'awarded')->get();
 
+      return response()->json(['status' => true , 'ongoingJobs' => $ongoingJobs]);
+
+    }
+
+    public function getCompletedJob(){
+
+        $completedJobs =  PersonalJob::with('doneRequest.editor' , 'review' )->where('client_id' , auth()->user()->id)->where('status' , 'completed')->get();
+
+        return response()->json(['status' => true , 'completedJobs' => $completedJobs]);
+
+    }
+
+    
+    public function getJobReview($request){
+
+        $jobReview = Review::where('job_id' , $request->job_id)->first();
+
+        return response()->json(['status' => true , 'jobReview' => $jobReview]);
+    
+    }
 
 
 

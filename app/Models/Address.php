@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\{Country , City};
 class Address extends Model
 {
     use HasFactory;
@@ -18,4 +18,12 @@ class Address extends Model
         "language",
         "user_id"
     ];
+
+    public function country(){
+        return $this->belongsTo(Country::class , 'country_id' , 'id');
+    }
+
+    public function city(){
+        return $this->belongsTo(Country::class , 'city_id' , 'id');
+    }
 }

@@ -346,6 +346,30 @@ class JobController extends Controller
             return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
     }
+
+
+    public function filterJob(Request $request){
+        $validator = Validator::make( $request->all() , [
+            'upper_ranger' => 'nullable|numeric',
+            'lower_range' => 'nullable|numeric',
+            'skills' => 'nullable|array'
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
+        }
+
+        try{
+
+            $response = $this->jobHandler->getFilteredJob($request);
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+
+    }
    
 
 

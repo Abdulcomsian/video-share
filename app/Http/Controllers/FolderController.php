@@ -285,7 +285,7 @@ class FolderController extends Controller
    {
         try{
             $validator = Validator::make( $request->all() , [
-                'folder_id' => 'required|numeric',
+                'folder_id' => 'nullable|numeric',
             ]);
 
             if($validator->fails())
@@ -299,6 +299,26 @@ class FolderController extends Controller
             return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $e->getMessage()] ,400);
         }
    }
+
+   public function getClientFolder(Request $request){
+
+        try{
+            $validator = Validator::make( $request->all() , [
+                'name' => 'required|string',
+            ]);
+
+            if($validator->fails())
+            {
+                return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
+            }else{
+                $response = $this->folderHandler->clientFolder($request);
+                return response()->json($response);
+            }
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $e->getMessage()] ,400);
+        }
+   
+    }
 
 
 }

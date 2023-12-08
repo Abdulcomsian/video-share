@@ -326,6 +326,21 @@ class FolderHandler
 
         }
 
+        public function clientFolder($request){
+            $name = $request->name;
+
+            if(isset($name) && !is_null($name)){
+                $folders = Folder::where('name' ,'like' , '%'.$name.'%')->where('client_id' , auth()->user()->id)->get();
+                return ['status' => true , 'folders' => $folders];
+            }else{
+                $folders = Folder::where('client_id' , auth()->user()->id)->get();
+                return ['status' => true , 'folders' => $folders];
+            }
+
+        }
+
+
+
 
 }
 

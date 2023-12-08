@@ -116,6 +116,7 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::get('ongoing-jobs' , [JobController::class , 'ongoingJob']);
     Route::get('completed-jobs' , [JobController::class , 'completedJob']);
     Route::post('get-job-review' , [JobController::class , 'jobReview']);
+    Route::post('get-client-folder' , [FolderController::class , 'getClientFolder']);
 });
 
 

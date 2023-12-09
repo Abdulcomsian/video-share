@@ -34,6 +34,7 @@ Route::post('register' ,[AuthController::class , 'register']);
 Route::post('verify-code',[AuthController::class , 'verifyUser']);
 Route::post('logout' , [AuthController::class , 'logout']);
 Route::post('forget-password' , [UserController::class , 'forgetPassword']);
+Route::post('update-password' , [UserController::class , 'updatePassword']);
 
 Route::middleware(['auth:api'])->group(function(){
     Route::post('update-profile-image' , [UserController::class , 'updateProfileImage']);
@@ -45,7 +46,6 @@ Route::middleware(['auth:api'])->group(function(){
     Route::get('get-frequently-ask-questions' , [HomeController::class , 'getFrequentlyAskQuestion']);
     Route::get('suggested-skills' , [HomeController::class , 'suggestedSkills']);
     Route::post('change-password' , [UserController::class , 'changePassword']);
-    Route::post('update-password' , [UserController::class , 'updatePassword']);
 });
 
 /* Editor Routes*/

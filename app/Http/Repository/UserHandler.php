@@ -189,7 +189,7 @@ class UserHandler{
             return ['status' => false , 'msg' => 'No User Found With This Email'];
         }
 
-        $verificationToken = rand(111111 , 999999);
+        $verificationToken = rand(1111 , 9999);
 
         $user->token = $verificationToken;
         $user->save();

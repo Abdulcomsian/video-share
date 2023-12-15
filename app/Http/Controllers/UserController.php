@@ -581,6 +581,32 @@ class UserController extends Controller
         } 
     }
 
+
+    public function sendPasscode(Request $request){
+        $validator = Validator::make($request->all() , [
+            'email' => 'required|email',
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $validator->getMessageBag()] ,400);
+        }
+
+        try{
+
+            $response = $this->userHandler->sendVerificationCode($request);
+
+            if(!$response['status']){
+                return response()->json( $response , 400);
+            }
+
+            return response()->json($response);
+
+        }catch(\Exception $e)
+        {
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
+        } 
+    }
+
    
 
 }

@@ -35,7 +35,7 @@ Route::post('verify-code',[AuthController::class , 'verifyUser']);
 Route::post('logout' , [AuthController::class , 'logout']);
 Route::post('forget-password' , [UserController::class , 'forgetPassword']);
 Route::post('update-password' , [UserController::class , 'updatePassword']);
-Route::post('resend-passcode' , [UserController::class , 'forgetPassword']);
+Route::post('resend-passcode' , [UserController::class , 'sendPasscode']);
 
 Route::middleware(['auth:api'])->group(function(){
     Route::post('update-profile-image' , [UserController::class , 'updateProfileImage']);

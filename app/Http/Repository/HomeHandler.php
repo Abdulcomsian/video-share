@@ -69,7 +69,7 @@ class HomeHandler{
     }
 
     public function getSuggestedSkills(){
-        $skillList = SuggestedSkills::get();
+        $skillList = SuggestedSkills::selectRaw('id,name as title')->get();
         return $skillList;
     }
 }

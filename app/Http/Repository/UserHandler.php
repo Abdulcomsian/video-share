@@ -223,4 +223,19 @@ class UserHandler{
 
     }
 
+    public function sendVerificationCode($request){
+        $verificationCode = rand(1111,9999);
+        $user = User::where('email' , $request->email)->first();
+        
+        if(!$user){
+            return ['status'=>false ,'msg' => 'No user found with this email'];
+        }
+
+        $user->verification_code = $verificationCode;
+        $user->save();
+        Mail::to($request->email)->send(new VerificationMail($verificationCode ));
+        
+        return ['status' => true ,'msg' => 'Verification code has been sent to your email'];
+    }
+
 }

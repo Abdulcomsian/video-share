@@ -21,13 +21,14 @@ class ReviewHandler{
     }
 
     public function reviewList(){
-        $reviewList = Review::with(['job' => function($query){
+        $reviewList = Review::whereHas('job' , function($query){
                         $query->whereHas('doneRequest' , function($query1){
                             return $query1->where('editor_id' , auth()->user()->id);
-                        })->with('doneRequest.proposal');
-                    }])
+                        });
+                    })->with('job.doneRequest.proposal' , 'job.user')
                     ->orderBy('id' , 'desc')
                     ->get();
+       
         $totalReviews = $reviewList->count();
         $averageRating = ($reviewList->sum('rating')) / $totalReviews;
         return ['success' => true , 'reviewList' => $reviewList , 'totalReviews' => $totalReviews , 'averageRating' => $averageRating];

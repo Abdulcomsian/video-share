@@ -238,4 +238,19 @@ class UserHandler{
         return ['status' => true ,'msg' => 'Verification code has been sent to your email'];
     }
 
+    public function updatePushNotification($request){
+
+        User::where('id' , auth()->user()->id)->update(['notification_status' => $request->status]);
+        
+        return ['status' => true , 'msg'=> 'Push Notification Updated Successfully'];
+    }
+
+    public function deleteUserProfile($request){
+
+        User::where('id' , auth()->user()->id)->delete();
+
+        return ['status' => true , 'msg'=> 'User Deleted Successfully'];
+
+    }
+
 }

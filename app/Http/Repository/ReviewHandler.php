@@ -30,7 +30,7 @@ class ReviewHandler{
                     ->get();
        
         $totalReviews = $reviewList->count();
-        $averageRating = ($reviewList->sum('rating')) / $totalReviews;
+        $averageRating = $totalReviews > 0 ? ($reviewList->sum('rating')) / $totalReviews : 0 ;
         return ['success' => true , 'reviewList' => $reviewList , 'totalReviews' => $totalReviews , 'averageRating' => $averageRating];
     }
 

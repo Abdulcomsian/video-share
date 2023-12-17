@@ -47,6 +47,8 @@ Route::middleware(['auth:api'])->group(function(){
     Route::get('get-frequently-ask-questions' , [HomeController::class , 'getFrequentlyAskQuestion']);
     Route::get('suggested-skills' , [HomeController::class , 'suggestedSkills']);
     Route::post('change-password' , [UserController::class , 'changePassword']);
+    Route::get('delete-profile' , [UserController::class , 'deleteUser']);
+    Route::post('change-push-notification' , [UserController::class , 'setPushNotification']);
 });
 
 /* Editor Routes*/

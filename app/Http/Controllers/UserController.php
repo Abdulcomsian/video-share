@@ -607,6 +607,41 @@ class UserController extends Controller
         } 
     }
 
+
+    public function setPushNotification(Request $request){
+        $validator = Validator ::make($request->all() , [
+            "status" => "required|boolean",
+        ]);
+
+        if($validator->fails()){
+            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $validator->getMessageBag()]);
+        }
+
+        try{
+            
+            $response = $this->userHandler->updatePushNotification($request);
+
+            return response()->json($response);
+
+        }catch(\Exception $e){
+
+            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()]);  
+        }
+    }
+
+    public function deleteUser(Request $request){
+        try{
+            
+            $response = $this->userHandler->deleteUserProfile($request);
+
+            return response()->json($response);
+
+        }catch(\Exception $e){
+
+            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()]);  
+        }  
+    }
+
    
 
 }

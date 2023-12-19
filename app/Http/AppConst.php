@@ -15,4 +15,5 @@ class AppConst{
     public const AWARDED_JOB = 1; //Table reference requests and job editor request
     public const CANCEL_JOB = 2; //Table reference requests and job editor request
     public const DONE_JOB = 3; //Table reference requests and job editor request
+    public const QUICK_DELIVERY = 1;
 }

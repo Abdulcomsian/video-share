@@ -26,7 +26,8 @@ class JobController extends Controller
                 "budget" => "required|numeric",
                 "deadline" => "required|date",
                 "skills" => "required|string",
-                "folder_id" => "required|numeric"
+                "folder_id" => "required|numeric",
+                "quick_delivery" => "required|numeric"
             ]);
 
             if($validator->fails())

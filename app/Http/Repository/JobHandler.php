@@ -15,18 +15,17 @@ class JobHandler{
         $budget = $request->budget;
         $deadline = $request->deadline;
         $folder = $request->folder_id;
-        
-        $jobId = PersonalJob::insertGetId(
-            [
+        $quickDelivery = $request->quick_delivery;
+        $jobId = PersonalJob::insertGetId([
                 "client_id" => auth()->user()->id	,
                 "title" => $title,	
                 "description" => $description,	
                 "budget" => $budget,
                 "deadline" => $deadline,
                 "folder_id" => $folder,	
-                "status" => "unawarded"
-                ]
-            );
+                "status" => "unawarded",
+                "quick_delivery" => $quickDelivery
+            ]);
             
         $skills = json_decode($request->skills);
         $skillable = "App\Models\PersonalJob";
@@ -141,7 +140,8 @@ class JobHandler{
                             ->join("job_editor_request" , "job_editor_request.job_id", "=" , "personal_jobs.id")
                             ->join("requests" , "requests.id" , "=" , "job_editor_request.request_id")
                             ->join("users" , "users.id" , "=" , "job_editor_request.editor_id")
-                            ->selectRaw(' users.id as editor_id , personal_jobs.title as job_title ,personal_jobs.deadline , personal_jobs.description as job_description , requests.description as proposal_detail , requests.bid_price')
+                            ->join('users as client','client.id' , '=' , 'personal_jobs.client_id')
+                            ->selectRaw(' users.id as editor_id , client.full_name as client_name , personal_jobs.title as job_title ,personal_jobs.deadline , personal_jobs.description as job_description , requests.description as proposal_detail , requests.bid_price')
                             ->where('job_editor_request.editor_id' , $editorId)
                             ->get();    
             

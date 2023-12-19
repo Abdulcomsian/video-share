@@ -353,7 +353,6 @@ class JobController extends Controller
         $validator = Validator::make( $request->all() , [
             'upper_ranger' => 'nullable|numeric',
             'lower_range' => 'nullable|numeric',
-            'skills' => 'nullable|array'
         ]);
 
         if($validator->fails())
@@ -364,12 +363,33 @@ class JobController extends Controller
         try{
 
             $response = $this->jobHandler->getFilteredJob($request);
+
             return response()->json($response);
 
         }catch(\Exception $e){
             return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
 
+    }
+
+    public function deleteJob(Request $request){
+        $validator = Validator::make( $request->all() , [
+            'job_id' => 'required|numeric',
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
+        }
+
+        try{
+
+            $response = $this->jobHandler->deleteJob($request);
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
     }
    
 

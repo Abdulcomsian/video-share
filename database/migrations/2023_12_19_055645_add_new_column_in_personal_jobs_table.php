@@ -15,6 +15,7 @@ class AddNewColumnInPersonalJobsTable extends Migration
     {
         Schema::table('personal_jobs', function (Blueprint $table) {
             $table->boolean('quick_delivery')->default(0)->after('status');
+            $table->softDeletes();
         });
     }
 

@@ -3,7 +3,7 @@
 namespace App\Http\Repository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
-use App\Models\{ User , Favourite, Review , PersonalJob};
+use App\Models\{ User , Favourite, Files, Review , PersonalJob};
 use App\Mail\ {VerificationMail , TokenMail};
 use App\Http\AppConst;
 use Illuminate\Support\Facades\Hash;
@@ -245,11 +245,26 @@ class UserHandler{
         return ['status' => true , 'msg'=> 'Push Notification Updated Successfully'];
     }
 
-    public function deleteUserProfile($request){
+    public function deleteUserProfile(){
 
         User::where('id' , auth()->user()->id)->delete();
 
         return ['status' => true , 'msg'=> 'User Deleted Successfully'];
+
+    }
+
+    public function clientProfile(){
+
+        $userId = auth()->user()->id;
+        $totalJobs  = PersonalJob::where('client_id' , $userId)->count();
+        $doneJobs   = PersonalJob::where('client_id' , $userId)->whereIn('status' , ['completed' , 'Completed'])->count();
+        $cancelJobs  = PersonalJob::where('client_id' , $userId)->whereIn('status' , ['canceled', 'Canceled'])->count();
+
+        $files = Files::whereHas('folder' , function($query){
+                            $query->where('client_id' , auth()->user()->id);
+                        })->orderBy('id' , 'desc')->get();
+
+        return ['totalJobs' => $totalJobs , 'doneJobsCount' => $doneJobs , 'cancelJobsCount' => $cancelJobs , 'recent_files' => $files];
 
     }
 

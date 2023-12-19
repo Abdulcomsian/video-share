@@ -629,10 +629,23 @@ class UserController extends Controller
         }
     }
 
-    public function deleteUser(Request $request){
+    public function deleteUser(){
         try{
             
-            $response = $this->userHandler->deleteUserProfile($request);
+            $response = $this->userHandler->deleteUserProfile();
+
+            return response()->json($response);
+
+        }catch(\Exception $e){
+
+            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()]);  
+        }  
+    }
+
+    public function getClientProfile(){
+        try{
+            
+            $response = $this->userHandler->clientProfile();
 
             return response()->json($response);
 

@@ -5,11 +5,12 @@ namespace App\Models;
 use App\Http\AppConst;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\{User , Skill , ShareFolder , JobPayment , EditorRequest , FavouriteRequest , Folder , Review};
 
 class PersonalJob extends Model
 {
-    use HasFactory;
+    use HasFactory , SoftDeletes;
 
     protected $table = "personal_jobs";
     protected $primaryKey = "id";

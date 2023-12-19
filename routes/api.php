@@ -78,6 +78,7 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::post('job-folder' , [FolderController::class , 'getJobFolder']);
     Route::get('review-list' , [ReviewController::class , 'getReviewList']);
     Route::get('country-list' , [HomeController::class , 'getCountries']);
+    Route::post('get-filtered-job' , [JobController::class , 'filterJob']);
 });
 
 
@@ -120,6 +121,8 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::get('completed-jobs' , [JobController::class , 'completedJob']);
     Route::post('get-job-review' , [JobController::class , 'jobReview']);
     Route::post('get-client-folder' , [FolderController::class , 'getClientFolder']);
+    Route::get('client-profile-detail' , [UserController::class , 'getClientProfile']);
+    Route::post('delete-job' , [JobController::class , 'deleteJob']);
 });
 
 

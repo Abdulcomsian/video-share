@@ -212,7 +212,7 @@ class JobHandler{
         
         $jobId = $request->job_id;
 
-        PersonalJob::where('id' , $jobId)->update(['status' => 'unawarded']);
+        PersonalJob::where('id' , $jobId)->update(['status' => 'canceled']);
 
         $requests = EditorRequest::where('job_id' , $jobId)
                                     ->where('status' , 1)
@@ -350,6 +350,47 @@ class JobHandler{
 
         return response()->json(['status' => true , 'jobReview' => $jobReview]);
     
+    }
+
+    public function deleteJob($request){
+        $jobId = $request->job_id;
+
+        PersonalJob::where('id' , $jobId)->delete();
+
+        return ["status" => true , "msg" => "Job Deleted Successfully"];
+
+    }
+
+    public function getFilteredJob($request){
+        $lowerRange = $request->lower_range;
+        $upperRange = $request->upper_range;
+        $skills = json_decode($request->skills);
+
+        $query = PersonalJob::query();
+
+        $query->when(isset($lowerRange) && !is_null($lowerRange) , function($query1) use ($lowerRange) {
+            $query1->where('budget' , '>=' , $lowerRange);
+        });
+
+        $query->when(isset($upperRange) && !is_null($upperRange) , function($query1) use ($upperRange) {
+            $query1->where('budget' , '<=' , $upperRange);
+        });
+
+        $query->when(isset($skills) && count($skills) > 0 , function($query1) use($skills){
+            $query1->whereHas('skills' , function($query2) use($skills){
+                $query2->whereIn('title' , $skills);
+            });
+        });
+
+        $query->with('user');
+
+        $query->where('status' , 'unawarded');
+
+        $jobs = $query->get();
+
+        return ['jobs' => $jobs , 'status' => true];
+        
+
     }
 
 

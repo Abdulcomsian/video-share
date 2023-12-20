@@ -49,6 +49,7 @@ Route::middleware(['auth:api'])->group(function(){
     Route::post('change-password' , [UserController::class , 'changePassword']);
     Route::get('delete-profile' , [UserController::class , 'deleteUser']);
     Route::post('change-push-notification' , [UserController::class , 'setPushNotification']);
+    Route::post('update-user-profile' , [UserController::class , 'updateUserProfile']);
 });
 
 /* Editor Routes*/

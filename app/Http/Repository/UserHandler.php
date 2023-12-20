@@ -3,7 +3,7 @@
 namespace App\Http\Repository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
-use App\Models\{ User , Favourite, Files, Review , PersonalJob};
+use App\Models\{ User , Favourite, Files, Review , PersonalJob, Address};
 use App\Mail\ {VerificationMail , TokenMail};
 use App\Http\AppConst;
 use Illuminate\Support\Facades\Hash;
@@ -264,7 +264,23 @@ class UserHandler{
                             $query->where('client_id' , auth()->user()->id);
                         })->orderBy('id' , 'desc')->get();
 
-        return ['totalJobs' => $totalJobs , 'doneJobsCount' => $doneJobs , 'cancelJobsCount' => $cancelJobs , 'recent_files' => $files];
+        $user = User::with('address')->where('id' , auth()->user()->id)->first();
+
+        return ['totalJobs' => $totalJobs , 'doneJobsCount' => $doneJobs , 'cancelJobsCount' => $cancelJobs , 'recent_files' => $files , 'user' => $user];
+
+    }
+
+    public function updateUserProfile($request){
+        $username = $request->full_name;
+        
+        User::where("id" , auth()->user()->id)->update(["full_name" => $username]);
+
+        Address::updateOrCreate(
+            ["user_id" => auth()->user()->id],
+            ["user_id" => auth()->user()->id , "country_id" => $request->country_id , "city_id" => $request->city_id , "language" => $request->language , "address" => $request->address],
+        );
+
+        return ["status" => true , "msg"=>"User Profile Updated Successfully"];
 
     }
 

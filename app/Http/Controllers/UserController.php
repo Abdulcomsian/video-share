@@ -657,4 +657,30 @@ class UserController extends Controller
 
    
 
+   public function updateUserProfile(Request $request){
+    $validator = Validator ::make($request->all() , [
+        "full_name" => "required|string",
+        "country_id" => "required|numeric",
+        "city_id" => "required|numeric",
+        "language" => "required|string",
+        "address" => "required|string"
+    ]);
+
+    if($validator->fails()){
+        return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $validator->getMessageBag()]);
+    }
+
+    try{
+        
+        $response = $this->userHandler->updateUserProfile($request);
+
+        return response()->json($response);
+
+    }catch(\Exception $e){
+
+        return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()]);  
+    }
+
+   }
+
 }

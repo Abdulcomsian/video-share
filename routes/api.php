@@ -50,6 +50,8 @@ Route::middleware(['auth:api'])->group(function(){
     Route::get('delete-profile' , [UserController::class , 'deleteUser']);
     Route::post('change-push-notification' , [UserController::class , 'setPushNotification']);
     Route::post('update-user-profile' , [UserController::class , 'updateUserProfile']);
+    Route::get('country-list' , [HomeController::class , 'getCountries']);
+    Route::post('city-list' , [HomeController::class , 'getCities']);
 });
 
 /* Editor Routes*/
@@ -66,7 +68,6 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::post('add-editor-skill' , [UserController::class ,'addEditorSkill']);
     Route::post('update-education' , [UserController::class ,'updateEducation']);
     Route::post('add-job-request' , [JobController::class , 'addJobRequest']);
-    Route::post('city-list' , [HomeController::class , 'getCities']);
     Route::get('profile-detail' , [UserController::class , 'getProfileDetail']);
     Route::get('proposal-list' , [JobController::class , 'getProposalList']);
     Route::get('job-list' , [JobController::class , 'getJobList']);
@@ -78,7 +79,6 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::get('done-jobs' , [JobController::class , 'doneJobs']);
     Route::post('job-folder' , [FolderController::class , 'getJobFolder']);
     Route::get('review-list' , [ReviewController::class , 'getReviewList']);
-    Route::get('country-list' , [HomeController::class , 'getCountries']);
     Route::post('get-filtered-job' , [JobController::class , 'filterJob']);
 });
 

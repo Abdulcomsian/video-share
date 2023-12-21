@@ -260,13 +260,17 @@ class UserHandler{
         $doneJobs   = PersonalJob::where('client_id' , $userId)->whereIn('status' , ['completed' , 'Completed'])->count();
         $cancelJobs  = PersonalJob::where('client_id' , $userId)->whereIn('status' , ['canceled', 'Canceled'])->count();
 
-        $files = Files::whereHas('folder' , function($query){
+        $files = Files::with('folder')->whereHas('folder' , function($query){
                             $query->where('client_id' , auth()->user()->id);
                         })->orderBy('id' , 'desc')->get();
 
         $user = User::with('address')->where('id' , auth()->user()->id)->first();
 
-        return ['totalJobs' => $totalJobs , 'doneJobsCount' => $doneJobs , 'cancelJobsCount' => $cancelJobs , 'recent_files' => $files , 'user' => $user];
+        $bucketName = config('filesystems.disks.s3.bucket');
+
+        $bucketAddress = "https://$bucketName.s3.amazonaws.com/";
+
+        return ['totalJobs' => $totalJobs , 'doneJobsCount' => $doneJobs , 'cancelJobsCount' => $cancelJobs , 'recent_files' => $files , 'user' => $user, 'bucketAddress' => $bucketAddress];
 
     }
 

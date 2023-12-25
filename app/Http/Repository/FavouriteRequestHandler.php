@@ -31,7 +31,7 @@ class FavouriteRequestHandler{
 
         $jobId = $request->job_id;
 
-        $favouriteList = PersonalJob::with('favouriteRequest.editorRequest.proposal')->where('id' , $jobId)->first();
+        $favouriteList = PersonalJob::with('favouriteRequest.editorRequest.proposal' , 'favouriteRequest.editorRequest.editor')->where('id' , $jobId)->first();
 
         return ["success" => true , "JobFavouriteList" => $favouriteList];
 

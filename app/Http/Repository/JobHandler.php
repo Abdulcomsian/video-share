@@ -123,10 +123,10 @@ class JobHandler{
                                 ->join('users' , 'users.id' , '=' , 'job_editor_request.editor_id')
                                 ->join('requests' , 'requests.id' , '=' , 'job_editor_request.request_id')
                                 ->where('personal_jobs.client_id' , $clientId)
-                                ->whereIn('personal_jobs.status' ,  ['Awarded' , 'awarded' , 'completed' , 'Completed'])
-                                ->whereIn('job_editor_request.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB])
-                                ->whereIn('requests.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB])
-                                ->selectRaw('personal_jobs.id as job_id, job_editor_request.id as proposal_id, personal_jobs.deadline, personal_jobs.title, personal_jobs.budget, personal_jobs.description as job_description, requests.bid_price, requests.description as proposal_detail, personal_jobs.awarded_date')
+                                ->whereIn('personal_jobs.status' ,  ['Awarded' , 'awarded' , 'completed' , 'Completed', 'canceled' , 'Canceled'])
+                                ->whereIn('job_editor_request.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB , AppConst::CANCEL_JOB])
+                                ->whereIn('requests.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB , AppConst::CANCEL_JOB])
+                                ->selectRaw('users.id as editor_id , users.profile_image, users.full_name , personal_jobs.id as job_id, personal_jobs.status as job_status, job_editor_request.id as proposal_id, personal_jobs.deadline, personal_jobs.title, personal_jobs.budget, personal_jobs.description as job_description, requests.bid_price, requests.description as proposal_detail, personal_jobs.awarded_date')
                                 ->get();
                                 // ->unique('job_id')
                                 // ->toSql();
@@ -191,7 +191,6 @@ class JobHandler{
 
     public function getEditorJobs()
     {
-    
         $jobs = DB::table('personal_jobs')
                     ->join('job_editor_request', 'job_id' ,'=' , 'personal_jobs.id'  )
                     ->join('folders' , 'folders.id' , '=' , 'personal_jobs.folder_id' )
@@ -199,7 +198,7 @@ class JobHandler{
                     ->join('requests' , 'job_editor_request.request_id' , '=' , 'requests.id')
                     ->where('job_editor_request.status' ,'=' , 1)
                     ->where('job_editor_request.editor_id' , '=' , auth()->user()->id)
-                    ->selectRaw('personal_jobs.id as job_id, personal_jobs.title as job_title,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price , folders.id')
+                    ->selectRaw('personal_jobs.id as job_id, personal_jobs.title as job_title, personal_jobs.status as job_status,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price , folders.id')
                     ->get();       
 
       return $jobs;

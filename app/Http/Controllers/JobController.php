@@ -353,6 +353,9 @@ class JobController extends Controller
         $validator = Validator::make( $request->all() , [
             'upper_ranger' => 'nullable|numeric',
             'lower_range' => 'nullable|numeric',
+            'title' => 'nullable|string',
+            'skills' => 'nullable|json',
+            'status' => 'nullable|string'
         ]);
 
         if($validator->fails())

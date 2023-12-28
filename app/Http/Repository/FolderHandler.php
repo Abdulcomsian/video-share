@@ -339,6 +339,22 @@ class FolderHandler
 
         }
 
+        public function searchFolder($request){
+            $name = $request->name;
+
+            $query = Folder::query();
+
+            $query->when(isset($request->name) && !is_null($request->name) , function($query1) use($name){
+                $query1->where('name' , 'like' ,'%'.$name.'%' );
+            });
+
+            $folder = $query->where('client_id' , auth()->user()->id)->orderBy('id' , 'desc')->get();
+
+            return ['status' => true , 'folder' => $folder ];
+
+
+        }
+
 
 
 

@@ -320,5 +320,23 @@ class FolderController extends Controller
    
     }
 
+    public function searchFolder(Request $request){
+        try{
+            $validator = Validator::make( $request->all() , [
+                'name' => 'required|string',
+            ]);
+
+            if($validator->fails())
+            {
+                return response()->json(["status" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
+            }else{
+                $response = $this->folderHandler->searchFolder($request);
+                return response()->json($response);
+            }
+        }catch(\Exception $e){
+            return response()->json(["status" => false , "msg" => "Something Went Wrong" ,"error" => $e->getMessage()] ,400);
+        }
+    }
+
 
 }

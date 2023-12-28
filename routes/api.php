@@ -29,6 +29,7 @@ use App\Http\Controllers\{ AuthController ,
 // });
 
 
+
 Route::match(['GET', 'POST'], '/login', [AuthController::class, 'login'])->name('login');
 Route::post('register' ,[AuthController::class , 'register']);
 Route::post('verify-code',[AuthController::class , 'verifyUser']);
@@ -52,6 +53,7 @@ Route::middleware(['auth:api'])->group(function(){
     Route::post('update-user-profile' , [UserController::class , 'updateUserProfile']);
     Route::get('country-list' , [HomeController::class , 'getCountries']);
     Route::post('city-list' , [HomeController::class , 'getCities']);
+    Route::post('filter-job' , [JobController::class , 'filterJob']);
 });
 
 /* Editor Routes*/
@@ -124,6 +126,7 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post('get-client-folder' , [FolderController::class , 'getClientFolder']);
     Route::get('client-profile-detail' , [UserController::class , 'getClientProfile']);
     Route::post('delete-job' , [JobController::class , 'deleteJob']);
+    Route::post('search-folder' , [FolderController::class , 'searchFolder']);
 });
 
 

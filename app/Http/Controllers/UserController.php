@@ -651,7 +651,7 @@ class UserController extends Controller
 
         }catch(\Exception $e){
 
-            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()]);  
+            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()] , 400);  
         }  
     }
 

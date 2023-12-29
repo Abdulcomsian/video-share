@@ -121,6 +121,12 @@ class FolderHandler
         {
             $folderId = $request->folder_id;
 
+            $runningJob = PersonalJob::where('folder_id' , $folderId)->whereIn('status' , ['awarded , Awarded'])->count();
+
+            if($runningJob > 0){
+                return ['success' => false , 'error' => "You can not delete the folder during a running job"];
+            }
+
             $folder = Folder::where('id' , $folderId)->first();
 
             if($folder){

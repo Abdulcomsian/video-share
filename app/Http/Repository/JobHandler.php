@@ -159,11 +159,15 @@ class JobHandler{
                             ->join("requests" , "requests.id" , "=" , "job_editor_request.request_id")
                             ->join("users" , "users.id" , "=" , "job_editor_request.editor_id")
                             ->join('users as client','client.id' , '=' , 'personal_jobs.client_id')
-                            ->selectRaw(' users.id as editor_id , client.full_name as client_name , personal_jobs.title as job_title ,personal_jobs.deadline , personal_jobs.description as job_description , requests.description as proposal_detail , requests.bid_price')
+                            ->join('folders' , 'folders.id' , '=' , 'personal_jobs.folder_id')
+                            ->selectRaw(' users.id as editor_id , client.full_name as client_name , personal_jobs.title as job_title ,personal_jobs.deadline , personal_jobs.description as job_description , requests.description as proposal_detail , requests.bid_price, folders.name as folder_name , folders.id as folder_id')
                             ->where('job_editor_request.editor_id' , $editorId)
                             ->orderBy('job_editor_request.id' , 'desc')
                             ->get();    
             
+        // $bucketName = config('filesystems.disks.s3.bucket');
+
+        // $bucketAddressPrefix = "https://$bucketName.s3.amazonaws.com/";
         
         return ['success' => true , 'proposals' => $proposalList];
     }

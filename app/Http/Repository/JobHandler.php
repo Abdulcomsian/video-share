@@ -122,11 +122,25 @@ class JobHandler{
                                 ->join( 'job_editor_request' , 'personal_jobs.id' , '=' , 'job_editor_request.job_id')
                                 ->join('users' , 'users.id' , '=' , 'job_editor_request.editor_id')
                                 ->join('requests' , 'requests.id' , '=' , 'job_editor_request.request_id')
+                                ->leftJoin('job_review' , 'personal_jobs.id', '=' , 'job_review.job_id')
                                 ->where('personal_jobs.client_id' , $clientId)
                                 ->whereIn('personal_jobs.status' ,  ['Awarded' , 'awarded' , 'completed' , 'Completed', 'canceled' , 'Canceled'])
                                 ->whereIn('job_editor_request.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB , AppConst::CANCEL_JOB])
                                 ->whereIn('requests.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB , AppConst::CANCEL_JOB])
-                                ->selectRaw('users.id as editor_id , users.profile_image, users.full_name , personal_jobs.id as job_id, personal_jobs.status as job_status, job_editor_request.id as proposal_id, personal_jobs.deadline, personal_jobs.title, personal_jobs.budget, personal_jobs.description as job_description, requests.bid_price, requests.description as proposal_detail, personal_jobs.awarded_date')
+                                ->selectRaw('users.id as editor_id , 
+                                            users.profile_image, 
+                                            users.full_name , 
+                                            personal_jobs.id as job_id, 
+                                            personal_jobs.status as job_status, 
+                                            job_editor_request.id as proposal_id, 
+                                            personal_jobs.deadline, 
+                                            personal_jobs.title, 
+                                            personal_jobs.budget, 
+                                            personal_jobs.description as job_description, 
+                                            requests.bid_price, 
+                                            requests.description as proposal_detail, 
+                                            personal_jobs.awarded_date,
+                                            If(job_review.id IS NOT NULL, true , false) as has_review')
                                 ->orderBy('personal_jobs.id' , 'desc')
                                 ->get();
                                 // ->unique('job_id')

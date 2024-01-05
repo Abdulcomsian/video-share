@@ -91,9 +91,9 @@ class UserHandler{
         return ["success" => true , 'favourites' => $favouriteList];
     }
 
-    public function profileDetail()
+    public function profileDetail($editorId)
     {
-        $userId = auth()->user()->id;
+        $userId = $editorId;
     
         $reviews = Review::whereHas('job' , function($query) use ($userId){
                             $query->whereHas('doneRequest' , function($query1) use ($userId){

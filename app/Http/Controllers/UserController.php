@@ -353,11 +353,20 @@ class UserController extends Controller
         } 
     }
 
-    public function getProfileDetail()
+    public function getProfileDetail(Request $request)
     {
-        try{
+        $validator = Validator::make($request->all() , [
+                        'editor_id' => 'nullable|numeric'
+                    ]);
 
-            $response = $this->userHandler->profileDetail();
+        if($validator->fails()){
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $validator->getMessage()] ,400); 
+        }
+
+        try{
+            $editorId = $request->editor_id ?? auth()->user()->id;
+
+            $response = $this->userHandler->profileDetail($editorId);
 
             return response()->json($response);
 

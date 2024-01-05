@@ -20,10 +20,11 @@ class ReviewHandler{
         return ['success' => true , 'msg' => 'Review Added Successfully'];
     }
 
-    public function reviewList(){
-        $reviewList = Review::whereHas('job' , function($query){
-                        $query->whereHas('doneRequest' , function($query1){
-                            return $query1->where('editor_id' , auth()->user()->id);
+    public function reviewList($editorId){
+
+        $reviewList = Review::whereHas('job' , function($query) use ($editorId){
+                        $query->whereHas('doneRequest' , function($query1) use ($editorId){
+                            return $query1->where('editor_id' , $editorId);
                         });
                     })->with('job.doneRequest.proposal' , 'job.user')
                     ->orderBy('id' , 'desc')

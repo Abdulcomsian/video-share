@@ -14,7 +14,7 @@ class ReviewController extends Controller
         $this->reviewHandler = $reviewHandler;
     } 
 
-    function addUpdateReview(Request $request){
+    public function addUpdateReview(Request $request){
         try{
             $validator = Validator::make($request->all() , [
                                             'job_id' => 'required|numeric',
@@ -39,9 +39,21 @@ class ReviewController extends Controller
         }
     }
 
-    function getReviewList(){
+    public function getReviewList(Request $request){
+        $validator = Validator::make($request->all() , [
+            'editor_id' => 'numeric|nullable',
+        ]);
+
+        if($validator->fails()){
+
+            return response()->json(['success' => false , 'msg' => 'Something Went Wrong' , 'error' => $validator->getMessageBag()]);
+        
+        }
+
         try{
-                $response = $this->reviewHandler->reviewList();
+                $editorId = $request->editor_id ?? auth()->user()->id;
+
+                $response = $this->reviewHandler->reviewList($editorId);
 
                 return response()->json($response);
 
@@ -51,5 +63,6 @@ class ReviewController extends Controller
         
         }
     }
+
 
 }

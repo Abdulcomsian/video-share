@@ -82,6 +82,15 @@ class UserHandler{
 
     }
 
+    public function deleteEditorFavourite($request){
+        
+        $favouriteId = $request->favourite_id;
+
+        Favourite::where('id' , $favouriteId)->delete();
+
+        return ["success"=> true , "msg" => "Editor Remove From Favourite Successfully"];
+    }
+
     public function favouriteList()
     {
         $userId = auth()->user()->id;

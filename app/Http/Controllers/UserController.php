@@ -338,6 +338,31 @@ class UserController extends Controller
         } 
     }
 
+    public function deleteFavourite(Request $request)
+    {
+        try{
+            $validator = Validator::make( $request->all(), [
+                "favourite_id"   => "required|numeric",
+            ]);
+
+            if($validator->fails())
+            {
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
+            
+            }else{
+
+                $response = $this->userHandler->deleteEditorFavourite($request);
+
+                return response()->json($response);
+            }
+
+        
+        }catch(\Exception $e)
+        {
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
+        } 
+    }
+
 
     public function getFavouriteList()
     {

@@ -94,6 +94,7 @@ Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
     Route::post("award-job" , [JobController::class , "awardJob"]);
     Route::get("awarded-job-list", [JobController::class ,"awardedJobList"]);
     Route::post("add-favourite" , [UserController::class , 'addFavourite']);
+    Route::post("delete-favourite" , [UserController::class , 'deleteFavourite']);
     Route::get('favourite-list' , [UserController::class , 'getFavouriteList']);
     Route::post('add-folder-file', [FolderController::class, 'addFolderFile']);
     Route::get('editor-list' , [UserController::class , 'getEditorList']);

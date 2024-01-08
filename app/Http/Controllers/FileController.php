@@ -107,6 +107,10 @@ class FileController extends Controller
             } else {
                 
                 $response = $this->filesHandler->getFile($request);
+
+                if(!$response['success']){
+                    return response()->json($response , 400);
+                }
                 
                 return response()->json($response);
             }
@@ -130,6 +134,10 @@ class FileController extends Controller
             } else {
                 
                 $response = $this->filesHandler->getShareFile($request);
+
+                if(!$response['success']){
+                    return response()->json($response , 400);
+                }
                 
                 return response()->json($response);
             }

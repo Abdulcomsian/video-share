@@ -86,7 +86,7 @@ class UserHandler{
     {
         $userId = auth()->user()->id;
 
-        $favouriteList = User::with('favourite.editor')->where('id' , $userId)->first();
+        $favouriteList = User::with('favourite.editor.skills', 'favourite.editor.editorProfile')->where('id' , $userId)->first();
 
         return ["success" => true , 'favourites' => $favouriteList];
     }

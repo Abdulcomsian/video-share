@@ -179,6 +179,10 @@ class FilesHandler{
 
         $file = Files::with('comments' ,'folder')->where('id' , $request->file_id)->first();
 
+        if(!$file){
+            return ['success' => false , 'msg' => 'Something Went Wrong' , 'error' => 'No File Found' ];
+        }
+
         $bucketName = config('filesystems.disks.s3.bucket');
         
         $folderPath = $file->folder->name;
@@ -187,7 +191,7 @@ class FilesHandler{
 
         $thumbnailPath = public_path('uploads');
         
-        return response()->json(['success' => true ,  'file'  => $file , 'bucketAddress' => $bucketAddress , 'thumbnailPath' => $thumbnailPath]);
+        return ['success' => true ,  'file'  => $file , 'bucketAddress' => $bucketAddress , 'thumbnailPath' => $thumbnailPath];
     
     }
 
@@ -195,6 +199,10 @@ class FilesHandler{
 
         $file = ShareFolderFiles::with('comments' , 'folder')->where('id' , $request->file_id)->first();
 
+        if(!$file){
+            return ['success' => false , 'msg' => 'Something Went Wrong' , 'error' => 'No file Exist With This Id'];
+        }
+
         $bucketName = config('filesystems.disks.s3.bucket');
         
         $folderPath = $file->folder->name;
@@ -203,7 +211,7 @@ class FilesHandler{
 
         $thumbnailPath = public_path('uploads');
         
-        return response()->json(['success' => true ,  'file'  => $file , 'bucketAddress' => $bucketAddress , 'thumbnailPath' => $thumbnailPath]);
+        return ['success' => true ,  'file'  => $file , 'bucketAddress' => $bucketAddress , 'thumbnailPath' => $thumbnailPath];
     
     }
 

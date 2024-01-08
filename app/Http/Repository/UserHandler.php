@@ -135,6 +135,18 @@ class UserHandler{
         $doneJobCount = $userDetails->doneJob->count();
 
         $cancelJobCount = $userDetails->cancelJob->count();
+
+        $editorStatus = false;
+
+        if(auth()->user()->type == AppConst::CLIENT){
+            $favouriteCount = Favourite::where('client_id' , auth()->user()->id)
+                               ->where('editor_id' , $editorId)
+                               ->count();
+
+            $editorStatus = $favouriteCount ? true : false;
+
+        }
+
         
         return [ 
                  'success' => true , 
@@ -148,7 +160,8 @@ class UserHandler{
                  'timelyDeliveredJobCount' => $doneJobCount,
                  'totalReview' => $totalReview,
                  'averageReviewRating' => $averageReviewRating,
-                 'lastReview' => $lastReviewComment
+                 'lastReview' => $lastReviewComment,
+                 'editorStatus' => $editorStatus
                ];
     }
 

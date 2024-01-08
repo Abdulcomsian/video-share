@@ -180,7 +180,7 @@ class FilesHandler{
         $file = Files::with('comments' ,'folder')->where('id' , $request->file_id)->first();
 
         if(!$file){
-            return ['success' => false , 'msg' => 'Something Went Wrong' , 'error' => 'No File Found' ];
+            return ['success' => false , 'msg' => 'Something Went Wrong' , 'error' => 'No File Found With This Id' ];
         }
 
         $bucketName = config('filesystems.disks.s3.bucket');

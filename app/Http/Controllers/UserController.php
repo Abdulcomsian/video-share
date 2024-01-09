@@ -342,7 +342,7 @@ class UserController extends Controller
     {
         try{
             $validator = Validator::make( $request->all(), [
-                "favourite_id"   => "required|numeric",
+                "editor_id"   => "required|numeric",
             ]);
 
             if($validator->fails())

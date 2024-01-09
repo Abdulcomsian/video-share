@@ -212,20 +212,23 @@ class JobHandler{
     public function getEditorJobs()
     {
         $jobs = DB::table('personal_jobs')
-        ->join('job_editor_request', 'job_id' ,'=' , 'personal_jobs.id'  )
-        ->join('folders' , 'folders.id' , '=' , 'personal_jobs.folder_id' )
-        ->join('users as editor' , 'job_editor_request.editor_id' ,'=' ,'editor.id')
-        ->join('users as client' , 'personal_jobs.client_id' , '=' , 'client.id')
-        ->join('requests' , 'job_editor_request.request_id' , '=' , 'requests.id')
-        ->where('job_editor_request.status' ,'=' , 1)
-        ->where('job_editor_request.editor_id' , '=' , auth()->user()->id)
-        ->selectRaw('personal_jobs.id as job_id, client.full_name as client_name, client.profile_image as client_image , personal_jobs.title as job_title,personal_jobs.status as job_status,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price , folders.id')
-        ->get();  
+                    ->join('job_editor_request', 'job_id' ,'=' , 'personal_jobs.id'  )
+                    ->join('folders' , 'folders.id' , '=' , 'personal_jobs.folder_id' )
+                    ->join('users as editor' , 'job_editor_request.editor_id' ,'=' ,'editor.id')
+                    ->join('users as client' , 'personal_jobs.client_id' , '=' , 'client.id')
+                    ->join('requests' , 'job_editor_request.request_id' , '=' , 'requests.id')
+                    ->where('job_editor_request.status' ,'=' , 1)
+                    ->where('job_editor_request.editor_id' , '=' , auth()->user()->id)
+                    ->selectRaw('personal_jobs.id as job_id, client.full_name as client_name, client.profile_image as client_image , personal_jobs.title as job_title,personal_jobs.status as job_status,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price , folders.id')
+                    ->get();  
         
+        $user = User::with('cancelJob' , 'doneJob')->where('id' , auth()->user()->id)->first();
+        $doneJobCount = $user->doneJob->count();
+        $cancelledJobCount = $user->cancelJob->count();
         // client.full_name as client_name, client.profile_image as client_image,
 
-$profileImageLinkPrefix = asset('uploads');
-return ['status' => true , 'jobs' => $jobs , 'profileImageLinkPrefix' => $profileImageLinkPrefix];
+        $profileImageLinkPrefix = asset('uploads');
+        return ['status' => true , 'jobs' => $jobs , 'profileImageLinkPrefix' => $profileImageLinkPrefix , 'doneJobCount' => $doneJobCount , 'cancelJobCount' => $cancelledJobCount];
     }
 
 

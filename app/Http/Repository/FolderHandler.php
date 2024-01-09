@@ -244,7 +244,7 @@ class FolderHandler
 
         public function checkShareFolder($jobId)
         {
-           return ShareFolder::where('id' , $jobId)->first();
+           return ShareFolder::where('job_id' , $jobId)->first();
         }
 
         public function createShareFolder($jobId)

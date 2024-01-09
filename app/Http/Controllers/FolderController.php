@@ -216,6 +216,8 @@ class FolderController extends Controller
 
     public function shareFile(Request $request)
     {
+        // set_time_limit(300);
+
         $validator = Validator::make($request->all() , [
             'job_id' => 'required',
             // 'files' => 'required|array|min:1',

@@ -76,6 +76,7 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
     Route::get('job-list' , [JobController::class , 'getJobList']);
     Route::get('unassigned-job-list' , [JobController::class , 'getUnassignedJobs']);
     Route::post('share-files' , [FolderController::class , 'shareFile']);
+    // Route::post('share-files' , function(){dd("inside share file");});
     Route::post('getshares' , [FolderController::class , 'getshares']);
     Route::post('delete-share-file' , [FileController::class , 'deleteShareFile']);
     Route::get('cancel-jobs' , [JobController::class , 'cancelJobs']);

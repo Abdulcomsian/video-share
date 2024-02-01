@@ -38,7 +38,7 @@ Route::post('forget-password' , [UserController::class , 'forgetPassword']);
 Route::post('update-password' , [UserController::class , 'updatePassword']);
 Route::post('resend-passcode' , [UserController::class , 'sendPasscode']);
 
-Route::middleware(['auth:api'])->group(function(){
+Route::middleware(['verify.authentication'])->group(function(){
     Route::post('update-profile-image' , [UserController::class , 'updateProfileImage']);
     Route::post('job-detail', [JobController::class, 'getJobDetail']);
     Route::post('add-file-comment', [CommentController::class, 'addFileComment']);
@@ -59,7 +59,7 @@ Route::middleware(['auth:api'])->group(function(){
 });
 
 /* Editor Routes*/
-Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
+Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(function(){
     Route::post('update-profile' , [UserController::class , 'updateProfile']);
     Route::post('update-editor-profile' , [UserController::class , 'updateEditorProfile']);
     Route::post('update-editor-portfolio' , [UserController::class , 'updateEditorPortfolio']);
@@ -87,7 +87,7 @@ Route::middleware(['auth:api' , 'api.editor.verify'])->group(function(){
 
 
 /* Client Routes*/
-Route::middleware(['auth:api' , 'api.client.verify'])->group(function(){
+Route::middleware(['verify.authentication' , 'api.client.verify'])->group(function(){
     Route::post("create-folder" , [FolderController::class , 'createClientFolder']);
     Route::post("post-job" , [JobController::class , 'addJob']);
     Route::get("client-jobs" , [JobController::class , 'clientJob']);

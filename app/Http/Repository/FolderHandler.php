@@ -102,7 +102,7 @@ class FolderHandler
         {
             $userId = auth()->user()->id;
 
-            $folders = Folder::with('files')->where('client_id' , $userId)->get();
+            $folders = Folder::with('files')->where('client_id' , $userId)->orderBy('id' , 'desc')->get();
 
             return ["success" => true , "msg" => "Folder Fetched Successfully" , "folders" => $folders];
         }
@@ -224,7 +224,7 @@ class FolderHandler
             
             $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
             
-            $files = Files::with('folder')->where('folder_id' , $folderId)->get();
+            $files = Files::with('folder')->where('folder_id' , $folderId)->orderBy('id' , 'desc')->get();
 
             $thumbnailPath = public_path('uploads');
 

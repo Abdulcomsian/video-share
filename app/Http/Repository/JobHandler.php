@@ -220,6 +220,7 @@ class JobHandler{
                     ->whereIn('job_editor_request.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB , AppConst::CANCEL_JOB])
                     ->where('job_editor_request.editor_id' , '=' , auth()->user()->id)
                     ->selectRaw('personal_jobs.id as job_id, client.full_name as client_name, client.profile_image as client_image , personal_jobs.title as job_title,personal_jobs.status as job_status,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price , folders.id')
+                    ->orderBy('personal_jobs.id' , 'desc')
                     ->get();  
         
         // $user = User::with('cancelJob' , 'doneJob')->where('id' , auth()->user()->id)->first();
@@ -233,7 +234,7 @@ class JobHandler{
 
 
     public function unassignedJobs(){
-        $unassignedJobs = PersonalJob::with('skills' , 'user')->where('status' , 'unawarded')->get();
+        $unassignedJobs = PersonalJob::with('skills' , 'user')->where('status' , 'unawarded')->orderBy('id' , 'desc')->get();
         return $unassignedJobs;
     }
 
@@ -286,7 +287,7 @@ class JobHandler{
     public function cancelJobList()
     {
         $userId = auth()->user()->id;
-        $cancelJobs = User::with('cancelJob.job')->where('id', $userId)->get();
+        $cancelJobs = User::with('cancelJob.job')->where('id', $userId)->orderBy('id' , 'desc')->get();
         return ["success" => true , "cancelJobs" => $cancelJobs];
     }
 
@@ -295,7 +296,7 @@ class JobHandler{
     {
         $userId = auth()->user()->id;
 
-        $doneJobs = User::with('doneJob.job.review')->where('id', $userId)->get();
+        $doneJobs = User::with('doneJob.job.review')->where('id', $userId)->orderBy('id' , 'desc')->get();
         
         return ["success" => true , "doneJobs" => $doneJobs];
     }
@@ -304,7 +305,7 @@ class JobHandler{
     {
         $userId = auth()->user()->id;
 
-        $postedJobs = PersonalJob::withCount('requestList')->where('client_id' , $userId)->where('status' , 'unawarded')->get();
+        $postedJobs = PersonalJob::withCount('requestList')->where('client_id' , $userId)->where('status' , 'unawarded')->orderBy('id' , 'desc')->get();
 
         return ["success" => true , 'postedJobs' => $postedJobs];
 
@@ -319,6 +320,7 @@ class JobHandler{
                                         }])
                                         ->whereIn('status' , ['awarded' , 'completed'])
                                         ->where('client_id' , $userId)
+                                        ->orderBy('id' , 'desc')
                                         ->get();
 
         // $awardedJobs = PersonalJob::with('awardedRequest.editor', 'review')->where('client_id' , $userId)->where('status' , 'awarded')->get();
@@ -358,7 +360,7 @@ class JobHandler{
 
     public function getOngoingJob(){
         
-      $ongoingJobs =  PersonalJob::with('awardedRequest.editor' , 'review' )->where('client_id' , auth()->user()->id)->where('status' , 'awarded')->get();
+      $ongoingJobs =  PersonalJob::with('awardedRequest.editor' , 'review' )->where('client_id' , auth()->user()->id)->where('status' , 'awarded')->orderBy('id' , 'desc')->get();
 
       return response()->json(['status' => true , 'ongoingJobs' => $ongoingJobs]);
 
@@ -366,7 +368,7 @@ class JobHandler{
 
     public function getCompletedJob(){
 
-        $completedJobs =  PersonalJob::with('doneRequest.editor' , 'review' )->where('client_id' , auth()->user()->id)->where('status' , 'completed')->get();
+        $completedJobs =  PersonalJob::with('doneRequest.editor' , 'review' )->where('client_id' , auth()->user()->id)->where('status' , 'completed')->orderBy('id' , 'desc')->get();
 
         return response()->json(['status' => true , 'completedJobs' => $completedJobs]);
 

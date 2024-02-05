@@ -20,6 +20,6 @@ class CheckAuthentication
             return $next($request);
         }
 
-        return response()->json(['status' => false , 'msg' => 'Unauthenticated User'] , 400);
+        return response()->json(['status' => false , 'msg' => 'Unauthenticated User'] , 401);
     }
 }

@@ -717,4 +717,73 @@ class UserController extends Controller
 
    }
 
+
+   public function addSocialLink(Request $request)
+   {
+    
+    $platform = json_decode($request->platform);
+    $url = json_decode($request->url);
+
+    if(count($platform) == 0 || count($url) == 0){
+        return response()->json(['status' => false , 'msg' => "Add Atleast One Platform And Url"] , 400);
+    }
+
+    if(count($url) != count($platform) ){
+        return response()->json(['status' => false , 'msg' => "Platform and url must be equal"] , 400);
+    }
+
+    try{
+
+        $response = $this->userHandler->addSocialLink($url , $platform );
+        return response()->json($response);
+    }catch(\Exception $e){
+        return response()->json(['status' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
+    }
+    
+   }
+
+
+   public function updateSocialLink(Request $request)
+   {
+
+    $platform = json_decode($request->platform);
+    $url = json_decode($request->url);
+
+    if(count($platform) == 0 || count($url) == 0){
+        return response()->json(['status' => false , 'msg' => "Add Atleast One Platform And Url"] , 400);
+    }
+
+    if(count($url) != count($platform) ){
+        return response()->json(['status' => false , 'msg' => "Platform and url must be equal"] , 400);
+    }
+
+    try{
+        $response = $this->userHandler->updateSocialLink($url , $platform );
+        return response()->json($response);
+    }catch(\Exception $e){
+        return response()->json(['status' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
+    }
+    
+   }
+
+   public function uploadPortfolioVideo(Request $request)
+   {
+    $validator = Validator::make($request->all() , [
+        "file" => "required|mimes:mp4,webm",
+    ]);
+
+    if($validator->fails()){
+        return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $validator->getMessageBag()]);
+    }
+
+    try{
+        $response = $this->userHandler->uploadPortfolioVideo($request);
+        return response()->json($response);
+    }catch(\Exception $e){
+        return response()->json(['status' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
+    }
+
+
+   }
+
 }

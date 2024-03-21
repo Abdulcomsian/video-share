@@ -3,12 +3,19 @@
 namespace App\Http\Repository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
-use App\Models\{ User , Favourite, Files, Review , PersonalJob, Address};
+use App\Models\{ User , Favourite, Files, Review , PersonalJob, Address , PortfolioVideo, SocialLink};
 use App\Mail\ {VerificationMail , TokenMail};
 use App\Http\AppConst;
 use Illuminate\Support\Facades\Hash;
-
+use App\Http\Repository\AwsHandler;
 class UserHandler{
+    
+    protected $awsHandler;
+
+    function __construct(AwsHandler $awsHandler)
+    {
+        $this->awsHandler = $awsHandler;    
+    }
     
     public function findUser($email , $password , $type)
     {
@@ -307,6 +314,48 @@ class UserHandler{
         );
 
         return ["status" => true , "msg"=>"User Profile Updated Successfully"];
+
+    }
+
+
+    public function addSocialLink($url , $platform )
+    {
+        $socailLinks = [];
+
+        foreach($url as $index => $link){
+           $socailLinks[] = ['platform' => $platform[$index] , 'url' => $link , 'user_id' => auth()->user()->id]; 
+        }
+
+        SocialLink::insert($socailLinks);
+        return ["status" => true , "msg"=>"Social links added successfully"];
+    }
+
+    public function updateSocialLink($url , $platform)
+    {
+        $socailLinks = [];
+        
+        SocialLink::where('user_id' , auth()->user()->id)->delete();
+
+        foreach($url as $index => $link){
+           $socailLinks[] = ['platform' => $platform[$index] , 'url' => $link, 'user_id' => auth()->user()->id]; 
+        }
+
+        SocialLink::insert($socailLinks);
+        return ["status" => true , "msg"=>"Social links updated successfully"];
+    }
+
+    public function uploadPortfolioVideo($request)
+    {
+        $file = $request->file('file');
+        $fileName = $file->getClientOriginalName();
+        $name = time() . "-" . $fileName;
+        $check = $this->awsHandler->uploadMedia( "user-porfolio" , $name , $file);
+        if($check['success']){
+            PortfolioVideo::updateOrCreate(['user_id' => auth()->user()->id] , ['user_id' => auth()->user()->id , 'video_url' => $name] );
+            return ['status' => true , 'msg' => 'Portfolio video updated successfully'];
+        }else{
+            return $check;
+        }
 
     }
 

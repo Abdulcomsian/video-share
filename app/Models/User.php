@@ -11,6 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\{ PersonalJob , Comment , Skill ,  EditorProfile , Education , Address , Folder , EditorRequest};
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements JWTSubject
@@ -64,6 +65,13 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope('videoDetail' , function(Builder $builder){
+            $builder->with('portfolioVideo');
+        });
     }
 
     public function comments()
@@ -125,6 +133,16 @@ class User extends Authenticatable implements JWTSubject
     public function doneJob()
     {
         return $this->hasMany(EditorRequest::class , 'editor_id', 'id')->where('status' , AppConst::DONE_JOB);
+    }
+
+    public function socialLink()
+    {
+        return $this->hasMany(SocialLink::class , 'user_id' , 'id');
+    }
+
+    public function portfolioVideo()
+    {
+        return $this->hasOne(PortfolioVideo::class , 'user_id' , 'id');
     }
 
 

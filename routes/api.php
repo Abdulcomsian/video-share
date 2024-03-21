@@ -83,6 +83,9 @@ Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(functi
     Route::get('done-jobs' , [JobController::class , 'doneJobs']);
     Route::post('job-folder' , [FolderController::class , 'getJobFolder']);
     Route::post('get-filtered-job' , [JobController::class , 'filterJob']);
+    Route::post('add-social-link' , [UserController::class , 'addSocialLink']);
+    Route::post('update-social-link' , [UserController::class , 'updateSocialLink']);
+    Route::post('upload-portfolio-video' , [UserController::class , 'uploadPortfolioVideo']);
 });
 
 

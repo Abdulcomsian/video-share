@@ -142,7 +142,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function portfolioVideo()
     {
-        return $this->hasOne(PortfolioVideo::class , 'user_id' , 'id');
+        return $this->hasMany(PortfolioVideo::class , 'user_id' , 'id');
     }
 
 

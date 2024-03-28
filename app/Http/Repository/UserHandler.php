@@ -346,16 +346,18 @@ class UserHandler{
 
     public function uploadPortfolioVideo($request)
     {
-        $file = $request->file('file');
-        $fileName = $file->getClientOriginalName();
-        $name = time() . "-" . $fileName;
-        $check = $this->awsHandler->uploadMedia( "user-porfolio" , $name , $file);
-        if($check['success']){
-            PortfolioVideo::updateOrCreate(['user_id' => auth()->user()->id] , ['user_id' => auth()->user()->id , 'video_url' => $name] );
-            return ['status' => true , 'msg' => 'Portfolio video updated successfully'];
-        }else{
-            return $check;
-        }
+        foreach($request->file('files') as $file)
+        {
+            $fileName = $file->getClientOriginalName();
+            $name = time() . "-" . str_replace(" ", "-", $fileName);
+            $check = $this->awsHandler->uploadMedia( "user-porfolio" , $name , $file);
+            if($check['success'])
+            {
+                PortfolioVideo::create(['user_id' => auth()->user()->id , 'video_url' => $name] );
+            }
+        }        
+
+        return ['status' => true , 'msg' => 'Portfolio video updated successfully'];
 
     }
 
@@ -365,7 +367,7 @@ class UserHandler{
 
         $bucketAddress = "https://$bucketName.s3.amazonaws.com/user-porfolio";
 
-        $portfolioVideo = PortfolioVideo::where('user_id' , auth()->user()->id)->first();
+        $portfolioVideo = PortfolioVideo::where('user_id' , auth()->user()->id)->get();
 
         return response()->json(['status' => true , 'bucketAddress' => $bucketAddress , 'portfolioVideo' => $portfolioVideo]);
     }

@@ -86,6 +86,7 @@ Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(functi
     Route::post('add-social-link' , [UserController::class , 'addSocialLink']);
     Route::post('update-social-link' , [UserController::class , 'updateSocialLink']);
     Route::post('upload-portfolio-video' , [UserController::class , 'uploadPortfolioVideo']);
+    Route::get('get-portfolio-video' , [UserController::class , 'portfolioVideo']);
 });
 
 

@@ -359,4 +359,15 @@ class UserHandler{
 
     }
 
+    public function getPortfolioVideo()
+    {
+        $bucketName = config('filesystems.disks.s3.bucket');
+
+        $bucketAddress = "https://$bucketName.s3.amazonaws.com/user-porfolio";
+
+        $portfolioVideo = PortfolioVideo::where('user_id' , auth()->user()->id)->first();
+
+        return response()->json(['status' => true , 'bucketAddress' => $bucketAddress , 'portfolioVideo' => $portfolioVideo]);
+    }
+
 }

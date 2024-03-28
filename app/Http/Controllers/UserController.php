@@ -783,7 +783,16 @@ class UserController extends Controller
         return response()->json(['status' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
     }
 
+   }
 
+   public function portfolioVideo()
+   {
+    try{
+        $response = $this->userHandler->getPortfolioVideo();
+        return response()->json($response);
+    }catch(\Exception $e){
+        return response()->json(['status' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
+    }
    }
 
 }

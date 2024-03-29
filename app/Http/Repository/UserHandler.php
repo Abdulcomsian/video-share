@@ -127,7 +127,7 @@ class UserHandler{
 
         $averageReviewRating =  $totalReview > 0 ? $reviews->pluck('rating')->sum()/$totalReview : 0;
 
-        $profile = User::with('address.country', 'address.city' , 'editorProfile' ,'skills' , 'education' , 'portfolio' )->where('id' , $userId)->first();
+        $profile = User::with('address.country', 'address.city' , 'editorProfile' ,'skills' , 'education' , 'portfolio' , 'portfolioVideo' )->where('id' , $userId)->first();
         
         $editorProfileAndSkill = ( isset($profile->editorProfile) && !is_null($profile->editorProfile)) && count($profile->skills) ? true :  false;
 

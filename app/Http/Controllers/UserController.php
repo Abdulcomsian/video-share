@@ -769,7 +769,7 @@ class UserController extends Controller
    public function uploadPortfolioVideo(Request $request)
    {
     $validator = Validator::make($request->all() , [
-        "files.*" => "required|mimes:mp4,webm",
+        "files.*" => "required",
     ]);
     
     if($validator->fails()){

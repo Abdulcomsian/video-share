@@ -127,7 +127,7 @@ class UserHandler{
 
         $averageReviewRating =  $totalReview > 0 ? $reviews->pluck('rating')->sum()/$totalReview : 0;
 
-        $profile = User::with('address.country', 'address.city' , 'editorProfile' ,'skills' , 'education' , 'portfolio' , 'portfolioVideo' )->where('id' , $userId)->first();
+        $profile = User::with('address.country', 'address.city' , 'editorProfile' ,'skills' , 'education' , 'portfolio' , 'portfolioVideo' ,'socialLink' )->where('id' , $userId)->first();
         
         $editorProfileAndSkill = ( isset($profile->editorProfile) && !is_null($profile->editorProfile)) && count($profile->skills) ? true :  false;
 
@@ -370,6 +370,28 @@ class UserHandler{
         $portfolioVideo = PortfolioVideo::where('user_id' , auth()->user()->id)->get();
 
         return response()->json(['status' => true , 'bucketAddress' => $bucketAddress , 'portfolioVideo' => $portfolioVideo]);
+    }
+
+
+    public function deletePortfolioVideo($request)
+    {
+        $video = PortfolioVideo::where('id' , $request->id)->first();
+
+        if($video){
+            $filename = 'user-porfolio/'.$video->video_url;
+            $check = $this->awsHandler->deleteMedia($filename);
+            if($check['success']){
+                $video->delete(); 
+                return ['status' => true , 'msg' => 'Video Deleted Successfully'];
+            }else{
+                return ['status' => false , 'msg' => 'Something Went Wrong While Deleting Video From Bucket' ];
+            }
+        }else{
+            return ['status' => false , 'msg' => 'video not found' ];
+        }
+
+
+        
     }
 
 }

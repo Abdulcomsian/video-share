@@ -795,4 +795,27 @@ class UserController extends Controller
     }
    }
 
+   public function deletePortfolioVideo(Request $request)
+   {
+    $validator = Validator::make($request->all() , [
+        "id" => "required|numeric",
+    ]);
+    
+    if($validator->fails()){
+        return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $validator->getMessageBag()]);
+    }
+
+    try{
+        $response = $this->userHandler->deletePortfolioVideo($request);
+        if($response['status']){
+            return response()->json($response);
+        }else{
+            return response()->json($response , 400);
+        }
+    }catch(\Exception $e){
+        return response()->json(['status' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
+    }
+
+   }
+
 }

@@ -29,10 +29,18 @@ class UserController extends Controller
                 "service_offering" => "required",
             ]);
 
+            $editorSkills = json_decode($request->skills);
 
-            if($validator->fails())
+            $validator2 = Validator::make($editorSkills , 
+                [ '*' => 'max:190'],
+                ['max' => 'skill must be less then 190 characters.' ]
+            );
+
+
+
+            if($validator->fails() || $validator2->fails())
             {
-                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->fails() ? $validator->getMessageBag() : $validator2->getMessageBag()] ,400);
                 
             }else{
                 $response = $this->editorHandler->editorProfile($request);

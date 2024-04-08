@@ -10,8 +10,8 @@ use App\Http\Controllers\{ AuthController ,
                             CommentController, 
                             FileController , 
                             FavouriteRequestController ,
-    HomeController,
-    ReviewController
+                            HomeController,
+                            ReviewController
                         };
 /*
 |--------------------------------------------------------------------------

@@ -27,8 +27,37 @@ class FilesHandler{
 
             if($request->file('files') && count($request->file('files')))
             {
-                foreach($request->file('files') as $index => $file){
+                // foreach($request->file('files') as $index => $file)
+                // {
 
+                //     $fileName = $file->getClientOriginalName();
+                //     $extension = $file->extension();
+                //     $name = time() . "-" . $fileName;
+                    
+                //     //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
+                //     $check = $this->aws->uploadMedia( $folder->name , $name , $file);
+                //     if($check['success']){
+                //         $type =in_array($extension , $videoExtension) ? 1 : 2;
+                //         $thumbnailName  = null;
+
+                //         if( isset($thumbnails[$index]) && !is_null($thumbnails[$index]) ){
+                //             $imageUrl = substr($thumbnails[$index], strpos($thumbnails[$index], ',') + 1);
+                //             $image = base64_decode($imageUrl);
+                //             $thumbnailName = time().$index."-job-file-thumbnail".".png";
+                //             file_put_contents(public_path()."/uploads/".$thumbnailName , $image);
+                //         }
+
+                //         $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];
+                //     }
+                
+                // }
+
+
+
+
+                foreach($request->data as $index => $data)
+                {
+                    $file = $data['file'];
                     $fileName = $file->getClientOriginalName();
                     $extension = $file->extension();
                     $name = time() . "-" . $fileName;
@@ -39,11 +68,10 @@ class FilesHandler{
                         $type =in_array($extension , $videoExtension) ? 1 : 2;
                         $thumbnailName  = null;
 
-                        if( isset($thumbnails[$index]) && !is_null($thumbnails[$index]) ){
-                            $imageUrl = substr($thumbnails[$index], strpos($thumbnails[$index], ',') + 1);
-                            $image = base64_decode($imageUrl);
-                            $thumbnailName = time().$index."-job-file-thumbnail".".png";
-                            file_put_contents(public_path()."/uploads/".$thumbnailName , $image);
+                        if( isset($data['thumbnail']) ){
+                            $thumbnail = $data['thumbnail'];
+                            $thumbnailName = time()."-".str_replace(" ", "_" , $thumbnail->getClientOriginalName());
+                            $thumbnail->move(public_path('/uploads') , $thumbnailName);
                         }
 
                         $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];

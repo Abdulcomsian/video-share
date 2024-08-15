@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{BillingController, DashboardController, UserController , FolderController, HomeController}; 
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -38,5 +39,17 @@ Route::get('test' , function(){
     dd("folder created successfully");
 });
 
+
+Route::view('test-data' , 'test' );
+Route::post('test-data' , function(Request $request){
+    dd($request->all());
+    foreach($request->data  as $data){
+        $index = 0;
+        foreach($data['file'] as $file){
+            $index++;
+        }
+        dd($index);
+    }
+})->name('test-data');
 
 // Route::get("test-update-link" , [UserController::class ,'updateLinkPage']);

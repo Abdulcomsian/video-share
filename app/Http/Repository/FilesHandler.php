@@ -71,7 +71,7 @@ class FilesHandler{
                         if( isset($data['thumbnail']) ){
                             $thumbnail = $data['thumbnail'];
                             $thumbnailName = time()."-".str_replace(" ", "_" , $thumbnail->getClientOriginalName());
-                            $thumbnail->move(public_path('/uploads') , $thumbnailName);
+                            $thumbnail->move(public_path('uploads') , $thumbnailName);
                         }
 
                         $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];

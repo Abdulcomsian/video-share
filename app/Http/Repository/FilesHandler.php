@@ -82,9 +82,10 @@ class FilesHandler{
                 
             //     // Files::insert($fileList);    
             // }
-
+    
             if($request->hasFile('file'))
             {
+                
                 $file = $request->file('file');
                 $fileName = $file->getClientOriginalName();
                 $extension = $file->extension();
@@ -106,10 +107,12 @@ class FilesHandler{
                 }
 
                 Files::create(['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName]);
-
+   
+                return ["success" => true , "msg" => "Files Added Successfully"];
+            } else {
+                return response()->json(['success' => false , "msg" => 'Please add file']);
             }
     
-            return ["success" => true , "msg" => "Files Added Successfully"];
 
         }catch(\Exception $e){
             return response()->json(['success' => false , "msg" => $e->getMessage()]);

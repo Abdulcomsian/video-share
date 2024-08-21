@@ -18,68 +18,95 @@ class FilesHandler{
     {
         try{
             $folderId = $request->folder_id;
-            $fileList = [];
+            // $fileList = [];
             $videoExtension = ['mp4' , 'webm'];
-            $thumbnails = json_decode($request->thumbnail);
+            // $thumbnails = json_decode($request->thumbnail);
             // dd("inside file");
 
             $folder = Folder::find($folderId);
 
-            if($request->file('files') && count($request->file('files')))
+            // if($request->file('files') && count($request->file('files')))
+            // {
+            //     // foreach($request->file('files') as $index => $file)
+            //     // {
+
+            //     //     $fileName = $file->getClientOriginalName();
+            //     //     $extension = $file->extension();
+            //     //     $name = time() . "-" . $fileName;
+                    
+            //     //     //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
+            //     //     $check = $this->aws->uploadMedia( $folder->name , $name , $file);
+            //     //     if($check['success']){
+            //     //         $type =in_array($extension , $videoExtension) ? 1 : 2;
+            //     //         $thumbnailName  = null;
+
+            //     //         if( isset($thumbnails[$index]) && !is_null($thumbnails[$index]) ){
+            //     //             $imageUrl = substr($thumbnails[$index], strpos($thumbnails[$index], ',') + 1);
+            //     //             $image = base64_decode($imageUrl);
+            //     //             $thumbnailName = time().$index."-job-file-thumbnail".".png";
+            //     //             file_put_contents(public_path()."/uploads/".$thumbnailName , $image);
+            //     //         }
+
+            //     //         $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];
+            //     //     }
+                
+            //     // }
+
+
+              
+
+
+            //     // foreach($request->data as $index => $data)
+            //     // {
+            //     //     $file = $data['file'];
+            //     //     $fileName = $file->getClientOriginalName();
+            //     //     $extension = $file->extension();
+            //     //     $name = time() . "-" . $fileName;
+                    
+            //     //     //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
+            //     //     $check = $this->aws->uploadMedia( $folder->name , $name , $file);
+            //     //     if($check['success']){
+            //     //         $type =in_array($extension , $videoExtension) ? 1 : 2;
+            //     //         $thumbnailName  = null;
+
+            //     //         if( isset($data['thumbnail']) ){
+            //     //             $thumbnail = $data['thumbnail'];
+            //     //             $thumbnailName = time()."-".str_replace(" ", "_" , $thumbnail->getClientOriginalName());
+            //     //             $thumbnail->move(public_path('uploads') , $thumbnailName);
+            //     //         }
+
+            //     //         $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];
+            //     //     }
+                
+            //     // }
+                
+            //     // Files::insert($fileList);    
+            // }
+
+            if($request->hasFile('file'))
             {
-                // foreach($request->file('files') as $index => $file)
-                // {
+                $file = $request->file('file');
+                $fileName = $file->getClientOriginalName();
+                $extension = $file->extension();
+                $name = time() . "-" . $fileName;  
 
-                //     $fileName = $file->getClientOriginalName();
-                //     $extension = $file->extension();
-                //     $name = time() . "-" . $fileName;
-                    
-                //     //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
-                //     $check = $this->aws->uploadMedia( $folder->name , $name , $file);
-                //     if($check['success']){
-                //         $type =in_array($extension , $videoExtension) ? 1 : 2;
-                //         $thumbnailName  = null;
+                $check = $this->aws->uploadMedia( $folder->name , $name , $file);
 
-                //         if( isset($thumbnails[$index]) && !is_null($thumbnails[$index]) ){
-                //             $imageUrl = substr($thumbnails[$index], strpos($thumbnails[$index], ',') + 1);
-                //             $image = base64_decode($imageUrl);
-                //             $thumbnailName = time().$index."-job-file-thumbnail".".png";
-                //             file_put_contents(public_path()."/uploads/".$thumbnailName , $image);
-                //         }
-
-                //         $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];
-                //     }
-                
-                // }
-
-
-
-
-                foreach($request->data as $index => $data)
-                {
-                    $file = $data['file'];
-                    $fileName = $file->getClientOriginalName();
-                    $extension = $file->extension();
-                    $name = time() . "-" . $fileName;
-                    
-                    //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
-                    $check = $this->aws->uploadMedia( $folder->name , $name , $file);
-                    if($check['success']){
-                        $type =in_array($extension , $videoExtension) ? 1 : 2;
-                        $thumbnailName  = null;
-
-                        if( isset($data['thumbnail']) ){
-                            $thumbnail = $data['thumbnail'];
-                            $thumbnailName = time()."-".str_replace(" ", "_" , $thumbnail->getClientOriginalName());
-                            $thumbnail->move(public_path('uploads') , $thumbnailName);
-                        }
-
-                        $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];
-                    }
-                
+                if(!$check['success']){
+                    return response()->json(['success' => false , "msg" => 'something went wrong while adding file']);
                 }
-                
-                Files::insert($fileList);    
+
+                $type =in_array($extension , $videoExtension) ? 1 : 2;
+                $thumbnailName  = null;
+
+                if( $request->hasFile('thumbnail') ){
+                    $thumbnail = $request->file('thumbnail');
+                    $thumbnailName = time()."-".str_replace(" ", "_" , $thumbnail->getClientOriginalName());
+                    $thumbnail->move(public_path('uploads') , $thumbnailName);
+                }
+
+                Files::create(['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName]);
+
             }
     
             return ["success" => true , "msg" => "Files Added Successfully"];

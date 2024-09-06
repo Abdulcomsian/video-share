@@ -102,7 +102,8 @@ class FilesHandler{
 
                 if( $request->hasFile('thumbnail') ){
                     $thumbnail = $request->file('thumbnail');
-                    $thumbnailName = time()."-".str_replace(" ", "_" , $thumbnail->getClientOriginalName());
+                    $thumbnailName = time().'-'.str_replace(" ", "_" , $request->filename);
+                    // $thumbnailName = time()."-".str_replace(" ", "_" , $thumbnail->getClientOriginalName());
                     $thumbnail->move(public_path('uploads') , $thumbnailName);
                 }
 

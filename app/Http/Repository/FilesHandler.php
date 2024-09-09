@@ -127,7 +127,7 @@ class FilesHandler{
     {
         $folderId = $request->folderId;
         $videoExtension = ['mp4' , 'webm'];
-        $name = time().'-'.$request->fileName;
+        $name = $request->fileName;
         $extension = explode("." , $request->fileName)[1];
         $thumbnail = null;
         if($request->hasFile('thumbnail'))
@@ -138,7 +138,6 @@ class FilesHandler{
             $file->move(public_path('uploads') , $thumbnail);
         }
 
-        $thumbnailName = $request->thumbnail;
         $type =in_array($extension , $videoExtension) ? 1 : 2;
         Files::create(['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnail]);
         return ["success" => true , "msg" => "Files Added Successfully"];
@@ -237,7 +236,7 @@ class FilesHandler{
     public function uploadDbShareFolderFiles($request , $shareFolder)
     {
        $videoExtension = ['mp4' , 'webm'];
-       $name  = time() . "-" . $request->fileName;
+       $name  = $request->fileName;
        $extension = explode(".",$request->fileName)[1];
        $type =in_array($extension , $videoExtension) ? 1 : 2;
        $thumbnail = null;

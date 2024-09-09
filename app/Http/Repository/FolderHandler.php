@@ -284,6 +284,17 @@ class FolderHandler
             }
         }
 
+        public function createDbShareFolder($request)
+        {
+            $editorId = auth()->user()->id;
+            $shareFolder = ShareFolder::create([
+                                "editor_id" => $editorId,
+                                "job_id" => $request->job_id, 
+                                "name"  => $request->folderName,
+                            ]);
+            return ["status" => true , "shareFolder" => $shareFolder];
+        }
+
 
         public function getShareFolderFiles($request)
         {

@@ -76,6 +76,7 @@ Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(functi
     Route::get('job-list' , [JobController::class , 'getJobList']);
     Route::get('unassigned-job-list' , [JobController::class , 'getUnassignedJobs']);
     Route::post('share-files' , [FolderController::class , 'shareFile']);
+    Route::post('direct-share-file-upload' , [FolderController::class , 'directShareFileUpload']);
     // Route::post('share-files' , function(){dd("inside share file");});
     Route::post('getshares' , [FolderController::class , 'getshares']);
     Route::post('delete-share-file' , [FileController::class , 'deleteShareFile']);
@@ -108,6 +109,7 @@ Route::middleware(['verify.authentication' , 'api.client.verify'])->group(functi
     Route::get('folder-list' , [FolderController::class , 'getClientFolders']);
     Route::post('folder-detail' , [FolderController::class , 'getFolderDetail']);
     Route::post('upload-files' , [FileController::class , 'uploadClientFile']);
+    Route::post('upload-client-files-directly' , [FileController::class , 'uploadClientFileDirectly']);
     Route::post('delete-file' , [FileController::class , 'deleteClientFile']);
     Route::post('update-folder' , [FolderController::class, 'updateClientFolder']);
     Route::post('delete-folder' , [FolderController::class , 'deleteClientFolder']);

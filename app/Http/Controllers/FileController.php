@@ -45,6 +45,33 @@ class FileController extends Controller
         }
     }
 
+    public function uploadClientFileDirectly(Request $request)
+    {
+        try{
+
+            $validator = Validator::make($request->all(), [
+                'folderId' => 'required',
+                'fileName' => 'required|string',
+                // 'thumbnailName' => 'required|string'
+            ]);   
+            
+            if ($validator->fails()) {
+
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
+            
+            } else {
+                
+                $response = $this->filesHandler->directMediaUpload($request);
+                
+                return response()->json($response);
+            }
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
+
+
     public function deleteClientFile(Request $request)
     {
         try{

@@ -250,6 +250,46 @@ class FolderController extends Controller
         }
     }
 
+    public function directShareFileUpload(Request $request)
+    {
+        $validator = Validator::make($request->all() , [
+            'job_id' => 'required',
+            'fileName' => 'required|string',
+            'folderName' => 'required|nullable'
+        ]);
+
+        if($validator->fails()){
+            
+            return response()->json(['success' => false , 'error' => $validator->getMessageBag()]); 
+        
+        }
+
+        try{
+            $shareFolder = $this->folderHandler->checkShareFolder($request->job_id);
+            if(!$shareFolder) {
+                if(is_null($request->folderName)){
+                    return response()->json(['status' => false , 'msg' => 'Please add folder name']);
+                }
+                
+                $createResponse = $this->folderHandler->createDbShareFolder($request);
+                
+                if(!$createResponse['status']){
+                    return response()->json(['status' => false , 'msg' => 'Something went wrong while creating folder']);
+                } 
+                $shareFolder = $createResponse['shareFolder'];
+            }
+
+            $response = $this->fileHandler->uploadDbShareFolderFiles($request , $shareFolder);
+            return response()->json($response);
+
+        }catch(\Exception $e)
+        {
+            return response()->json(['status' => false , 'error' => $e->getMessage()]);
+        }
+
+
+    }
+
     public function getshares(Request $request)
     {
         try{

@@ -24,7 +24,7 @@ class FilesHandler{
             // dd("inside file");
 
             $folder = Folder::find($folderId);
-
+            //multile file uplaod code starts here
             // if($request->file('files') && count($request->file('files')))
             // {
             //     // foreach($request->file('files') as $index => $file)
@@ -82,38 +82,46 @@ class FilesHandler{
                 
             //     // Files::insert($fileList);    
             // }
-    
-            if($request->hasFile('file'))
-            {
+            //multiple file upload code ends here
+
+            //single file upload code starts here
+            // if($request->hasFile('file'))
+            // {
                 
-                $file = $request->file('file');
-                $fileName = $file->getClientOriginalName();
-                $extension = $file->extension();
-                $name = time() . "-" . $fileName;  
+            //     $file = $request->file('file');
+            //     $fileName = $file->getClientOriginalName();
+            //     $extension = $file->extension();
+            //     $name = time() . "-" . $fileName;  
 
-                $check = $this->aws->uploadMedia( $folder->name , $name , $file);
+            //     $check = $this->aws->uploadMedia( $folder->name , $name , $file);
 
-                if(!$check['success']){
-                    return response()->json(['success' => false , "msg" => 'something went wrong while adding file']);
-                }
+            //     if(!$check['success']){
+            //         return response()->json(['success' => false , "msg" => 'something went wrong while adding file']);
+            //     }
 
-                $type =in_array($extension , $videoExtension) ? 1 : 2;
-                $thumbnailName  = null;
+            //     $type =in_array($extension , $videoExtension) ? 1 : 2;
+            //     $thumbnailName  = null;
 
-                if( $request->hasFile('thumbnail') ){
-                    $thumbnail = $request->file('thumbnail');
-                    $thumbnailName = time().'-'.str_replace(" ", "_" , $request->filename);
-                    // $thumbnailName = time()."-".str_replace(" ", "_" , $thumbnail->getClientOriginalName());
-                    $thumbnail->move(public_path('uploads') , $thumbnailName);
-                }
+            //     if( $request->hasFile('thumbnail') ){
+            //         $thumbnail = $request->file('thumbnail');
+            //         $thumbnailName = time().'-'.str_replace(" ", "_" , $request->filename);
+            //         // $thumbnailName = time()."-".str_replace(" ", "_" , $thumbnail->getClientOriginalName());
+            //         $thumbnail->move(public_path('uploads') , $thumbnailName);
+            //     }
 
-                Files::create(['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName]);
+            //     Files::create(['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName]);
    
-                return ["success" => true , "msg" => "Files Added Successfully"];
-            } else {
-                return response()->json(['success' => false , "msg" => 'Please add file']);
-            }
-    
+            //     return ["success" => true , "msg" => "Files Added Successfully"];
+            // } else {
+            //     return response()->json(['success' => false , "msg" => 'Please add file']);
+            // }
+            //single upload file code ends here
+            $name = time().'-'.$request->filename;
+            $extension = explode("." , $request->filename)[1];
+            $thumbnailName = $request->thumbnail;
+            $type =in_array($extension , $videoExtension) ? 1 : 2;
+            Files::create(['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName]);
+            return ["success" => true , "msg" => "Files Added Successfully"];
 
         }catch(\Exception $e){
             return response()->json(['success' => false , "msg" => $e->getMessage()]);

@@ -149,17 +149,21 @@ class FilesHandler{
     {
 
         try{
-            $fileId = $request->file_id;
-    
+            $fileId = $request->file_id;    
+            
             $file = Files::where('id' , $fileId)->first();
+            
             if($file){
                 $folder = Folder::find($file->folder_id);
                 $fileName = $folder->name.'/'.$file->path;
                 $check = $this->aws->deleteMedia($fileName);
                 if($check['success']){
-                    $file->delete(); 
+                    Files::where('id' , $fileId)->delete();
+                    return ["success" => true , "msg" => "File Deleted Successfully"];
+                } else {
+                    return ["success" => false , "msg" => "Something went wrong while deleting file"];
                 }
-                return $check;
+                // return $check;
                 //file path in s3
                 // if(Storage::disk('s3')->exists($fileName))
                 // {

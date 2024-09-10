@@ -114,7 +114,7 @@ Route::middleware(['verify.authentication' , 'api.client.verify'])->group(functi
     Route::post('update-folder' , [FolderController::class, 'updateClientFolder']);
     Route::post('delete-folder' , [FolderController::class , 'deleteClientFolder']);
     Route::post('get-folder-files' , [FolderController::class , 'getFolderFiles']);
-    Route::post('client-share-folder-files' , [FolderController::class , 'getshares']);
+    Route::post('client-share-folder-files' , [FolderController::class , 'getShareFolderFile']);
     Route::post('process-payment', [BillingController::class , 'processBilling']);
     Route::get('public-key' , [BillingController::class , 'getPublicKey']);
     Route::post('get-payment-intent' , [BillingController::class , 'getPaymentIntent']);

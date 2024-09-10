@@ -290,7 +290,7 @@ class FolderController extends Controller
 
     }
 
-    public function getshares(Request $request)
+    public function getShareFolderFile(Request $request)
     {
         try{
 

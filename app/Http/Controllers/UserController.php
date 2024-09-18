@@ -79,6 +79,30 @@ class UserController extends Controller
         }
     }
 
+    public function addEditorPortfolio(Request $request)
+    {
+        try{
+            $validator = Validator::make( $request->all(), [
+                "link" => "required|string",
+                "thumbnail" => "required|file"
+            ]);
+
+            if($validator->fails())
+            {
+                return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
+            
+            }else{
+
+                return $this->editorHandler->addEditorPortfolio($request);
+            }
+
+        
+        }catch(\Exception $e)
+        {
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
+        } 
+    }
+
     public function updateProfile(Request $request)
     {
         try{

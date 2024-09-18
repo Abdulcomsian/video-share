@@ -128,6 +128,23 @@ class EditorHandler{
 
     }
 
+    public function addEditorPortfolio($request)
+    {
+        $filename = null;
+        if($request->hasFile('thumbnail'))
+        {
+            $file = $request->file('thumbnail');
+            $filename = time().'-'.str_replace(" ","_", $file->getClientOriginalName());
+            $file->move(public_path('uploads') , $filename);
+        }
+
+        $portfolio = ["editor_id" => auth()->user()->id  , "link" => $request->link , "thumbnail" => $filename];
+        EditorPortfolio::insert($portfolio);
+
+        return response()->json(['success' => true , 'msg' => 'Portfolio added successfully']);
+
+    }
+
 
     public function editorEducation($request)
     {

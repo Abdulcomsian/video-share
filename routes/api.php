@@ -62,7 +62,8 @@ Route::middleware(['verify.authentication'])->group(function(){
 Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(function(){
     Route::post('update-profile' , [UserController::class , 'updateProfile']);
     Route::post('update-editor-profile' , [UserController::class , 'updateEditorProfile']);
-    Route::post('update-editor-portfolio' , [UserController::class , 'updateEditorPortfolio']);
+    Route::post('add-editor-portfolio' , [UserController::class , 'addEditorPortfolio']);
+    Route::post('update-single-editor-portfolio' , [UserController::class , 'updateSingleEditorPortfolio']);
     Route::post('update-editor-education' , [UserController::class , 'updateEditorEducation']);
     Route::post('update-hourly-rate' , [UserController::class , 'updateHourlyRate']);
     Route::post('update-address' , [UserController::class, 'updateAddress']);

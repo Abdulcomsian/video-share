@@ -369,7 +369,9 @@ class UserHandler{
 
         $portfolioVideo = PortfolioVideo::where('user_id' , auth()->user()->id)->get();
 
-        return response()->json(['status' => true , 'bucketAddress' => $bucketAddress , 'portfolioVideo' => $portfolioVideo]);
+        $thumbnailPrefix = asset('uploads');
+
+        return response()->json(['status' => true , 'bucketAddress' => $bucketAddress , 'portfolioVideo' => $portfolioVideo , 'thumbnailPrefix' => $thumbnailPrefix]);
     }
 
 

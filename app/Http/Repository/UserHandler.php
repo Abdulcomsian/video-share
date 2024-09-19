@@ -3,7 +3,7 @@
 namespace App\Http\Repository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
-use App\Models\{ User , Favourite, Files, Review , PersonalJob, Address , PortfolioVideo, SocialLink};
+use App\Models\{ User , Favourite, Files, Review , PersonalJob, Address , EditorPortfolio, PortfolioVideo, SocialLink};
 use App\Mail\ {VerificationMail , TokenMail};
 use App\Http\AppConst;
 use Illuminate\Support\Facades\Hash;
@@ -392,6 +392,19 @@ class UserHandler{
 
 
         
+    }
+
+    public function uploadPortfolioFile($request)
+    {
+        $file = $request->file('thumbnail');
+        $thumbnailname = time().'-'.str_replace(" ","_", $file->getClientOriginalName());
+        $file->move(public_path("uploads/$thumbnailname"));
+        PortfolioVideo::create([
+            'thumbnail' => $thumbnailname,
+            'video_url' => $request->filename,
+            'user_id' => auth()->user()->id
+        ]);
+        return ['status' => true , 'msg' => 'Portfolio file added successfully'];
     }
 
 }

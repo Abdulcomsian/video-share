@@ -13,6 +13,7 @@ class EditorPortfolio extends Model
     protected $primaryKey = "id";
     protected $fillable = [
         "editor_id",
-        "link"
+        "link",
+        "thumbnail",
     ];
 }

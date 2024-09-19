@@ -850,4 +850,25 @@ class UserController extends Controller
 
    }
 
+
+   public function uploadPortfolioFile(Request $request)
+   {
+        $validator = Validator::make($request->all() , [
+            "filename" => 'required|string',
+            "thumbnail" => 'required|file'
+        ]);
+        
+        if($validator->fails()){
+            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $validator->getMessageBag()]);
+        }
+
+        try{
+            $response = $this->userHandler->uploadPortfolioFile($request);
+            return response()->json($response);
+        
+        }catch(\Exception $e){
+            return response()->json(['status' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
+        }
+   }
+
 }

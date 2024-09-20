@@ -404,7 +404,7 @@ class UserHandler{
         {
             $file = $request->file('thumbnail');
             $thumbnailname = time().'-'.str_replace(" ","_", $file->getClientOriginalName());
-            $file->move(public_path("uploads/$thumbnailname"));
+            $file->move(public_path("uploads") , $thumbnailname);
         }
         PortfolioVideo::create([
             'thumbnail' => $thumbnailname,

@@ -84,7 +84,6 @@ class UserController extends Controller
         try{
             $validator = Validator::make( $request->all(), [
                 "link" => "required|string",
-                "thumbnail" => "nullable|file"
             ]);
 
             if($validator->fails())

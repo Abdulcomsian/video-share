@@ -377,20 +377,20 @@ class UserHandler{
 
     public function deletePortfolioVideo($request)
     {
-        PortfolioVideo::where('id' , $request->id)->delete();
-        return ['status' => true , 'msg' => 'Video Deleted Successfully'];
-        // if($video){
-        //     $filename = 'user-porfolio/'.$video->video_url;
-        //     $check = $this->awsHandler->deleteMedia($filename);
-        //     if($check['success']){
-        //         $video->delete(); 
-        //         return ['status' => true , 'msg' => 'Video Deleted Successfully'];
-        //     }else{
-        //         return ['status' => false , 'msg' => 'Something Went Wrong While Deleting Video From Bucket' ];
-        //     }
-        // }else{
-        //     return ['status' => false , 'msg' => 'video not found' ];
-        // }
+        $video = PortfolioVideo::where('id' , $request->id)->first();
+        
+        if($video){
+            $filename = 'user-porfolio/'.$video->video_url;
+            $check = $this->awsHandler->deleteMedia($filename);
+            if($check['success']){
+                PortfolioVideo::where('id' , $request->id)->delete();
+                return ['status' => true , 'msg' => 'Video Deleted Successfully'];
+            }else{
+                return ['status' => false , 'msg' => 'Something Went Wrong While Deleting Video From Bucket' ];
+            }
+        }else{
+            return ['status' => false , 'msg' => 'video not found' ];
+        }
 
 
         

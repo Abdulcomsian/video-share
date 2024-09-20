@@ -138,10 +138,13 @@ class EditorHandler{
             $file->move(public_path('uploads') , $filename);
         }
 
-        $portfolio = ["editor_id" => auth()->user()->id  , "link" => $request->link , "thumbnail" => $filename];
-        EditorPortfolio::insert($portfolio);
+        EditorPortfolio::updateOrCreate(
+            ["editor_id" => auth()->user()->id],
+            ["editor_id" => auth()->user()->id  , "link" => $request->link , "thumbnail" => $filename]
+        );
 
-        return response()->json(['success' => true , 'msg' => 'Portfolio added successfully']);
+
+        return response()->json(['success' => true , 'msg' => 'Portfolio updated successfully']);
 
     }
 

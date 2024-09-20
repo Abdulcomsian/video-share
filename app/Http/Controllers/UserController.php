@@ -855,7 +855,7 @@ class UserController extends Controller
    {
         $validator = Validator::make($request->all() , [
             "filename" => 'required|string',
-            "thumbnail" => 'required|file'
+            "thumbnail" => 'nullable|file'
         ]);
         
         if($validator->fails()){

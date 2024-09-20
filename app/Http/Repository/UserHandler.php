@@ -398,9 +398,14 @@ class UserHandler{
 
     public function uploadPortfolioFile($request)
     {
-        $file = $request->file('thumbnail');
-        $thumbnailname = time().'-'.str_replace(" ","_", $file->getClientOriginalName());
-        $file->move(public_path("uploads/$thumbnailname"));
+        $thumbnailname = null;
+
+        if($request->hasFile('thumbnail'))
+        {
+            $file = $request->file('thumbnail');
+            $thumbnailname = time().'-'.str_replace(" ","_", $file->getClientOriginalName());
+            $file->move(public_path("uploads/$thumbnailname"));
+        }
         PortfolioVideo::create([
             'thumbnail' => $thumbnailname,
             'video_url' => $request->filename,

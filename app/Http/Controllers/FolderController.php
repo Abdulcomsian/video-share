@@ -31,11 +31,11 @@ class FolderController extends Controller
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
+
                 $response = $this->folderHandler->createFilesInFolder($request);
-                
+
                 return response()->json($response);
             }
         } catch (\Exception $e) {
@@ -53,11 +53,11 @@ class FolderController extends Controller
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
+
                 $response = $this->folderHandler->createFolder($request);
-                
+
                 return response()->json($response);
             }
         } catch (\Exception $e) {
@@ -71,13 +71,13 @@ class FolderController extends Controller
         try{
 
             $response = $this->folderHandler->clientFolders();
-                
-            return response()->json($response); 
+
+            return response()->json($response);
 
         }catch(\Exception $e){
 
             return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
-        
+
         }
     }
 
@@ -91,11 +91,11 @@ class FolderController extends Controller
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
+
                 $response = $this->folderHandler->folderDetail($request);
-                
+
                 return response()->json($response);
             }
         } catch (\Exception $e) {
@@ -110,22 +110,22 @@ class FolderController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'folder_id' => 'required',
-            ]);   
-            
+            ]);
+
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
-                
+
+
                 $response = $this->folderHandler->deleteFolder($request);
                 if($response['success']){
                     return response()->json($response);
                 }else{
                     return response()->json($response , 400);
                 }
-                
+
             }
 
         }catch(\Exception $e){
@@ -140,14 +140,14 @@ class FolderController extends Controller
             $validator = Validator::make($request->all(), [
                 'folder_id' => 'required',
                 'folder_name' => 'required'
-            ]);   
-            
+            ]);
+
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
+
                 $response = $this->folderHandler->updateFolder($request);
 
                 if($response['success']){
@@ -155,7 +155,7 @@ class FolderController extends Controller
                 }else{
                     return response()->json($response , 400);
                 }
-                
+
             }
 
         }catch(\Exception $e){
@@ -202,7 +202,7 @@ class FolderController extends Controller
 
         if($validator->fails())
         {
-            return response()->json(['success' => false , 'error' => $validator->getMessageBag()]); 
+            return response()->json(['success' => false , 'error' => $validator->getMessageBag()]);
         }else{
 
             $response = $this->folderHandler->getFiles($request);
@@ -221,25 +221,25 @@ class FolderController extends Controller
         $validator = Validator::make($request->all() , [
             'job_id' => 'required',
             // 'files' => 'required|array|min:1',
-            // 'files.*' => 'file|mimes:mp4,avi,jpg,png,jpeg,mpeg|max:51200' 
+            // 'files.*' => 'file|mimes:mp4,avi,jpg,png,jpeg,mpeg|max:51200'
         ]);
 
         if($validator->fails()){
-            
-            return response()->json(['success' => false , 'error' => $validator->getMessageBag()]); 
-        
+
+            return response()->json(['success' => false , 'error' => $validator->getMessageBag()]);
+
         }else{
             $checkFolder = $this->folderHandler->checkShareFolder($request->job_id);
 
             if(!$checkFolder){
 
                 $response = $this->folderHandler->createShareFolder($request->job_id);
-               
+
                if($response['success'] == false)
                {
-                
-                    return response()->json($response); 
-               
+
+                    return response()->json($response);
+
                }
             }
 
@@ -259,9 +259,9 @@ class FolderController extends Controller
         ]);
 
         if($validator->fails()){
-            
-            return response()->json(['success' => false , 'error' => $validator->getMessageBag()]); 
-        
+
+            return response()->json(['success' => false , 'error' => $validator->getMessageBag()]);
+
         }
 
         try{
@@ -270,12 +270,12 @@ class FolderController extends Controller
                 if(is_null($request->folderName)){
                     return response()->json(['status' => false , 'msg' => 'Please add folder name']);
                 }
-                
+
                 $createResponse = $this->folderHandler->createDbShareFolder($request);
-                
+
                 if(!$createResponse['status']){
                     return response()->json(['status' => false , 'msg' => 'Something went wrong while creating folder']);
-                } 
+                }
                 $shareFolder = $createResponse['shareFolder'];
             }
 
@@ -296,24 +296,56 @@ class FolderController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'job_id' => 'required',
-            ]);   
-            
+            ]);
+
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
+
                 $response = $this->folderHandler->getShareFolderFiles($request);
 
                 if($response['success']){
-                    
+
                     return response()->json($response);
 
                 }else{
 
                     return response()->json($response , 400);
-                    
+
+                }
+            }
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+    }
+
+    public function readShareFolderFileById(Request $request)
+    {
+        try{
+
+            $validator = Validator::make($request->all(), [
+                'share_folder_file_id' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+
+                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
+
+            } else {
+
+                $response = $this->folderHandler->readShareFolderFile($request);
+
+                if($response['success']){
+
+                    return response()->json($response);
+
+                }else{
+
+                    return response()->json($response , 400);
+
                 }
             }
 
@@ -359,7 +391,7 @@ class FolderController extends Controller
         }catch(\Exception $e){
             return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $e->getMessage()] ,400);
         }
-   
+
     }
 
     public function searchFolder(Request $request){

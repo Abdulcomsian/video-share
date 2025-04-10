@@ -70,7 +70,7 @@ class FolderHandler
 
                    // $check = Storage::disk('s3')->makeDirectory($folderName);
                     $check = $this->aws->createFolder($folderName);
-            
+
                     if($check['success'])
                     {
                         Folder::create([
@@ -81,16 +81,16 @@ class FolderHandler
                         return ["success" => true , "msg" => "Folder Created Successfully"];
 
                     }else{
-                   
+
                         return response()->json(["success" => false , "msg" => "Error While Creating Folder"]);
                     }
-                
+
                 }else{
                     return response()->json(["success" => false , "msg" => "Folder Already Exist"]);
-                
+
                 }
 
-                
+
 
             }catch(\Exception $e){
 
@@ -132,19 +132,19 @@ class FolderHandler
             if($folder){
                 //Storage::disk('s3')->deleteDirectory($folder->name);
                 $check = $this->aws->deleteFolder($folder->name);
-                
+
                 if($check['success']){
-    
+
                     $folder->delete();
-                
+
                 }
                 return $check;
             }else{
                 return ['success' => false , 'error' => "No Folder Found"];
             }
-            
-            
-            
+
+
+
         }
 
         public function updateFolder($request)
@@ -174,11 +174,11 @@ class FolderHandler
                 // $newFolder = Storage::disk('s3')->makeDirectory($folderName);
 
                 // if($newFolder){
-                    
+
                 //     foreach($files as $file)
                 //     {
                 //         $newKey = str_replace($folder->name, $folderName, $file);
-                        
+
                 //         Storage::disk('s3')->copy($file, $newKey);
                 //     }
 
@@ -195,13 +195,13 @@ class FolderHandler
                 // }
 
 
-                
+
             }else{
                 return ["success" => false , "msg" => "Can't Change Folder Name Already Folder Exist With This Name"];
             }
 
-    
-            
+
+
 
         }
 
@@ -217,13 +217,13 @@ class FolderHandler
             $folderId = $request->folder_id;
 
             $bucketName = config('filesystems.disks.s3.bucket');
-            
+
             $folder = Folder::find($folderId);
-            
+
             $folderPath = $folder->name;
-            
+
             $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
-            
+
             $files = Files::with('folder')->where('folder_id' , $folderId)->orderBy('id' , 'desc')->get();
 
             $thumbnailPath = public_path('uploads');
@@ -266,14 +266,14 @@ class FolderHandler
                 {
                     ShareFolder::create([
                         "editor_id" => $editorId,
-                        "job_id" => $jobId, 
+                        "job_id" => $jobId,
                         "name"  => $folderName,
                     ]);
 
                     return ["success" => true , "msg" => "Folder Created Successfully"];
 
                 }else{
-                
+
                     return ["success" => false , "msg" => "Error While Creating Folder"];
                 }
 
@@ -289,7 +289,7 @@ class FolderHandler
             $editorId = auth()->user()->id;
             $shareFolder = ShareFolder::create([
                                 "editor_id" => $editorId,
-                                "job_id" => $request->job_id, 
+                                "job_id" => $request->job_id,
                                 "name"  => $request->folderName,
                             ]);
             return ["status" => true , "shareFolder" => $shareFolder];
@@ -301,40 +301,65 @@ class FolderHandler
             $jobId = $request->job_id;
 
             $bucketName = config('filesystems.disks.s3.bucket');
-            
+
             $personalJob = PersonalJob::with('folder')->where('id' , $jobId)->first();
 
         if($personalJob->folder){
-            
+
             $folder = $personalJob->folder;
-            
+
             $folderPath = $folder->name;
-            
+
             $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
-            
+
             $files = ShareFolderFiles::with('folder')->where('share_folder_id' , $folder->id)->get();
 
             $thumbnailPath = public_path('uploads');
-           
+
             return ["success" => true , "files" => $files , "bucket_address" => $bucketAddress , 'thumbnailPath' => $thumbnailPath];
-        
+
         }else{
 
             return ["success" => true ,  "msg"=>"Sorry, No Folder/Files Found" ];
         }
-        
-            
 
-            
+
+
+
+        }
+
+        public function readShareFolderFile($request)
+        {
+
+            $shareFolderFileId = $request->share_folder_file_id;
+
+            $file = ShareFolderFiles::find($shareFolderFileId);
+
+            if ($file && !$file->is_read) {
+                $file->is_read = true;
+                $file->save();
+
+                return [
+                    'success' => true,
+                    'message' => 'File marked as read.',
+                    'file' => $file
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'Already marked as read or not found.',
+                ];
+            }
+
         }
 
 
         public function jobFolder($request)
         {
             $bucketName = config('filesystems.disks.s3.bucket');
-            
+
             $folder = Folder::with('files')->where('id' , $request->folder_id)->first();
-            
+
             $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folder->name;
 
             $thumbnailPath = public_path('uploads');

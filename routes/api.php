@@ -2,13 +2,13 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{ AuthController ,  
-                            UserController , 
-                            FolderController , 
-                            JobController , 
-                            BillingController , 
-                            CommentController, 
-                            FileController , 
+use App\Http\Controllers\{ AuthController ,
+                            UserController ,
+                            FolderController ,
+                            JobController ,
+                            BillingController ,
+                            CommentController,
+                            FileController ,
                             FavouriteRequestController ,
                             HomeController,
                             ReviewController
@@ -57,6 +57,7 @@ Route::middleware(['verify.authentication'])->group(function(){
     Route::post('profile-detail' , [UserController::class , 'getProfileDetail']);
     Route::post('review-list' , [ReviewController::class , 'getReviewList']);
     Route::post('share-folder-files' , [FolderController::class , 'getShareFolderFile']);
+    Route::post('share-folder-files/read' , [FolderController::class , 'readShareFolderFileById']);
 });
 
 /* Editor Routes*/

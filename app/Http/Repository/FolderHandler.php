@@ -312,6 +312,12 @@ class FolderHandler
 
             $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
 
+            // update all files that are not marked as read
+            ShareFolderFiles::where('share_folder_id', $folder->id)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+
             $files = ShareFolderFiles::with('folder')->where('share_folder_id' , $folder->id)->get();
 
             $thumbnailPath = public_path('uploads');
@@ -325,31 +331,6 @@ class FolderHandler
 
 
 
-
-        }
-
-        public function readShareFolderFile($request)
-        {
-
-            $shareFolderFileId = $request->share_folder_file_id;
-
-            $file = ShareFolderFiles::find($shareFolderFileId);
-
-            if ($file && !$file->is_read) {
-                $file->is_read = true;
-                $file->save();
-
-                return [
-                    'success' => true,
-                    'message' => 'File marked as read.',
-                    'file' => $file
-                ];
-            } else {
-                return [
-                    'success' => false,
-                    'message' => 'Already marked as read or not found.',
-                ];
-            }
 
         }
 

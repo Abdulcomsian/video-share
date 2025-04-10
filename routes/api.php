@@ -57,7 +57,6 @@ Route::middleware(['verify.authentication'])->group(function(){
     Route::post('profile-detail' , [UserController::class , 'getProfileDetail']);
     Route::post('review-list' , [ReviewController::class , 'getReviewList']);
     Route::post('share-folder-files' , [FolderController::class , 'getShareFolderFile']);
-    Route::post('share-folder-files/read' , [FolderController::class , 'readShareFolderFileById']);
 });
 
 /* Editor Routes*/

@@ -73,7 +73,16 @@ class PersonalJob extends Model
 
     public function review()
     {
-        return $this->hasOne(Review::class , 'job_id' , 'id'); 
+        return $this->hasOne(Review::class , 'job_id' , 'id');
+    }
+
+    public function unreadSharedFilesCount()
+    {
+        return ShareFolderFiles::whereIn('share_folder_id', function ($query) {
+            $query->select('id')
+                ->from('share_folder')
+                ->where('job_id', $this->id);
+        })->where('is_read', 0)->count();
     }
 
 }

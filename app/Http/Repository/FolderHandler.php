@@ -6,6 +6,7 @@ namespace App\Http\Repository;
 use App\Models\{ ShareFolder , Files , Folder, PersonalJob, ShareFolderFiles};
 use Illuminate\Support\Facades\Storage;
 use App\Http\Repository\AwsHandler;
+use App\Http\AppConst;
 class FolderHandler
 {
     protected $aws;
@@ -298,6 +299,7 @@ class FolderHandler
 
         public function getShareFolderFiles($request)
         {
+
             $jobId = $request->job_id;
 
             $bucketName = config('filesystems.disks.s3.bucket');
@@ -312,11 +314,13 @@ class FolderHandler
 
             $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
 
+            // when accessing by client
             // update all files that are not marked as read
-            ShareFolderFiles::where('share_folder_id', $folder->id)
-            ->where('is_read', false)
-            ->update(['is_read' => true]);
-
+            if(auth()->user()->type == AppConst::CLIENT)
+            {
+                ShareFolderFiles::where('share_folder_id', $folder->id)
+                ->update(['is_read' => true]);
+            }
 
             $files = ShareFolderFiles::with('folder')->where('share_folder_id' , $folder->id)->get();
 

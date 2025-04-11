@@ -11,8 +11,10 @@ use App\Http\Controllers\{ AuthController ,
                             FileController ,
                             FavouriteRequestController ,
                             HomeController,
-                            ReviewController
+                            ReviewController,
+                            PersonalJobChatController
                         };
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -139,6 +141,14 @@ Route::middleware(['verify.authentication' , 'api.client.verify'])->group(functi
     Route::post('delete-job' , [JobController::class , 'deleteJob']);
     Route::post('search-folder' , [FolderController::class , 'searchFolder']);
     Route::post('get-editor-review' , [ReviewController::class , 'getEditorReviews']);
+});
+
+
+// personal job chat
+
+Route::middleware('verify.authentication')->group(function () {
+    Route::get('chat/{personalJobId}', [PersonalJobChatController::class, 'index']);
+    Route::post('chat/send', [PersonalJobChatController::class, 'store']);
 });
 
 

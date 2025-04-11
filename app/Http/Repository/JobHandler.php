@@ -18,15 +18,15 @@ class JobHandler{
         $quickDelivery = $request->quick_delivery;
         $jobId = PersonalJob::insertGetId([
                 "client_id" => auth()->user()->id	,
-                "title" => $title,	
-                "description" => $description,	
+                "title" => $title,
+                "description" => $description,
                 "budget" => $budget,
                 "deadline" => $deadline,
-                "folder_id" => $folder,	
+                "folder_id" => $folder,
                 "status" => "unawarded",
                 "quick_delivery" => $quickDelivery
             ]);
-            
+
         $skills = json_decode($request->skills);
         $skillable = "App\Models\PersonalJob";
         $skillList =[];
@@ -116,7 +116,7 @@ class JobHandler{
     {
         $clientId = auth()->user()->id;
 
-        
+
 
         $awardedJobs = DB::table('personal_jobs')
                                 ->join( 'job_editor_request' , 'personal_jobs.id' , '=' , 'job_editor_request.job_id')
@@ -127,18 +127,18 @@ class JobHandler{
                                 ->whereIn('personal_jobs.status' ,  ['Awarded' , 'awarded' , 'completed' , 'Completed', 'canceled' , 'Canceled'])
                                 ->whereIn('job_editor_request.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB , AppConst::CANCEL_JOB])
                                 ->whereIn('requests.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB , AppConst::CANCEL_JOB])
-                                ->selectRaw('users.id as editor_id , 
-                                            users.profile_image, 
-                                            users.full_name , 
-                                            personal_jobs.id as job_id, 
-                                            personal_jobs.status as job_status, 
-                                            job_editor_request.id as proposal_id, 
-                                            personal_jobs.deadline, 
-                                            personal_jobs.title, 
-                                            personal_jobs.budget, 
-                                            personal_jobs.description as job_description, 
-                                            requests.bid_price, 
-                                            requests.description as proposal_detail, 
+                                ->selectRaw('users.id as editor_id ,
+                                            users.profile_image,
+                                            users.full_name ,
+                                            personal_jobs.id as job_id,
+                                            personal_jobs.status as job_status,
+                                            job_editor_request.id as proposal_id,
+                                            personal_jobs.deadline,
+                                            personal_jobs.title,
+                                            personal_jobs.budget,
+                                            personal_jobs.description as job_description,
+                                            requests.bid_price,
+                                            requests.description as proposal_detail,
                                             personal_jobs.awarded_date,
                                             If(job_review.id IS NOT NULL, true , false) as has_review')
                                 ->orderBy('personal_jobs.id' , 'desc')
@@ -146,7 +146,7 @@ class JobHandler{
                                 // ->unique('job_id')
                                 // ->toSql();
         return ["success" => true , "awardedJobs" => $awardedJobs];
-                
+
 
     }
 
@@ -163,12 +163,12 @@ class JobHandler{
                             ->selectRaw(' users.id as editor_id , client.full_name as client_name , personal_jobs.title as job_title ,personal_jobs.deadline , personal_jobs.description as job_description , requests.description as proposal_detail , requests.bid_price, folders.name as folder_name , folders.id as folder_id')
                             ->where('job_editor_request.editor_id' , $editorId)
                             ->orderBy('job_editor_request.id' , 'desc')
-                            ->get();    
-            
+                            ->get();
+
         // $bucketName = config('filesystems.disks.s3.bucket');
 
         // $bucketAddressPrefix = "https://$bucketName.s3.amazonaws.com/";
-        
+
         return ['success' => true , 'proposals' => $proposalList];
     }
 
@@ -176,20 +176,22 @@ class JobHandler{
     public function jobDetail($request)
     {
         $jobId = $request->job_id;
-        
+
         $personalJob = PersonalJob::with('skills' , 'jobFolder.files' , 'review')->where('id' , $jobId)->first();
 
-        return ["success" => true , "jobDetail" => $personalJob];
+        $unreadSharedFilesCount = $personalJob->unreadSharedFilesCount();
+
+        return ["success" => true , "jobDetail" => $personalJob, "unreadSharedFilesCount" => $unreadSharedFilesCount];
     }
 
     public function awardClientJob($request)
     {
-        try{    
+        try{
             $jobId = $request->job_id;
             $requestId = $request->request_id;
 
             EditorRequest::where(
-              [  
+              [
                 ['job_id' , $jobId],
                 ['request_id' , $requestId]
               ]
@@ -200,7 +202,7 @@ class JobHandler{
             JobProposal::where('id' , $requestId)->update(['status' => 1]);
 
             JobPayment::create(['job_id' => $jobId , 'request_id' => $requestId , 'client_transfer_status' => AppConst::CLIENT_PENDING , 'editor_transfer_status' => AppConst::EDITOR_PENDING]);
-            
+
             return ['success' => true , 'msg' => 'Job Awarded Successfully'];
 
         }catch(\Exception $e){
@@ -219,10 +221,10 @@ class JobHandler{
                     ->join('requests' , 'job_editor_request.request_id' , '=' , 'requests.id')
                     ->whereIn('job_editor_request.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB , AppConst::CANCEL_JOB])
                     ->where('job_editor_request.editor_id' , '=' , auth()->user()->id)
-                    ->selectRaw('personal_jobs.id as job_id, client.full_name as client_name, client.profile_image as client_image , personal_jobs.title as job_title,personal_jobs.status as job_status,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price , folders.id')
+                    ->selectRaw('personal_jobs.id as job_id, client.full_name as client_name, client.profile_image as client_image , personal_jobs.title as job_title,personal_jobs.status as job_status,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price , folders.id, personal_jobs.awarded_date')
                     ->orderBy('personal_jobs.id' , 'desc')
-                    ->get();  
-        
+                    ->get();
+
         // $user = User::with('cancelJob' , 'doneJob')->where('id' , auth()->user()->id)->first();
         // $doneJobCount = $user->doneJob->count();
         // $cancelledJobCount = $user->cancelJob->count();
@@ -239,7 +241,7 @@ class JobHandler{
     }
 
     public function cancelJob($request){
-        
+
         $jobId = $request->job_id;
 
         PersonalJob::where('id' , $jobId)->update(['status' => 'canceled']);
@@ -247,7 +249,7 @@ class JobHandler{
         $requests = EditorRequest::where('job_id' , $jobId)
                                     ->where('status' , 1)
                                     ->get();
-        
+
         foreach($requests as $editorRequest)
         {
             $requestId = $editorRequest->request_id;
@@ -258,9 +260,9 @@ class JobHandler{
             $editorRequest->save();
         }
 
-        
+
         return ['success' => true , 'msg' => 'Job Canceled Successfully'];
-        
+
     }
 
 
@@ -297,7 +299,7 @@ class JobHandler{
         $userId = auth()->user()->id;
 
         $doneJobs = User::with('doneJob.job.review')->where('id', $userId)->orderBy('id' , 'desc')->get();
-        
+
         return ["success" => true , "doneJobs" => $doneJobs];
     }
 
@@ -336,7 +338,7 @@ class JobHandler{
         $jobRequest = PersonalJob::with('requestList.proposal','requestList.favourite' , 'requestList.editor.skills')->where('id' , $jobId)->first();
 
         return ["success" => true , 'jobRequest' => $jobRequest];
-        
+
     }
 
     public function awardedJobEditorRequest($request)
@@ -346,7 +348,7 @@ class JobHandler{
         $jobRequest = PersonalJob::with('awardedRequest.proposal','awardedRequest.favourite' , 'awardedRequest.editor.skills')->where('id' , $jobId)->first();
 
         return ["success" => true , 'jobRequest' => $jobRequest];
-        
+
     }
 
     public function unawardedJobRequest($request){
@@ -359,7 +361,7 @@ class JobHandler{
     }
 
     public function getOngoingJob(){
-        
+
       $ongoingJobs =  PersonalJob::with('awardedRequest.editor' , 'review' )->where('client_id' , auth()->user()->id)->where('status' , 'awarded')->orderBy('id' , 'desc')->get();
 
       return response()->json(['status' => true , 'ongoingJobs' => $ongoingJobs]);
@@ -374,13 +376,13 @@ class JobHandler{
 
     }
 
-    
+
     public function getJobReview($request){
 
         $jobReview = Review::where('job_id' , $request->job_id)->first();
 
         return response()->json(['status' => true , 'jobReview' => $jobReview]);
-    
+
     }
 
     public function deleteJob($request){
@@ -402,7 +404,7 @@ class JobHandler{
 
 
         $query = PersonalJob::query();
-        
+
         $query->with('user' , 'skills' , 'awardedRequest.editor' , 'unawardedRequest.editor', 'awardedRequest.proposal' , 'unawardedRequest.proposal');
 
         $query->when(isset($title) && !is_null($title) , function($query1) use($title){
@@ -430,7 +432,7 @@ class JobHandler{
         $jobs = $query->orderby('id' , 'desc')->get();
 
         return ['jobs' => $jobs , 'status' => true];
-        
+
 
     }
 
@@ -439,7 +441,7 @@ class JobHandler{
 }
 
 
- 
+
 
 
 

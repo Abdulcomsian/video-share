@@ -322,39 +322,6 @@ class FolderController extends Controller
         }
     }
 
-    public function readShareFolderFileById(Request $request)
-    {
-        try{
-
-            $validator = Validator::make($request->all(), [
-                'share_folder_file_id' => 'required',
-            ]);
-
-            if ($validator->fails()) {
-
-                return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-
-            } else {
-
-                $response = $this->folderHandler->readShareFolderFile($request);
-
-                if($response['success']){
-
-                    return response()->json($response);
-
-                }else{
-
-                    return response()->json($response , 400);
-
-                }
-            }
-
-        }catch(\Exception $e){
-            return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
-        }
-    }
-
-
     public function getJobFolder(Request $request)
    {
         try{

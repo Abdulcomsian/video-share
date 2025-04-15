@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Repository\{JobHandler , StripeService};
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class JobController extends Controller
 {
@@ -16,7 +17,7 @@ class JobController extends Controller
         $this->jobHandler = $jobHandler;
         $this->stripeService = $stripeService;
     }
-    
+
     public function addJob(Request $request)
     {
         try{
@@ -38,7 +39,7 @@ class JobController extends Controller
                 $response = $this->jobHandler->addClientJob($request);
                 return response()->json($response);
             }
-    
+
         }catch(\Exception $e){
             return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
@@ -51,7 +52,7 @@ class JobController extends Controller
         try{
             $response = $this->jobHandler->clientJobList();
             return response()->json($response);
-    
+
         }catch(\Exception $e){
             return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
@@ -63,7 +64,7 @@ class JobController extends Controller
         try{
             $response = $this->jobHandler->jobRequestList();
             return response()->json($response);
-    
+
         }catch(\Exception $e){
             return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
@@ -90,7 +91,7 @@ class JobController extends Controller
                 }
 
             }
-    
+
         }catch(\Exception $e){
             return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
@@ -194,7 +195,7 @@ class JobController extends Controller
                 $response = $this->jobHandler->cancelJob($request);
                 return response()->json($response);
             }
-    
+
         }catch(\Exception $e){
             return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
@@ -274,7 +275,7 @@ class JobController extends Controller
         }
 
    }
-   
+
    public function awardedJobRequest(Request $request){
 
         $validator = Validator::make( $request->all() , [
@@ -303,7 +304,7 @@ class JobController extends Controller
         }else{
             $response = $this->jobHandler->unawardedJobRequest($request);
             return response()->json($response);
-        }  
+        }
     }
 
     public function ongoingJob(){
@@ -394,7 +395,32 @@ class JobController extends Controller
             return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
         }
     }
-   
+
+    public function extendJobDeliveryDate(Request $request)
+    {
+        $validator = Validator::make( $request->all() , [
+            'job_id' => [
+                'required',
+                'numeric',
+                Rule::exists('personal_jobs', 'id'),
+            ],
+            'extended_date' => 'required|date'
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json(["success" => false , "msg" => "Something Went Wrong" ,"error" => $validator->getMessageBag()] ,400);
+        }
+
+        try{
+            $response = $this->jobHandler->extendJobDeliveryDate($request);
+            return response()->json($response);
+
+        }catch(\Exception $e){
+            return response()->json(["success" => false , "msg" => "Something Went Wrong", "error" => $e->getMessage()] ,400);
+        }
+
+    }
 
 
 }

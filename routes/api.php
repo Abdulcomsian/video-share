@@ -94,6 +94,7 @@ Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(functi
     Route::post('upload-portfolio-video' , [UserController::class , 'uploadPortfolioVideo']);
     Route::post('delete-portfolio-video' , [UserController::class , 'deletePortfolioVideo']);
     Route::get('get-portfolio-video' , [UserController::class , 'portfolioVideo']);
+    Route::post('extend-job-delivery-date', [JobController::class, 'extendJobDeliveryDate']);
 });
 
 

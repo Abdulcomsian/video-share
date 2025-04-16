@@ -5,6 +5,7 @@ namespace App\Http\Repository;
 use App\Http\AppConst;
 use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal, JobPayment , User , Folder, Review};
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class JobHandler{
 
@@ -436,7 +437,61 @@ class JobHandler{
 
     }
 
+    public function extendJobDeliveryDate($request)
+    {
 
+        $personalJob = PersonalJob::where('id', $request->job_id)->first();
+
+        if($personalJob->extended_delivery_date  != '') {
+            return ['success' => false , 'msg' => 'Extended request is already submitted.'];
+        }
+
+        if($personalJob->is_extend_delivery != '') {
+            return ['success' => false , 'msg' => 'Already extended the delivery date.'];
+        }
+
+        $deadline = Carbon::parse($personalJob->deadline);
+        $today = Carbon::now();
+        $extendedDate = Carbon::parse($request->extended_date);
+
+        // Must be max 7 days before the deadline
+        // if ($today->gt($deadline->copy()->subDays(7))) {
+        //     return ['success' => false , 'msg' => 'You can only request an extension up to 7 days before the deadline.'];
+        // }
+
+        // Extended date must be greater than the current deadline
+        if ($extendedDate->lte($deadline)) {
+            return ['success' => false , 'msg' => 'The extended date must be after the current deadline.'];
+        }
+
+        $personalJob->extended_delivery_date = $extendedDate;
+        $personalJob->save();
+
+        return ['success' => true , 'msg' => 'Job delivery date extended successfully.'];
+
+    }
+
+    public function updateJobDeliveryDateRequest($request)
+    {
+
+        $personalJob = PersonalJob::where('id', $request->job_id)->first();
+        if($personalJob->extended_delivery_date == '') {
+            return ['success' => false , 'msg' => 'No extended delivery request found.'];
+        }
+
+        if($personalJob->is_extend_delivery != '') {
+            return ['success' => false , 'msg' => 'Already extended the delivery date.'];
+        }
+
+
+        $isApprove = (bool) $request->is_approve;
+
+        $personalJob->is_extend_delivery = $isApprove;
+        $personalJob->save();
+
+        return ['success' => true , 'msg' => 'Job delivery date updated successfully.'];
+
+    }
 
 }
 

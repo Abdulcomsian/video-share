@@ -94,6 +94,7 @@ Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(functi
     Route::post('upload-portfolio-video' , [UserController::class , 'uploadPortfolioVideo']);
     Route::post('delete-portfolio-video' , [UserController::class , 'deletePortfolioVideo']);
     Route::get('get-portfolio-video' , [UserController::class , 'portfolioVideo']);
+    Route::post('extend-job-delivery-date', [JobController::class, 'extendJobDeliveryDate']);
 });
 
 
@@ -141,6 +142,7 @@ Route::middleware(['verify.authentication' , 'api.client.verify'])->group(functi
     Route::post('delete-job' , [JobController::class , 'deleteJob']);
     Route::post('search-folder' , [FolderController::class , 'searchFolder']);
     Route::post('get-editor-review' , [ReviewController::class , 'getEditorReviews']);
+    Route::post('extend-job-delivery-date-request', [JobController::class, 'extendJobDeliveryDateRequest']);
 });
 
 

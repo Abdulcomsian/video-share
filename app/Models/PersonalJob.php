@@ -14,7 +14,7 @@ class PersonalJob extends Model
 
     protected $table = "personal_jobs";
     protected $primaryKey = "id";
-    protected $fillable = ['client_id' , 'title'  , 'description' , 'budget' , 'deadline', 'status', 'quick_delivery' , 'awarded_date' , 'folder_id'];
+    protected $fillable = ['client_id' , 'title'  , 'description' , 'budget' , 'deadline', 'status', 'quick_delivery' , 'awarded_date' , 'folder_id', 'is_extend_delivery', 'extended_delivery_date'];
 
     public function user()
     {

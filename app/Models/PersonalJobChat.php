@@ -16,9 +16,13 @@ class PersonalJobChat extends Model
         'is_read'
     ];
 
+    protected $hidden = [
+        'is_read'
+    ];
+
     public function sender()
     {
-        return $this->belongsTo(User::class, 'sender_id');
+        return $this->belongsTo(User::class, 'sender_id')->select('id', 'full_name', 'email', 'type');
     }
 
 }

@@ -38,7 +38,7 @@ class PersonalJobChatController extends Controller
         try {
 
             $validator = Validator::make($request->all(), [
-                'personal_job_id' => 'required|exists:personal_jobs,id',
+                'job_id' => 'required|exists:personal_jobs,id',
                 'message' => 'required|string',
             ]);
 

@@ -59,6 +59,9 @@ Route::middleware(['verify.authentication'])->group(function(){
     Route::post('profile-detail' , [UserController::class , 'getProfileDetail']);
     Route::post('review-list' , [ReviewController::class , 'getReviewList']);
     Route::post('share-folder-files' , [FolderController::class , 'getShareFolderFile']);
+    // personal job chat
+    Route::get('chat/{personalJobId}', [PersonalJobChatController::class, 'index']);
+    Route::post('chat/send', [PersonalJobChatController::class, 'store']);
 });
 
 /* Editor Routes*/
@@ -144,15 +147,6 @@ Route::middleware(['verify.authentication' , 'api.client.verify'])->group(functi
     Route::post('get-editor-review' , [ReviewController::class , 'getEditorReviews']);
     Route::post('extend-job-delivery-date-request', [JobController::class, 'extendJobDeliveryDateRequest']);
 });
-
-
-// personal job chat
-
-Route::middleware('verify.authentication')->group(function () {
-    Route::get('chat/{personalJobId}', [PersonalJobChatController::class, 'index']);
-    Route::post('chat/send', [PersonalJobChatController::class, 'store']);
-});
-
 
 // Route::post('add-links' , [UserController::class , 'addLinks']);
 // Route::post('update-profile' , [UserController::class , 'updateProfile']);

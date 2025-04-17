@@ -24,7 +24,7 @@ class PersonalJobChatRepository
     {
 
         $message = PersonalJobChat::create([
-            'personal_job_id' => $request->personal_job_id,
+            'personal_job_id' => $request->job_id,
             'sender_id' => auth()->id(),
             'message' => $request->message,
         ]);

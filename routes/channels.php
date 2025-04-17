@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
-
+use App\Models\PersonalJob;
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -19,5 +19,12 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 
 Broadcast::channel('video-share-chat.{personalJobId}', function ($user, $personalJobId) {
     // You can add role checks here if needed
+    $personalJob = PersonalJob::find($personalJobId);
+
+    if (!$personalJob) {
+        return false;
+    }
+
     return true;
+
 });

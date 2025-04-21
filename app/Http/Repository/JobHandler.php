@@ -446,8 +446,8 @@ class JobHandler{
             return ['success' => false , 'msg' => 'Extended request is already submitted.'];
         }
 
-        if($personalJob->is_extend_delivery != '') {
-            return ['success' => false , 'msg' => 'Already extended the delivery date.'];
+        if($personalJob->is_extend_delivery === true) {
+            return ['success' => false , 'msg' => 'Extended delivery date is already accepted.'];
         }
 
         $deadline = Carbon::parse($personalJob->deadline);
@@ -455,9 +455,9 @@ class JobHandler{
         $extendedDate = Carbon::parse($request->extended_date);
 
         // Must be max 7 days before the deadline
-        // if ($today->gt($deadline->copy()->subDays(7))) {
-        //     return ['success' => false , 'msg' => 'You can only request an extension up to 7 days before the deadline.'];
-        // }
+        if ($today->gt($deadline->copy()->subDays(7))) {
+            return ['success' => false , 'msg' => 'You can only request an extension up to 7 days before the deadline.'];
+        }
 
         // Extended date must be greater than the current deadline
         if ($extendedDate->lte($deadline)) {
@@ -479,14 +479,18 @@ class JobHandler{
             return ['success' => false , 'msg' => 'No extended delivery request found.'];
         }
 
-        if($personalJob->is_extend_delivery != '') {
-            return ['success' => false , 'msg' => 'Already extended the delivery date.'];
+        if($personalJob->is_extend_delivery === true) {
+            return ['success' => false , 'msg' => 'Extended delivery date is already accepted.'];
         }
-
 
         $isApprove = (bool) $request->is_approve;
 
         $personalJob->is_extend_delivery = $isApprove;
+
+        if(!$isApprove) {
+            $personalJob->extended_delivery_date = '';
+        }
+
         $personalJob->save();
 
         return ['success' => true , 'msg' => 'Job delivery date updated successfully.'];

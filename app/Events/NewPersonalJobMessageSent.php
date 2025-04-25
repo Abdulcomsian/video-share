@@ -33,7 +33,7 @@ class NewPersonalJobMessageSent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('video-share-chat.' . $this->message->personal_job_id);
+        return new PresenceChannel('video-share-chat.' . $this->message->personal_job_id);
     }
 
     public function broadcastAs(): string

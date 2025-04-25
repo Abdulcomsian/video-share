@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{ AuthController ,
                             UserController ,
@@ -62,6 +63,31 @@ Route::middleware(['verify.authentication'])->group(function(){
     // personal job chat
     Route::get('chat/{personalJobId}', [PersonalJobChatController::class, 'index']);
     Route::post('chat/send', [PersonalJobChatController::class, 'store']);
+    Route::post('/broadcasting/auth', function (Request $request) {
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // Run Laravel's default broadcast auth logic
+        $result = Broadcast::auth($request);
+
+        if (is_array($result)) {
+            $auth = $result['auth'];
+            $channelData = $result['channel_data'] ?? null;
+        } else {
+            $auth = $result;
+            $channelData = json_encode(['user_id' => $user->id]);
+        }
+
+        return response()->json([
+            'auth' => $auth,
+            'shared_secret' => hash('sha256', $user->id . now()),
+            'channel_data' => $channelData,
+        ]);
+    });
+
 });
 
 /* Editor Routes*/

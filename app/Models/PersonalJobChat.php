@@ -22,7 +22,7 @@ class PersonalJobChat extends Model
 
     public function sender()
     {
-        return $this->belongsTo(User::class, 'sender_id')->select('id', 'full_name', 'email', 'type');
+        return $this->belongsTo(User::class, 'sender_id')->select('id', 'full_name', 'email', 'type', 'profile_image');
     }
 
 }

@@ -224,7 +224,7 @@ class JobHandler{
                     ->join('requests' , 'job_editor_request.request_id' , '=' , 'requests.id')
                     ->whereIn('job_editor_request.status' , [AppConst::AWARDED_JOB , AppConst::DONE_JOB , AppConst::CANCEL_JOB])
                     ->where('job_editor_request.editor_id' , '=' , auth()->user()->id)
-                    ->selectRaw('personal_jobs.id as job_id, client.full_name as client_name, client.profile_image as client_image , personal_jobs.title as job_title,personal_jobs.status as job_status,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price , folders.id, personal_jobs.awarded_date')
+                    ->selectRaw('personal_jobs.id as job_id, client.full_name as client_name, client.profile_image as client_image , personal_jobs.title as job_title,personal_jobs.status as job_status,  personal_jobs.description as job_description, personal_jobs.deadline, requests.bid_price , folders.id, personal_jobs.awarded_date,personal_jobs.is_extend_delivery,personal_jobs.extended_delivery_date')
                     ->orderBy('personal_jobs.id' , 'desc')
                     ->get();
 

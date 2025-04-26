@@ -75,10 +75,24 @@ Route::middleware(['verify.authentication'])->group(function(){
 
         if (is_array($result)) {
             $auth = $result['auth'];
-            $channelData = $result['channel_data'] ?? null;
+            $channelData = [
+                'user_id' => $user->id,
+                'user_info' => [
+                    'name' => $user->full_name,
+                    'email' => $user->email
+                ],
+            ];
+            $channelData = json_encode($channelData);
         } else {
             $auth = $result;
-            $channelData = json_encode(['user_id' => $user->id]);
+            $channelData = [
+                'user_id' => $user->id,
+                'user_info' => [
+                    'name' => $user->full_name,
+                    'email' => $user->email
+                ],
+            ];
+            $channelData = json_encode($channelData);
         }
 
         return response()->json([

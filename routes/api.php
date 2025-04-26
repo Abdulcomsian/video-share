@@ -70,35 +70,31 @@ Route::middleware(['verify.authentication'])->group(function(){
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        // Run Laravel's default broadcast auth logic
-        $result = Broadcast::auth($request);
+        $socketId = $request->input('socket_id');
+        $channelName = $request->input('channel_name');
 
-        if (is_array($result)) {
-            $auth = $result['auth'];
-            $channelData = [
-                'user_id' => $user->id,
-                'user_info' => [
-                    'name' => $user->full_name,
-                    'email' => $user->email
-                ],
-            ];
-            $channelData = json_encode($channelData);
-        } else {
-            $auth = $result;
-            $channelData = [
-                'user_id' => $user->id,
-                'user_info' => [
-                    'name' => $user->full_name,
-                    'email' => $user->email
-                ],
-            ];
-            $channelData = json_encode($channelData);
-        }
+        // Build your custom channel data
+        $channelData = [
+            'user_id' => $user->id,
+            'user_info' => [
+                'name' => $user->full_name,
+                'email' => $user->email,
+            ],
+        ];
 
+        $encodedChannelData = json_encode($channelData);
+
+        // Build the signature manually
+        $stringToSign = "{$socketId}:{$channelName}:{$encodedChannelData}";
+        $authSignature = hash_hmac('sha256', $stringToSign, env('PUSHER_APP_SECRET'));
+
+        $auth = env('PUSHER_APP_KEY') . ':' . $authSignature;
+
+        // Return in Flutter's expected format
         return response()->json([
             'auth' => $auth,
-            'shared_secret' => hash('sha256', $user->id . now()),
-            'channel_data' => $channelData,
+            'shared_secret' => hash('sha256', $user->id . now()), // optional, your logic
+            'channel_data' => $encodedChannelData,
         ]);
     });
 

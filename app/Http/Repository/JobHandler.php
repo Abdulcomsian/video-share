@@ -141,6 +141,8 @@ class JobHandler{
                                             requests.bid_price,
                                             requests.description as proposal_detail,
                                             personal_jobs.awarded_date,
+                                            personal_jobs.is_extend_delivery,
+                                            personal_jobs.extended_delivery_date,
                                             If(job_review.id IS NOT NULL, true , false) as has_review')
                                 ->orderBy('personal_jobs.id' , 'desc')
                                 ->get();
@@ -488,7 +490,7 @@ class JobHandler{
         $personalJob->is_extend_delivery = $isApprove;
 
         if(!$isApprove) {
-            $personalJob->extended_delivery_date = '';
+            $personalJob->extended_delivery_date = null;
         }
 
         $personalJob->save();

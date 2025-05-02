@@ -19,7 +19,7 @@
 
         {{-- adding active and open class if child is active --}}
         {{-- main menu --}}
-        <li class="menu-item">
+        <li class="menu-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
             <a href="{{ route('admin:dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons mdi mdi-home-outline"></i>
                 <div>Dashboard</div>

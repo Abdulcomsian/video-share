@@ -17,13 +17,14 @@ use Illuminate\Http\Request;
 Route::get('/terms-and-condition' , [HomeController::class , 'termsAndConditionPage'])->name('get.temsAndCondition.page');
 
 Auth::routes(['except' => ['register']]);
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
 Route::middleware(['auth:web' , 'web.admin.verify'])->group(function(){
-    Route::get('/' , [DashboardController::class , 'getAdminDashboard'])->name('get.admin.dashboard');
+    Route::get('/' , function (){
+        return redirect()->route('admin:dashboard');
+    });
     Route::group(['prefix' => 'admin', 'as' => 'admin:'], function () {
-
+        Route::get('/dashboard' , [DashboardController::class , 'index'])->name('dashboard');
         Route::get('/clients' , [DashboardController::class , 'getClientPage'])->name('client.page');
         Route::get('/client-list' , [UserController::class , 'getDashboardClientList'])->name('get.client.list');
         Route::get('/editors' , [DashboardController::class , 'getEditorPage'])->name('editor.page');

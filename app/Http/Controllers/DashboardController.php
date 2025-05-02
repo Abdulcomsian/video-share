@@ -11,25 +11,18 @@ class DashboardController extends Controller
 
     public function __construct(DashboardHandler $dashboard)
     {
-        $this->dashboard = $dashboard;       
+        $this->dashboard = $dashboard;
     }
 
-    public function getAdminDashboard()
+    public function index()
     {
-        $folderCount = $this->dashboard->totalFolders();
-        $videoCount = $this->dashboard->totalVideoFile();
-        $imageCount = $this->dashboard->totalImages();
-        $userCount = $this->dashboard->totalUser();
+
         $activeJobCount = $this->dashboard->activeJobs();
         $completedJobCount = $this->dashboard->completedJob();
         $clientCount = $this->dashboard->clients();
         $editorCount = $this->dashboard->editors();
 
-        return view('admin.home')->with(["folderCount" => $folderCount , "videoCount" => $videoCount,
-                                         "imageCount" => $imageCount , "userCount" => $userCount,
-                                         "activeJobCount" => $activeJobCount , "completedJobCount" => $completedJobCount,
-                                         "clientCount" => $clientCount , "editorCount" => $editorCount
-                                        ]);
+        return view('admin.home', compact("activeJobCount", "completedJobCount", "clientCount", "editorCount"));
     }
 
 

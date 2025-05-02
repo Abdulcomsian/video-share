@@ -1,93 +1,3 @@
-{{-- @extends('layout.dashboard-master')
-@section('content')
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="card-counter dashboard-card">
-                  <i class="fas fa-folder-open"></i>
-                  <span class="d-flex flex-column text-center align-content-center">
-                    <span class="count-numbers">{{$folderCount}}</span>
-                    <span class="count-numbers"> Folder</span>
-                  </span>
-                </div>
-              </div>
-
-              <div class="col-md-3">
-                <div class="card-counter dashboard-card">
-                    <i class="fas fa-file-video"></i>
-                    <span class="d-flex flex-column text-center align-content-center">
-                      <span class="count-numbers">{{$videoCount}}</span>
-                      <span class="count-name">Videos</span>
-                    </span>
-                </div>
-              </div>
-
-              <div class="col-md-3">
-                <div class="card-counter dashboard-card">
-                    <i class="fas fa-photo-video"></i>
-                    <span class="d-flex flex-column text-center align-content-center">
-                      <span class="count-numbers">{{$imageCount}}</span>
-                      <span class="count-numbers"> Images</span>
-                    </span>
-                </div>
-              </div>
-
-              <div class="col-md-3">
-                <div class="card-counter dashboard-card">
-                  <i class="fa fa-users"></i>
-                  <span class="d-flex flex-column text-center align-content-center">
-                    <span class="count-numbers">{{$userCount}}</span>
-                    <span class="count-numbers"> Users</span>
-                  </span>
-                </div>
-              </div>
-
-        </div>
-        <div class="row">
-            <div class="col-md-3">
-                <div class="card-counter dashboard-card">
-                    <i class="fas fa-briefcase"></i>
-                    <span class="d-flex flex-column text-center align-content-center">
-                      <span class="count-numbers">{{$activeJobCount}}</span>
-                      <span class="count-numbers"> Active Job</span>
-                    </span>
-                </div>
-              </div>
-
-              <div class="col-md-3">
-                <div class="card-counter dashboard-card">
-                    <i class="far fa-handshake"></i>
-                    <span class="d-flex flex-column text-center align-content-center">
-                      <span class="count-numbers">{{$completedJobCount}}</span>
-                      <span class="count-numbers"> Done Job</span>
-                    </span>
-                </div>
-              </div>
-
-              <div class="col-md-3">
-                <div class="card-counter dashboard-card">
-                    <i class="fas fa-user-tie"></i>
-                    <span class="d-flex flex-column text-center align-content-center">
-                      <span class="count-numbers">{{$clientCount}}</span>
-                      <span class="count-numbers"> Client</span>
-                    </span>
-                </div>
-              </div>
-
-              <div class="col-md-3">
-                <div class="card-counter dashboard-card">
-                  <i class="fas fa-user-edit"></i>
-                    <span class="d-flex flex-column text-center align-content-center">
-                      <span class="count-numbers">{{$editorCount}}</span>
-                      <span class="count-numbers"> Editor</span>
-                    </span>
-                </div>
-              </div>
-
-        </div>
-    </div>
-@endsection --}}
-
 @extends('layout.contentNavbarLayout')
 
 @section('title', 'Dashboard')
@@ -121,18 +31,33 @@
   <div class="col-md-6 col-lg-4">
     <div class="card">
       <div class="card-body">
-        <h4 class="card-title mb-4">Total Customers</h4>
-        <h4 class="text-primary mb-2">{{ $totalCustomers ?? 0 }}</h4>
-        <a href="#" class="btn btn-sm btn-primary">View Customers</a>
+        <h4 class="card-title mb-4">Total Clients</h4>
+        <h4 class="text-primary mb-2">{{ $clientCount }}</h4>
+        {{-- <a href="#" class="btn btn-sm btn-primary">View Customers</a> --}}
       </div>
     </div>
   </div>
   <div class="col-md-6 col-lg-4">
     <div class="card">
       <div class="card-body">
-        <h4 class="card-title mb-4">Total Merchants</h4>
-        <h4 class="text-primary mb-2">{{ $totalMerchants ?? 0 }}</h4>
-        <a href="#" class="btn btn-sm btn-primary">View Merchants</a>
+        <h4 class="card-title mb-4">Total Editors</h4>
+        <h4 class="text-primary mb-2">{{ $editorCount }}</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-4">Active Jobs</h4>
+        <h4 class="text-primary mb-2">{{ $activeJobCount }}</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-4">Completed Jobs</h4>
+        <h4 class="text-primary mb-2">{{ $completedJobCount }}</h4>
       </div>
     </div>
   </div>

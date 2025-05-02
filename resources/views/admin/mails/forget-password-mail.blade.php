@@ -23,7 +23,7 @@
         }
 
         .header {
-            background-color: #A694DD;
+            background-color: #ef5332;
             color: #FFFFFF;
             padding: 20px;
             text-align: center;
@@ -40,7 +40,7 @@
 
         .button {
             display: inline-block;
-            background-color: #A694DD;
+            background-color: #ef5332;
             color: #FFFFFF;
             text-decoration: none;
             padding: 10px 20px;
@@ -70,7 +70,7 @@
                 password:</p>
             <p>
                 <a href="{{ $link }}"
-                    style="display: inline-block; background-color: #A694DD; color: white; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 5px;">
+                    style="display: inline-block; background-color: #ef5332; color: white; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 5px;">
                     Reset Password
                 </a>
             </p>

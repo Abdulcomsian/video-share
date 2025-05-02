@@ -151,4 +151,9 @@ class User extends Authenticatable implements JWTSubject
         $this->notify(new SuperAdminForgetPasswordEmailNotification($token));
     }
 
+    public function getImagePathAttribute(): string
+    {
+        return $this->profile_image ? asset('storage/' . $this->profile_image) : asset('images/avatar.jpeg');
+    }
+
 }

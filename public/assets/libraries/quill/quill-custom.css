@@ -1,0 +1,7 @@
+#quill-editor.ql-container {
+    height: auto;
+}
+
+#quill-editor .ql-editor {
+    height: 200px;
+}

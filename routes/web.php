@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{BillingController, DashboardController, UserController , FolderController, HomeController, ProfileController};
+use App\Http\Controllers\Web\{ClientController, EditorController, JobController};
 use Illuminate\Http\Request;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,15 +27,18 @@ Route::middleware(['auth:web' , 'web.admin.verify'])->group(function(){
     });
     Route::group(['prefix' => 'admin', 'as' => 'admin:'], function () {
         Route::get('/dashboard' , [DashboardController::class , 'index'])->name('dashboard');
-        Route::get('/clients' , [DashboardController::class , 'getClientPage'])->name('client.page');
-        Route::get('/client-list' , [UserController::class , 'getDashboardClientList'])->name('get.client.list');
-        Route::get('/editors' , [DashboardController::class , 'getEditorPage'])->name('editor.page');
-        Route::get('/editor-list' , [UserController::class , 'getDashboardEditorList'])->name('get.editor.list');
-        Route::get('/folders' , [DashboardController::class , 'getFolderPage'])->name('folder.page');
-        Route::get('/folder-list' , [FolderController::class , 'getFolderList'])->name('get.folder.list');
+        Route::get('/manage/clients' , [ClientController::class , 'index'])->name('clients.list');
+        Route::get('/manage/editors' , [EditorController::class , 'index'])->name('editors.list');
+        Route::get('/jobs' , [JobController::class , 'index'])->name('jobs.list');
+        Route::get('/jobs/{id}' , [JobController::class , 'show'])->name('jobs.show');
+        // Route::get('/client-list' , [UserController::class , 'getDashboardClientList'])->name('get.client.list');
+        // Route::get('/editors' , [DashboardController::class , 'getEditorPage'])->name('editor.page');
+        // Route::get('/editor-list' , [UserController::class , 'getDashboardEditorList'])->name('get.editor.list');
+        // Route::get('/folders' , [DashboardController::class , 'getFolderPage'])->name('folder.page');
+        // Route::get('/folder-list' , [FolderController::class , 'getFolderList'])->name('get.folder.list');
         //test routes starts here
-        Route::get("billing" , [BillingController::class , 'getBillingPage']);
-        Route::post("add-billing" , [BillingController::class , 'processBillingFees'])->name('stripe.store');
+        // Route::get("billing" , [BillingController::class , 'getBillingPage']);
+        // Route::post("add-billing" , [BillingController::class , 'processBillingFees'])->name('stripe.store');
         //test routes ends here
 
         // profile

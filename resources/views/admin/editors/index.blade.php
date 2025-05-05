@@ -1,6 +1,6 @@
-@extends('layouts/contentNavbarLayout')
+@extends('layout.contentNavbarLayout')
 
-@section('title', 'Customers List')
+@section('title', 'Editors List')
 
 @push('my-styles')
 
@@ -11,7 +11,7 @@
 @section('content')
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <h4 class="py-3"><span class="text-muted fw-light">Manage Users /</span> Customers
+            <h4 class="py-3"><span class="text-muted fw-light">Manage Users /</span> Editors
             </h4>
         </div>
 

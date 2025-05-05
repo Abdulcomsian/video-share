@@ -27,29 +27,29 @@
             </a>
         </li>
 
-        <li class="menu-item">
-            <a href="{{ route('admin:dashboard') }}" class="menu-link menu-toggle">
+        <li class="menu-item {{ request()->is('admin/manage/*') ? 'active open' : '' }}">
+            <a href="javascript:void(0)" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons mdi mdi-account-outline"></i>
                 <div>Manage Users</div>
             </a>
 
             <ul class="menu-sub">
-                <li class="menu-item">
-                    <a href="javascript:void(0)" class="menu-link">
+                <li class="menu-item {{ request()->is('admin/manage/clients') ? 'active' : '' }}"">
+                    <a href="{{ route('admin:clients.list') }}" class="menu-link">
                         {{-- <i class="{{ $submenu->icon }}"></i> --}}
                         <div>Clients</div>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="javascript:void(0)" class="menu-link">
+                <li class="menu-item {{ request()->is('admin/manage/editors') ? 'active' : '' }}"">
+                    <a href="{{ route('admin:editors.list') }}" class="menu-link">
                         <div>Editors</div>
                     </a>
                 </li>
             </ul>
         </li>
 
-        <li class="menu-item">
-            <a href="{{ route('admin:dashboard') }}" class="menu-link">
+        <li class="menu-item {{ request()->is('admin/jobs/*') ? 'active' : '' }}"">
+            <a href="{{ route('admin:jobs.list') }}" class="menu-link">
                 <i class="menu-icon tf-icons mdi mdi-file-sign"></i>
                 <div>Jobs</div>
             </a>

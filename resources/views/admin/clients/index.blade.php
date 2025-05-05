@@ -1,4 +1,4 @@
-@extends('layouts/contentNavbarLayout')
+@extends('layout.contentNavbarLayout')
 
 @section('title', 'Merchants List')
 
@@ -11,7 +11,7 @@
 @section('content')
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <h4 class="py-3"><span class="text-muted fw-light">Manage Users /</span> Merchants
+            <h4 class="py-3"><span class="text-muted fw-light">Manage Users /</span> Clients
             </h4>
         </div>
 

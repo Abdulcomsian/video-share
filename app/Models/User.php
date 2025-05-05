@@ -13,6 +13,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 // use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Notifications\SuperAdminForgetPasswordEmailNotification;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -145,6 +146,14 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(PortfolioVideo::class , 'user_id' , 'id');
     }
 
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new SuperAdminForgetPasswordEmailNotification($token));
+    }
 
+    public function getImagePathAttribute(): string
+    {
+        return $this->profile_image ? asset('storage/' . $this->profile_image) : asset('images/avatar.jpeg');
+    }
 
 }

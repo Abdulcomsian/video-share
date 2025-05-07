@@ -31,6 +31,7 @@ Route::middleware(['auth:web' , 'web.admin.verify'])->group(function(){
         Route::get('/manage/editors' , [EditorController::class , 'index'])->name('editors.list');
         Route::get('/jobs' , [JobController::class , 'index'])->name('jobs.list');
         Route::get('/jobs/{id}' , [JobController::class , 'show'])->name('jobs.show');
+        Route::get('/jobs/proposals/{id}' , [JobController::class , 'jobProposals'])->name('jobs.proposals-list');
         // Route::get('/client-list' , [UserController::class , 'getDashboardClientList'])->name('get.client.list');
         // Route::get('/editors' , [DashboardController::class , 'getEditorPage'])->name('editor.page');
         // Route::get('/editor-list' , [UserController::class , 'getDashboardEditorList'])->name('get.editor.list');

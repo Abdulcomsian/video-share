@@ -28,12 +28,33 @@ class JobListDataTable extends DataTable
                     $q->where('full_name', 'like', "%{$keyword}%");
                 });
             })
+            ->addColumn('awarded_budget', function ($row) {
+                if($row->status === 'completed') {
+
+                    return $row->doneRequest->proposal->bid_price ?? 0;
+
+                }
+                elseif ($row->status === 'awarded') {
+
+                    return $row->awardedRequest->proposal->bid_price ?? 0;
+
+                }
+                elseif ($row->status === 'canceled') {
+
+                    return $row->awardedRequest->proposal->bid_price ?? 0;
+
+                }
+                else
+                {
+                    return $row->budget ?? 0;
+                }
+            })
             ->rawColumns(['actions']);
     }
 
     public function query(PersonalJob $model): QueryBuilder
     {
-        return $model->newQuery()->with('user')->orderByDesc('id');
+        return $model->newQuery()->with('user','awardedRequest.proposal','doneRequest.proposal')->orderByDesc('id');
     }
 
     public function html(): HtmlBuilder
@@ -65,9 +86,14 @@ class JobListDataTable extends DataTable
             Column::computed('client_full_name')
             ->title('Client')
             ->searchable(true)
-            ->orderable(true),
+            ->orderable(false),
             Column::make('title'),
-            Column::make('budget'),
+            Column::make('budget')->title('Budget')
+            ->searchable(false)
+            ->orderable(false),
+            Column::make('awarded_budget')->title('Awarded Budget')
+            ->searchable(false)
+            ->orderable(false),
             Column::make('status'),
             Column::computed('actions')
                 ->title('Actions')

@@ -16,31 +16,11 @@ class JobController extends Controller
     public function show($id)
     {
 
-        $job = PersonalJob::with('skills' , 'jobFolder.files' , 'review', 'user', 'awardedRequest.proposal','doneRequest.proposal','payment','requestList.proposal','requestList.editor')->where('id' , $id)->first();
+        $job = PersonalJob::with('skills' , 'jobFolder.files' , 'review', 'user','payment','requestList.proposal','requestList.editor','acceptedRequest.proposal','acceptedRequest.editor')->where('id' , $id)->first();
 
-        if($job->status === 'completed') {
+        // dd($job->toArray(),$job->requestList->toArray());
 
-            $jobBudget = $job->doneRequest->proposal->bid_price ?? 0;
-
-        }
-        elseif ($job->status === 'awarded') {
-
-            $jobBudget = $job->awardedRequest->proposal->bid_price ?? 0;
-
-        }
-        elseif ($job->status === 'canceled') {
-
-            $jobBudget = $job->awardedRequest->proposal->bid_price ?? 0;
-
-        }
-        else
-        {
-            $jobBudget = $row->budget ?? 0;
-        }
-
-        // dd($job->toArray());
-
-        return view('admin.jobs.show', compact('job', 'jobBudget'));
+        return view('admin.jobs.show', compact('job'));
 
     }
 

@@ -2,6 +2,14 @@
 
 @section('title', 'Job Details')
 
+@push('my-styles')
+    <style>
+        .fs-0-9 {
+            font-size: 0.9rem;
+        }
+    </style>
+@endpush
+
 @section('content')
     <h4 class="py-3 mb-4">
         <span class="text-muted fw-light">Jobs /</span> View Details
@@ -11,10 +19,16 @@
         <div class="col-md-12">
             <div class="card mb-4">
                 <div class="card-header d-flex flex-column justify-content-between pb-0">
-                    <h4 class="mb-2">
-                        Title : {{ $job->title }}
-                    </h4>
                     <div class="row">
+                        <div class="col-12">
+                            <h4 class="mb-2">
+                                Title : {{ $job->title }}
+                            </h4>
+                            <p class="mb-1 fs-0-9"><strong>Budget:</strong> {{ $job->budget ?? 0 }}</p>
+                            <p class="mb-1 fs-0-9"><strong>Awarded Budget:</strong>
+                                {{ $job->acceptedRequest->proposal->bid_price ?? 0 }}</p>
+
+                        </div>
                         <div class="col-12">
                             @forelse ($job->skills as $skill)
                                 <span class="badge bg-label-primary my-1">{{ $skill->title }}</span>
@@ -36,9 +50,10 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <p class="mb-1"><strong>Budget:</strong> {{ $job->budget ?? 0 }}</p>
-                                    <p class="mb-1"><strong>Awarded Budget:</strong> {{ $jobBudget ?? 0 }}</p>
+                                    <p class="mb-1"><strong>Awarded Budget:</strong>
+                                        {{ $job->acceptedRequest->proposal->bid_price ?? 0 }}</p>
                                     <p class="mb-1"><strong>Status:</strong> <span
-                                            class="badge bg-label-{{ $job->status !== 'unawarded' ? 'success' : 'danger' }} rounded-pill">
+                                            class="badge bg-label-{{ $job->status !== 'unawarded' && $job->status !== 'canceled' ? 'success' : 'danger' }} rounded-pill">
                                             {{ ucfirst($job->status) }}
                                         </span></p>
                                     <p class="mb-1"><strong>Awarded Date:</strong>
@@ -51,6 +66,8 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="row mb-4">
                         <div class="col-5">
                             <h5>Payment</h5>
                             <div class="row">

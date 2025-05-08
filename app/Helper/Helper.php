@@ -20,4 +20,19 @@ class Helper{
             return response()->json(['success' => false , 'msg' => 'Something Went Wrong' , 'error' => $e->getMessage()] , 400);
         }
     }
+    public static function getProposalStatus($status)
+    {
+        $statusLabels = [
+            0 => 'unawarded',
+            1 => 'awarded',
+            2 => 'cancelled',
+            3 => 'completed',
+        ];
+
+        $label = $statusLabels[$status] ?? 'Unknown';
+
+        return $label;
+
+    }
+
 }

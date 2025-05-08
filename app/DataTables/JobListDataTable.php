@@ -21,40 +21,30 @@ class JobListDataTable extends DataTable
                 return '<a href="'. route('admin:jobs.show', $row->id) .'" class="btn btn-sm btn-primary">View</a>';
             })
             ->addColumn('client_full_name', function ($row) {
-                return optional($row->user)->full_name ?? '-';
+                return $row->user->full_name ?? '';
             })
             ->filterColumn('client_full_name', function($query, $keyword) {
                 $query->whereHas('user', function ($q) use ($keyword) {
                     $q->where('full_name', 'like', "%{$keyword}%");
                 });
             })
+            ->addColumn('editor_full_name', function ($row) {
+                return $row->acceptedRequest->editor->full_name ?? '';
+            })
+            ->filterColumn('editor_full_name', function($query, $keyword) {
+                $query->whereHas('acceptedRequest.editor', function ($q) use ($keyword) {
+                    $q->where('full_name', 'like', "%{$keyword}%");
+                });
+            })
             ->addColumn('awarded_budget', function ($row) {
-                if($row->status === 'completed') {
-
-                    return $row->doneRequest->proposal->bid_price ?? 0;
-
-                }
-                elseif ($row->status === 'awarded') {
-
-                    return $row->awardedRequest->proposal->bid_price ?? 0;
-
-                }
-                elseif ($row->status === 'canceled') {
-
-                    return $row->awardedRequest->proposal->bid_price ?? 0;
-
-                }
-                else
-                {
-                    return $row->budget ?? 0;
-                }
+                return $row->doneRequest->proposal->bid_price ?? 0;
             })
             ->rawColumns(['actions']);
     }
 
     public function query(PersonalJob $model): QueryBuilder
     {
-        return $model->newQuery()->with('user','awardedRequest.proposal','doneRequest.proposal')->orderByDesc('id');
+        return $model->newQuery()->with('user','acceptedRequest.proposal','acceptedRequest.editor')->orderByDesc('id');
     }
 
     public function html(): HtmlBuilder
@@ -83,10 +73,6 @@ class JobListDataTable extends DataTable
             ->title('#')
             ->searchable(false) // Disable searching on this column
             ->orderable(false), // Disable ordering on this column
-            Column::computed('client_full_name')
-            ->title('Client')
-            ->searchable(true)
-            ->orderable(false),
             Column::make('title'),
             Column::make('budget')->title('Budget')
             ->searchable(false)
@@ -94,9 +80,17 @@ class JobListDataTable extends DataTable
             Column::make('awarded_budget')->title('Awarded Budget')
             ->searchable(false)
             ->orderable(false),
+            Column::computed('client_full_name')
+            ->title('Client')
+            ->searchable(true)
+            ->orderable(false),
+            Column::computed('editor_full_name')
+            ->title('Editor')
+            ->searchable(true)
+            ->orderable(false),
             Column::make('status'),
             Column::computed('actions')
-                ->title('Actions')
+                ->title('Action')
                 ->exportable(false)
                 ->printable(false)
                 ->width(120)

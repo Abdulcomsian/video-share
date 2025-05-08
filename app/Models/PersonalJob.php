@@ -46,6 +46,11 @@ class PersonalJob extends Model
         return $this->hasOne(JobPayment::class  , 'job_id' , 'id');
     }
 
+    public function acceptedRequest()
+    {
+        return $this->hasOne(EditorRequest::class , 'job_id' , 'id' )->where('status', '!=', AppConst::UN_AWARDED_JOB);
+    }
+
     public function awardedRequest()
     {
         return $this->hasOne(EditorRequest::class , 'job_id' , 'id' )->where( 'status' , AppConst::AWARDED_JOB );

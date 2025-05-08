@@ -2,10 +2,10 @@
   // Variables
   return [
     "creatorName" => "ThemeSelection",
-    "systemName" => "Video Share",
+    "systemName" => "Open Edit",
     "supportEmail" => "support@example.com",
     "creatorUrl" => "https://themeselection.com",
-    "templateName" => "Video Share",
+    "templateName" => "Open Edit",
     "templateSuffix" => "Bootstrap 5 HTML Laravel Free Admin Template",
     "templateVersion" => "1.0.0",
     "templateFree" => true,

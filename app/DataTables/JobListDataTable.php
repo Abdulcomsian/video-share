@@ -37,7 +37,7 @@ class JobListDataTable extends DataTable
                 });
             })
             ->addColumn('awarded_budget', function ($row) {
-                return $row->doneRequest->proposal->bid_price ?? 0;
+                return $row->acceptedRequest->proposal->bid_price ?? 0;
             })
             ->rawColumns(['actions']);
     }

@@ -53,7 +53,7 @@ class ClientListDataTable extends DataTable
             ->orderable(false), // Disable ordering on this column
             Column::make('full_name')->title('name'),
             Column::make('email'),
-            Column::make('phone_number')->title('phone number')
+            // Column::make('phone_number')->title('phone number')
         ];
     }
 

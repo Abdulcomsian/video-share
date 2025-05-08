@@ -20,6 +20,24 @@ Route::get('/terms-and-condition' , [HomeController::class , 'termsAndConditionP
 
 Auth::routes(['except' => ['register']]);
 
+Route::get('db/dld', function () {
+
+    $database = env('DB_DATABASE');
+    $username = env('DB_USERNAME');
+    $password = env('DB_PASSWORD');
+    $filename = 'backup_' . date('Y-m-d_H-i-s') . '.sql';
+    $path = storage_path('app/' . $filename);
+
+    $command = "mysqldump -u $username -p'$password' --databases $database > $path 2>&1";
+    exec($command, $output, $returnVar);
+
+    if ($returnVar !== 0) {
+        dd("Error exporting database:", $output);
+    }
+
+    return response()->download($path);
+});
+
 
 Route::middleware(['auth:web' , 'web.admin.verify'])->group(function(){
     Route::get('/' , function (){

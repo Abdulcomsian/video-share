@@ -41,10 +41,12 @@
                                             class="badge bg-label-{{ $job->status !== 'unawarded' ? 'success' : 'danger' }} rounded-pill">
                                             {{ ucfirst($job->status) }}
                                         </span></p>
-                                    <p class="mb-1"><strong>Description:</strong> {{ $job->description }}</p>
-                                    <p class="mb-1"><strong>Awarded Date:</strong> {{ $job->awarded_date }}</p>
+                                    <p class="mb-1"><strong>Awarded Date:</strong>
+                                        {{ $job->awarded_date != '' ? date('d-m-Y', strtotime($job->awarded_date)) : '' }}
+                                    </p>
                                     <p class="mb-1"><strong>Extended Delivery Date:</strong>
                                         {{ $job->extended_delivery_date }}</p>
+                                    <p class="mb-1"><strong>Description:</strong> {{ $job->description }}</p>
 
                                 </div>
                             </div>
@@ -79,7 +81,7 @@
                                 <div class="col-md-12">
                                     <p class="mb-1"><strong>Name:</strong> {{ $job->user->full_name }}</p>
                                     <p class="mb-1"><strong>Email:</strong> {{ $job->user->email }}</p>
-                                    <p class="mb-1"><strong>Coontact No:</strong> {{ $job->user->phone_number }}</p>
+                                    <p class="mb-1"><strong>Contact No:</strong> {{ $job->user->phone_number }}</p>
                                 </div>
                             </div>
                         </div>
@@ -122,7 +124,7 @@
 
                     <hr>
 
-                    <div class="card-body mt-4">
+                    <div class="card-body mt-4 px-0">
                         <a href="{{ route('admin:jobs.list') }}" class="btn btn-primary btn-sm me-2">Jobs List</a>
                     </div>
 
@@ -134,26 +136,31 @@
 @endsection
 
 @push('my-script')
-<script>
-    $(document).on('click', '.pagination a', function (e) {
-        e.preventDefault();
-        let url = $(this).attr('href');
-        fetchProposals(url);
-    });
-    let fetchProposalsUrl = "{{ route('admin:jobs.proposals-list', $job->id) }}";
-    fetchProposals(fetchProposalsUrl);
-
-    function fetchProposals(url) {
-        $.ajax({
-            url: url,
-            success: function (data) {
-                $('#proposals-table-wrapper').html(data);
-            },
-            error: function () {
-                alert('Something went wrong while fetching proposals.');
-            }
+    <script>
+        $(document).on('click', '.pagination a', function(e) {
+            e.preventDefault();
+            let url = $(this).attr('href');
+            fetchProposals(url);
         });
-    }
-</script>
-@endpush
+        let fetchProposalsUrl = "{{ route('admin:jobs.proposals-list', $job->id) }}";
+        fetchProposals(fetchProposalsUrl);
 
+        function fetchProposals(url) {
+            $.ajax({
+                url: url,
+                success: function(data) {
+                    $('#proposals-table-wrapper').html(data);
+                },
+                error: function() {
+                    alert('Something went wrong while fetching proposals.');
+                }
+            });
+        }
+
+        $(document).on('click', '.proposal-toggle-details', function() {
+            let index = $(this).data('index');
+            let row = $('.proposal-details-row[data-index="' + index + '"]');
+            row.slideToggle(); // Smooth toggle
+        });
+    </script>
+@endpush

@@ -100,17 +100,21 @@
                     <div class="row">
                         <div class="col-md-12">
                             <p class="mb-1"><strong>Status:</strong> <span
-                                class="badge bg-label-{{ $job->status !== 'unawarded' && $job->status !== 'canceled' ? 'success' : 'danger' }} rounded-pill">
-                                {{ ucfirst($job->status) }}
-                            </span></p>
+                                    class="badge bg-label-{{ $job->status !== 'unawarded' && $job->status !== 'canceled' ? 'success' : 'danger' }} rounded-pill">
+                                    {{ ucfirst($job->status) }}
+                                </span></p>
                             <p class="mb-1"><strong>Budget:</strong> {{ $job->budget ?? 0 }}</p>
                             <p class="mb-1"><strong>Awarded Budget:</strong>
                                 {{ $job->acceptedRequest->proposal->bid_price ?? 0 }}</p>
                             <p class="mb-1"><strong>Awarded Date:</strong>
                                 {{ $job->awarded_date != '' ? date('d-m-Y', strtotime($job->awarded_date)) : '' }}
                             </p>
+                            <p class="mb-1"><strong>Deadline:</strong>
+                                {{ $job->deadline != '' ? date('d-m-Y', strtotime($job->deadline)) : '' }}
+                            </p>
                             <p class="mb-1"><strong>Extended Delivery Date:</strong>
-                                {{ $job->extended_delivery_date }}</p>
+                                {{ $job->extended_delivery_date != '' ? date('d-m-Y', strtotime($job->extended_delivery_date)) : '' }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -125,7 +129,7 @@
                         <div class="col-md-12">
                             <p class="mb-1"><strong>Name:</strong> {{ $job->user->full_name }}</p>
                             <p class="mb-1"><strong>Email:</strong> {{ $job->user->email }}</p>
-                            <p class="mb-1"><strong>Contact No:</strong> {{ $job->user->phone_number }}</p>
+                            {{-- <p class="mb-1"><strong>Contact No:</strong> {{ $job->user->phone_number }}</p> --}}
                         </div>
                     </div>
                 </div>
@@ -141,8 +145,8 @@
                             <p class="mb-1"><strong>Name:</strong> {{ $job->acceptedRequest->editor->full_name ?? '' }}
                             </p>
                             <p class="mb-1"><strong>Email:</strong> {{ $job->acceptedRequest->editor->email ?? '' }}</p>
-                            <p class="mb-1"><strong>Contact No:</strong>
-                                {{ $job->acceptedRequest->editor->phone_number ?? '' }}</p>
+                            {{-- <p class="mb-1"><strong>Contact No:</strong>
+                                {{ $job->acceptedRequest->editor->phone_number ?? '' }}</p> --}}
                         </div>
                     </div>
                 </div>
@@ -156,18 +160,18 @@
                     <div class="row">
                         <div class="col-md-12">
                             <p class="mb-1"><strong>Client Released:</strong> <span
-                                    class="badge bg-label-{{ $job->payment->client_transfer_status ? 'success' : 'danger' }} rounded-pill">
-                                    {{ $job->payment->client_transfer_status ? 'YES' : 'NO' }}
+                                    class="badge bg-label-{{ $job->payment?->client_transfer_status ? 'success' : 'danger' }} rounded-pill">
+                                    {{ $job->payment?->client_transfer_status ? 'YES' : 'NO' }}
                                 </span></p>
                             <p class="mb-1"><strong>Client Released Date:</strong>
-                                {{ $job->client_payment_date != '' ? date('d-m-Y', strtotime($job->client_payment_date)) : '' }}
+                                {{ $job->payment?->client_payment_date != '' ? date('d-m-Y', strtotime($job->payment?->client_payment_date)) : '' }}
                             </p>
                             <p class="mb-1"><strong>Editor Received:</strong> <span
-                                    class="badge bg-label-{{ $job->payment->editor_transfer_status ? 'success' : 'danger' }} rounded-pill">
-                                    {{ $job->payment->editor_transfer_status ? 'YES' : 'NO' }}
+                                    class="badge bg-label-{{ $job->payment?->editor_transfer_status ? 'success' : 'danger' }} rounded-pill">
+                                    {{ $job->payment?->editor_transfer_status ? 'YES' : 'NO' }}
                                 </span></p>
                             <p class="mb-1"><strong>Editor Received Date:</strong>
-                                {{ $job->editor_payment_date != '' ? date('d-m-Y', strtotime($job->editor_payment_date)) : '' }}
+                                {{ $job->payment?->editor_payment_date != '' ? date('d-m-Y', strtotime($job->payment?->editor_payment_date)) : '' }}
                             </p>
                         </div>
                     </div>

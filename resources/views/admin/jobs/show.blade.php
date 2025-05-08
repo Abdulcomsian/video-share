@@ -11,25 +11,21 @@
 @endpush
 
 @section('content')
-    <h4 class="py-3 mb-4">
+    <h4 class="py-3 mb-2">
         <span class="text-muted fw-light">Jobs /</span> View Details
     </h4>
 
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-8">
             <div class="card mb-4">
-                <div class="card-header d-flex flex-column justify-content-between pb-0">
+                <div class="card-header pb-0">
                     <div class="row">
-                        <div class="col-12">
+                        <div class="col-md-12">
                             <h4 class="mb-2">
                                 Title : {{ $job->title }}
                             </h4>
-                            <p class="mb-1 fs-0-9"><strong>Budget:</strong> {{ $job->budget ?? 0 }}</p>
-                            <p class="mb-1 fs-0-9"><strong>Awarded Budget:</strong>
-                                {{ $job->acceptedRequest->proposal->bid_price ?? 0 }}</p>
-
                         </div>
-                        <div class="col-12">
+                        <div class="col-md-12">
                             @forelse ($job->skills as $skill)
                                 <span class="badge bg-label-primary my-1">{{ $skill->title }}</span>
                             @empty
@@ -40,67 +36,14 @@
 
                 </div>
 
-                <hr>
                 <div class="card-body pt-0">
-
-                    {{-- Job Details --}}
+                    <hr />
                     <div class="row mb-4">
-                        <div class="col-7">
-                            <h5>Job Details</h5>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <p class="mb-1"><strong>Budget:</strong> {{ $job->budget ?? 0 }}</p>
-                                    <p class="mb-1"><strong>Awarded Budget:</strong>
-                                        {{ $job->acceptedRequest->proposal->bid_price ?? 0 }}</p>
-                                    <p class="mb-1"><strong>Status:</strong> <span
-                                            class="badge bg-label-{{ $job->status !== 'unawarded' && $job->status !== 'canceled' ? 'success' : 'danger' }} rounded-pill">
-                                            {{ ucfirst($job->status) }}
-                                        </span></p>
-                                    <p class="mb-1"><strong>Awarded Date:</strong>
-                                        {{ $job->awarded_date != '' ? date('d-m-Y', strtotime($job->awarded_date)) : '' }}
-                                    </p>
-                                    <p class="mb-1"><strong>Extended Delivery Date:</strong>
-                                        {{ $job->extended_delivery_date }}</p>
-                                    <p class="mb-1"><strong>Description:</strong> {{ $job->description }}</p>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col-5">
-                            <h5>Payment</h5>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <p class="mb-1"><strong>Client Released:</strong> <span
-                                            class="badge bg-label-{{ $job->payment->client_transfer_status ? 'success' : 'danger' }} rounded-pill">
-                                            {{ $job->payment->client_transfer_status ? 'YES' : 'NO' }}
-                                        </span></p>
-                                    <p class="mb-1"><strong>Client Released Date:</strong>
-                                        {{ $job->client_payment_date != '' ? date('d-m-Y', strtotime($job->client_payment_date)) : '' }}
-                                    </p>
-                                    <p class="mb-1"><strong>Editor Received:</strong> <span
-                                            class="badge bg-label-{{ $job->payment->editor_transfer_status ? 'success' : 'danger' }} rounded-pill">
-                                            {{ $job->payment->editor_transfer_status ? 'YES' : 'NO' }}
-                                        </span></p>
-                                    <p class="mb-1"><strong>Editor Received Date:</strong>
-                                        {{ $job->editor_payment_date != '' ? date('d-m-Y', strtotime($job->editor_payment_date)) : '' }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h5>Client Details</h5>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <p class="mb-1"><strong>Name:</strong> {{ $job->user->full_name }}</p>
-                                    <p class="mb-1"><strong>Email:</strong> {{ $job->user->email }}</p>
-                                    <p class="mb-1"><strong>Contact No:</strong> {{ $job->user->phone_number }}</p>
-                                </div>
-                            </div>
+                        <div class="col-md-8">
+                            <h6 class="mb-1">
+                                <strong>Description </strong>
+                            </h6>
+                            <p class="mb-1">{{ $job->description }}</p>
                         </div>
                     </div>
 
@@ -139,8 +82,6 @@
                         </div>
                     </div>
 
-                    <hr>
-
                     <div class="card-body mt-4 px-0">
                         <a href="{{ route('admin:jobs.list') }}" class="btn btn-primary btn-sm me-2">Jobs List</a>
                     </div>
@@ -148,6 +89,90 @@
                 </div>
             </div>
 
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-2">
+                <div class="card-header pb-0">
+                    <h5 class="my-1">Details</h5>
+                </div>
+                <hr class="mt-1 mb-2" />
+                <div class="card-body pt-0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="mb-1"><strong>Status:</strong> <span
+                                class="badge bg-label-{{ $job->status !== 'unawarded' && $job->status !== 'canceled' ? 'success' : 'danger' }} rounded-pill">
+                                {{ ucfirst($job->status) }}
+                            </span></p>
+                            <p class="mb-1"><strong>Budget:</strong> {{ $job->budget ?? 0 }}</p>
+                            <p class="mb-1"><strong>Awarded Budget:</strong>
+                                {{ $job->acceptedRequest->proposal->bid_price ?? 0 }}</p>
+                            <p class="mb-1"><strong>Awarded Date:</strong>
+                                {{ $job->awarded_date != '' ? date('d-m-Y', strtotime($job->awarded_date)) : '' }}
+                            </p>
+                            <p class="mb-1"><strong>Extended Delivery Date:</strong>
+                                {{ $job->extended_delivery_date }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-2">
+                <div class="card-header pb-0">
+                    <h5 class="my-1">Client</h5>
+                </div>
+                <hr class="mt-1 mb-2" />
+                <div class="card-body pt-0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="mb-1"><strong>Name:</strong> {{ $job->user->full_name }}</p>
+                            <p class="mb-1"><strong>Email:</strong> {{ $job->user->email }}</p>
+                            <p class="mb-1"><strong>Contact No:</strong> {{ $job->user->phone_number }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-2">
+                <div class="card-header pb-0">
+                    <h5 class="my-1">Editor</h5>
+                </div>
+                <hr class="mt-1 mb-2" />
+                <div class="card-body pt-0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="mb-1"><strong>Name:</strong> {{ $job->acceptedRequest->editor->full_name ?? '' }}
+                            </p>
+                            <p class="mb-1"><strong>Email:</strong> {{ $job->acceptedRequest->editor->email ?? '' }}</p>
+                            <p class="mb-1"><strong>Contact No:</strong>
+                                {{ $job->acceptedRequest->editor->phone_number ?? '' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-2">
+                <div class="card-header pb-0">
+                    <h5 class="my-1">Payment Details</h5>
+                </div>
+                <hr class="mt-1 mb-2" />
+                <div class="card-body pt-0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="mb-1"><strong>Client Released:</strong> <span
+                                    class="badge bg-label-{{ $job->payment->client_transfer_status ? 'success' : 'danger' }} rounded-pill">
+                                    {{ $job->payment->client_transfer_status ? 'YES' : 'NO' }}
+                                </span></p>
+                            <p class="mb-1"><strong>Client Released Date:</strong>
+                                {{ $job->client_payment_date != '' ? date('d-m-Y', strtotime($job->client_payment_date)) : '' }}
+                            </p>
+                            <p class="mb-1"><strong>Editor Received:</strong> <span
+                                    class="badge bg-label-{{ $job->payment->editor_transfer_status ? 'success' : 'danger' }} rounded-pill">
+                                    {{ $job->payment->editor_transfer_status ? 'YES' : 'NO' }}
+                                </span></p>
+                            <p class="mb-1"><strong>Editor Received Date:</strong>
+                                {{ $job->editor_payment_date != '' ? date('d-m-Y', strtotime($job->editor_payment_date)) : '' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

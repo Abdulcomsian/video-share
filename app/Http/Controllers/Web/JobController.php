@@ -18,8 +18,6 @@ class JobController extends Controller
 
         $job = PersonalJob::with('skills' , 'jobFolder.files' , 'review', 'user','payment','requestList.proposal','requestList.editor','acceptedRequest.proposal','acceptedRequest.editor')->where('id' , $id)->first();
 
-        // dd($job->toArray(),$job->requestList->toArray());
-
         return view('admin.jobs.show', compact('job'));
 
     }

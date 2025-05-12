@@ -285,6 +285,8 @@ class JobHandler{
         $editorRequest->status = AppConst::DONE_JOB;
         $editorRequest->save();
 
+        JobPayment::where(['job_id' => $jobId , 'request_id' => $editorRequest->request_id])->update(['client_transfer_status' => AppConst::CLIENT_PAYED , 'client_payment_date' => date("Y-m-d")]);
+
         return ['success' => true , 'msg' => 'Job Done Successfully'];
     }
 

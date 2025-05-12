@@ -60,7 +60,7 @@ class StripeService{
                 'capture_method' => 'manual', // This holds the payment
                 'description' => 'Job award payment hold for editor',
                 'metadata' => [
-                    'job_id' => $request->job_id,
+                    'job_proposal_id' => $requestId,
                     'client_id' => auth()->id(),
                 ],
             ]);
@@ -183,6 +183,16 @@ class StripeService{
         }catch(\Exception $e){
             return ['success' => false , 'msg' => 'Something Went Wrong' , 'error' => $e->getMessage()];
         }
+    }
+
+    public function capturedPayment($paymentIntentId)
+    {
+        return PaymentIntent::retrieve($paymentIntentId)->capture();
+    }
+
+    public function reversePayment($paymentIntentId)
+    {
+        return PaymentIntent::retrieve($paymentIntentId)->cancel();
     }
 
 }

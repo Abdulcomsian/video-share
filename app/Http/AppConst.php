@@ -9,6 +9,7 @@ class AppConst{
     public const ADMIN = 3;
     public const CLIENT_PENDING = 0;
     public const CLIENT_PAYED = 1;
+    public const CLIENT_CANCELLED = 2;
     public const EDITOR_PENDING = 0;
     public const EDITOR_PAYED = 1;
     public const UN_AWARDED_JOB = 0; //Table reference requests and job editor request

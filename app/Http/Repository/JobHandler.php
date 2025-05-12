@@ -192,6 +192,7 @@ class JobHandler{
         try{
             $jobId = $request->job_id;
             $requestId = $request->request_id;
+            $paymentIntentId = $request->payment_intent_id;
 
             EditorRequest::where(
               [
@@ -204,7 +205,7 @@ class JobHandler{
 
             JobProposal::where('id' , $requestId)->update(['status' => 1]);
 
-            JobPayment::create(['job_id' => $jobId , 'request_id' => $requestId , 'client_transfer_status' => AppConst::CLIENT_PENDING , 'editor_transfer_status' => AppConst::EDITOR_PENDING]);
+            JobPayment::create(['job_id' => $jobId , 'request_id' => $requestId ,'payment_intent_id' => $paymentIntentId, 'client_transfer_status' => AppConst::CLIENT_PENDING , 'editor_transfer_status' => AppConst::EDITOR_PENDING]);
 
             return ['success' => true , 'msg' => 'Job Awarded Successfully'];
 
@@ -285,7 +286,7 @@ class JobHandler{
         $editorRequest->status = AppConst::DONE_JOB;
         $editorRequest->save();
 
-        JobPayment::where(['job_id' => $jobId , 'request_id' => $editorRequest->request_id])->update(['client_transfer_status' => AppConst::CLIENT_PAYED , 'client_payment_date' => date("Y-m-d")]);
+        JobPayment::where(['job_id' => $jobId , 'request_id' => $editorRequest->request_id])->update(['client_transfer_status' => AppConst::CLIENT_PAYED , 'client_payment_date' => Carbon::now()->format('Y-m-d')]);
 
         return ['success' => true , 'msg' => 'Job Done Successfully'];
     }

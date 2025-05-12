@@ -144,7 +144,8 @@ class JobController extends Controller
     try{
         $validator = Validator::make( $request->all() , [
                                         'job_id' => 'required|numeric',
-                                        'request_id' => 'required|numeric'
+                                        'request_id' => 'required|numeric',
+                                        'payment_intent_id' => 'required|string',
                                     ]);
         if($validator->fails())
         {

@@ -155,6 +155,22 @@ class JobHandler{
                                 ->get();
                                 // ->unique('job_id')
                                 // ->toSql();
+        $jobIds = $awardedJobs->pluck('job_id')->unique();
+
+        $unreadSharedFilesCountArr = collect(); // Default as empty collection
+
+        if (!empty($awardedJobs) && $awardedJobs->isNotEmpty()) {
+            $jobIds = $awardedJobs->pluck('job_id')->unique()->filter()->values();
+
+            $jobsWithCounts = PersonalJob::whereIn('id', $jobIds)->get()->keyBy('id');
+
+            $unreadSharedFilesCountArr = $awardedJobs->map(function ($row) use ($jobsWithCounts) {
+                $job = $jobsWithCounts[$row->job_id] ?? null;
+                $row->unreadSharedFilesCount = $job ? $job->unreadSharedFilesCount() : 0;
+                return $row;
+            });
+        }
+
         return ["success" => true , "awardedJobs" => $awardedJobs];
 
 

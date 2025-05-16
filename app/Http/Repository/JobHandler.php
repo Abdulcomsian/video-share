@@ -3,11 +3,18 @@
 namespace App\Http\Repository;
 
 use App\Http\AppConst;
+use app\Http\Repository\StripeService;
 use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal, JobPayment , User , Folder, Review};
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class JobHandler{
+
+    protected $stripeService;
+    public function __construct(StripeService $stripeService)
+    {
+        $this->stripeService = $stripeService;
+    }
 
     public function addClientJob($request)
     {
@@ -192,6 +199,7 @@ class JobHandler{
         try{
             $jobId = $request->job_id;
             $requestId = $request->request_id;
+            $paymentIntentId = $request->payment_intent_id;
 
             EditorRequest::where(
               [
@@ -204,7 +212,7 @@ class JobHandler{
 
             JobProposal::where('id' , $requestId)->update(['status' => 1]);
 
-            JobPayment::create(['job_id' => $jobId , 'request_id' => $requestId , 'client_transfer_status' => AppConst::CLIENT_PENDING , 'editor_transfer_status' => AppConst::EDITOR_PENDING]);
+            JobPayment::create(['job_id' => $jobId , 'request_id' => $requestId ,'payment_intent_id' => $paymentIntentId, 'client_transfer_status' => AppConst::CLIENT_PENDING , 'editor_transfer_status' => AppConst::EDITOR_PENDING]);
 
             return ['success' => true , 'msg' => 'Job Awarded Successfully'];
 
@@ -263,6 +271,15 @@ class JobHandler{
             $editorRequest->save();
         }
 
+        $jobPayment = JobPayment::where('job_id' , $jobId)->first();
+        if($jobPayment)
+        {
+            $jobPayment->client_transfer_status = AppConst::CLIENT_CANCELLED;
+            $jobPayment->client_payment_date = now()->format('Y-m-d');
+            $jobPayment->save();
+
+            $this->stripeService->reversePayment($jobPayment->payment_intent_id);
+        }
 
         return ['success' => true , 'msg' => 'Job Canceled Successfully'];
 
@@ -284,6 +301,17 @@ class JobHandler{
 
         $editorRequest->status = AppConst::DONE_JOB;
         $editorRequest->save();
+
+        $jobPayment = JobPayment::where(['job_id' => $jobId , 'request_id' => $editorRequest->request_id])->first();
+
+        if($jobPayment)
+        {
+
+            JobPayment::where('id', $jobPayment->id)->update(['client_transfer_status' => AppConst::CLIENT_PAYED , 'client_payment_date' => Carbon::now()->format('Y-m-d')]);
+
+            $this->stripeService->capturedPayment($jobPayment->payment_intent_id);
+
+        }
 
         return ['success' => true , 'msg' => 'Job Done Successfully'];
     }

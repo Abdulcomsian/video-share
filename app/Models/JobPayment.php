@@ -11,8 +11,8 @@ class JobPayment extends Model
 
     protected $table = "job_payment";
     protected $primaryKey = "id";
-    protected $fillable = ['job_id' , 'request_id'  , 'client_transfer_status' , 'editor_transfer_status' , 'client_payment_date', 'editor_payment_date'];
+    protected $fillable = ['job_id' , 'request_id'  , 'client_transfer_status' , 'editor_transfer_status' , 'client_payment_date', 'editor_payment_date', 'payment_intent_id'];
 
-    
+
 
 }

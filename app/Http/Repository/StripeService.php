@@ -48,24 +48,30 @@ class StripeService{
             //     return ["success" => false , 'msg' => "Something Went Wrong" , "error" => "Job Must Be Awarded First"];
             // }
             $jobProposal = JobProposal::where('id' , $requestId)->first();
-            
+
             Stripe::setApiKey(env('STRIPE_SECRET'));
             $amount = $jobProposal->bid_price * 100;
             $currency = 'usd';
-    
+
             $paymentIntent = PaymentIntent::create([
                 'amount' => $amount,
                 'currency' => $currency,
                 'payment_method_types' => ['card'],
+                'capture_method' => 'manual', // This holds the payment
+                'description' => 'Job award payment hold for editor',
+                'metadata' => [
+                    'job_proposal_id' => $requestId,
+                    'client_id' => auth()->id(),
+                ],
             ]);
 
-            
-            return ['success' => true , 'clientSecret' => $paymentIntent->client_secret];
+
+            return ['success' => true , 'clientSecret' => $paymentIntent->client_secret, 'payment_intent_id' => $paymentIntent->id];
 
         }catch(\Exception $e){
 
             return ['success' => false , 'error' => $e->getMessage()];
-        
+
         }
 
     }
@@ -74,7 +80,7 @@ class StripeService{
         try{
             //setting stripe secret key
             Stripe::setApiKey(env('STRIPE_SECRET'));
-            
+
             //creating token
             $token = Token::create([
                 'card' => [
@@ -84,42 +90,42 @@ class StripeService{
                     'cvc' => $request->cvc,
                 ],
             ]);
-    
+
             $amount = $request->amount;
-    
+
             $platformCommission = $request->amount * 0.05;
-    
-    
+
+
             $charge = Charge::create([
                 'amount' => $platformCommission * 100, // Stripe accepts amounts in cents
                 'currency' => 'usd',
                 'source' => $token->id,
                 'description' => 'Payment for service',
             ]);
-    
+
             $editorAmount = $amount - $platformCommission;
-    
+
             // $EDITOR_STRIPE_ACCOUNT_ID = 4000000000000077;
             // Create a transfer to the employee's Stripe account
-    
+
             $stripeConnectedAccount = new StripeClient(env('STRIPE_SECRET'));
-            
+
             $account = $stripeConnectedAccount->accounts->create([
                 'type' => 'standard',
                 'default_currency' => 'usd',
                 'email' => 'rajashayzee@yahoo.com'
             ]);
-    
+
             $accountId = $account->id;
-    
-    
+
+
             $transfer = Transfer::create([
                 'amount' => $editorAmount * 100,
                 'currency' => 'usd',
-                'destination' => $accountId, 
+                'destination' => $accountId,
                 'transfer_group' => 'ORDER_'.$charge->id,
             ]);
-    
+
             dd( "Hrere bossss", $transfer);
             }catch(\Exception $e){
                 dd($e->getMessage());
@@ -177,6 +183,16 @@ class StripeService{
         }catch(\Exception $e){
             return ['success' => false , 'msg' => 'Something Went Wrong' , 'error' => $e->getMessage()];
         }
+    }
+
+    public function capturedPayment($paymentIntentId)
+    {
+        return PaymentIntent::retrieve($paymentIntentId)->capture();
+    }
+
+    public function reversePayment($paymentIntentId)
+    {
+        return PaymentIntent::retrieve($paymentIntentId)->cancel();
     }
 
 }

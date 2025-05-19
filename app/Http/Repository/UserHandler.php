@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Http\Repository;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -9,51 +9,51 @@ use App\Http\AppConst;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Repository\AwsHandler;
 class UserHandler{
-    
+
     protected $awsHandler;
 
     function __construct(AwsHandler $awsHandler)
     {
-        $this->awsHandler = $awsHandler;    
+        $this->awsHandler = $awsHandler;
     }
-    
+
     public function findUser($email , $password , $type)
     {
         $token = auth()->guard('api')->attempt(["email" => $email , "password" => $password]);
-        
+
         if(!$token)
         {
             return response()->json(["success" => false , "msg" => "Something went wrong" , "error" => "unauthorized"] , 400);
-        
+
         }else{
 
             $jwt = $this->respondWithToken($token);
-            
+
             if($type == "register"){
                 $verificationCode = rand(1111,9999);
                 User::where('id' , auth()->user()->id)->update(['verification_code' => $verificationCode]);
                 Mail::to($email)->send(new VerificationMail($verificationCode ));
                 $msg = "User Added Successfully";
-            
+
             }else{
                 $msg = "User Signed In Successfully";
             }
- 
+
 
             $baseUrl = public_path("uploads");
 
             if(auth()->user()->type == AppConst::EDITOR){
 
                 $profile = User::with('editorProfile' ,'skills' , 'education' , 'portfolio' )->where('id' , auth()->user()->id)->first();
-            
+
                 $editorProfileAndSkill = ( isset($profile->editorProfile) && !is_null($profile->editorProfile)) && count($profile->skills) ? true :  false;
-        
+
                 $editorPortfolio = count($profile->portfolio) ? true : false;
-        
+
                 $editorEducation = count($profile->education) ? true : false;
-        
-                $editorPerHourRate = ( isset($profile->editorProfile) && !is_null($profile->editorProfile) ) && (isset($profile->editorProfile->amount_per_hour) && !is_null($profile->editorProfile->amount_per_hour)) ? true : false; 
-                
+
+                $editorPerHourRate = ( isset($profile->editorProfile) && !is_null($profile->editorProfile) ) && (isset($profile->editorProfile->amount_per_hour) && !is_null($profile->editorProfile->amount_per_hour)) ? true : false;
+
                 return response()->json(["success" => true , "msg" => $msg , 'token' => $jwt , 'baseUrl' => $baseUrl , "editorProfileAndSkill" => $editorProfileAndSkill , "editorPortfolio" => $editorPortfolio , "editorEducation" => $editorEducation, "editorPerHourRate" => $editorPerHourRate]);
 
             }else{
@@ -79,7 +79,7 @@ class UserHandler{
     {
         $editorId = $request->editor_id;
         $clientId = auth()->user()->id;
-        
+
         Favourite::create([
           "editor_id" => $editorId,
           "client_id" => $clientId
@@ -90,7 +90,7 @@ class UserHandler{
     }
 
     public function deleteEditorFavourite($request){
-        
+
         $editorId = $request->editor_id;
 
         Favourite::where('editor_id' , $editorId)->where('client_id' , auth()->user()->id)->delete();
@@ -110,7 +110,7 @@ class UserHandler{
     public function profileDetail($editorId)
     {
         $userId = $editorId;
-    
+
         $reviews = Review::whereHas('job' , function($query) use ($userId){
                             $query->whereHas('doneRequest' , function($query1) use ($userId){
                                  $query1->where('editor_id' , $userId);
@@ -120,22 +120,22 @@ class UserHandler{
                         ->orderBy('id' , 'desc')
                         ->get();
 
-                    
+
         $totalReview = $reviews->count();
-       
+
         $lastReviewComment = $totalReview > 0 ? $reviews[0] : null;
 
         $averageReviewRating =  $totalReview > 0 ? $reviews->pluck('rating')->sum()/$totalReview : 0;
 
         $profile = User::with('address.country', 'address.city' , 'editorProfile' ,'skills' , 'education' , 'portfolio' , 'portfolioVideo' ,'socialLink' )->where('id' , $userId)->first();
-        
+
         $editorProfileAndSkill = ( isset($profile->editorProfile) && !is_null($profile->editorProfile)) && count($profile->skills) ? true :  false;
 
         $editorPortfolio = count($profile->portfolio) ? true : false;
 
         $editorEducation = count($profile->education) ? true : false;
 
-        $editorPerHourRate = ( isset($profile->editorProfile) && !is_null($profile->editorProfile) ) && (isset($profile->editorProfile->amount_per_hour) && !is_null($profile->editorProfile->amount_per_hour)) ? true : false; 
+        $editorPerHourRate = ( isset($profile->editorProfile) && !is_null($profile->editorProfile) ) && (isset($profile->editorProfile->amount_per_hour) && !is_null($profile->editorProfile->amount_per_hour)) ? true : false;
 
         $userDetails = User::with('doneJob' , 'cancelJob')->where('id' , $userId)->first();
 
@@ -154,13 +154,13 @@ class UserHandler{
 
         }
 
-        
-        return [ 
-                 'success' => true , 
-                 'profile' => $profile , 
-                 'editorProfileAndSkill' => $editorProfileAndSkill , 
-                 'editorPortfolio' => $editorPortfolio, 
-                 'editorEducation' => $editorEducation, 
+
+        return [
+                 'success' => true ,
+                 'profile' => $profile ,
+                 'editorProfileAndSkill' => $editorProfileAndSkill ,
+                 'editorPortfolio' => $editorPortfolio,
+                 'editorEducation' => $editorEducation,
                  'editorPerHourRate' => $editorPerHourRate,
                  'doneJobsCount' => $doneJobCount,
                  'cancelJobCount' => $cancelJobCount,
@@ -235,7 +235,7 @@ class UserHandler{
         $newPassword = $request->new_password;
 
         $user = User::where(['email' => $email])->first();
-        
+
         if(!$user){
             return ['status' => false , 'msg' => 'No User Found With This Email'];
         }
@@ -255,7 +255,7 @@ class UserHandler{
     public function sendVerificationCode($request){
         $verificationCode = rand(1111,9999);
         $user = User::where('email' , $request->email)->first();
-        
+
         if(!$user){
             return ['status'=>false ,'msg' => 'No user found with this email'];
         }
@@ -263,14 +263,14 @@ class UserHandler{
         $user->verification_code = $verificationCode;
         $user->save();
         Mail::to($request->email)->send(new VerificationMail($verificationCode ));
-        
+
         return ['status' => true ,'msg' => 'Verification code has been sent to your email'];
     }
 
     public function updatePushNotification($request){
 
         User::where('id' , auth()->user()->id)->update(['notification_status' => $request->status]);
-        
+
         return ['status' => true , 'msg'=> 'Push Notification Updated Successfully'];
     }
 
@@ -305,7 +305,7 @@ class UserHandler{
 
     public function updateUserProfile($request){
         $username = $request->full_name;
-        
+
         User::where("id" , auth()->user()->id)->update(["full_name" => $username]);
 
         Address::updateOrCreate(
@@ -323,7 +323,7 @@ class UserHandler{
         $socailLinks = [];
 
         foreach($url as $index => $link){
-           $socailLinks[] = ['platform' => $platform[$index] , 'url' => $link , 'user_id' => auth()->user()->id]; 
+           $socailLinks[] = ['platform' => $platform[$index] , 'url' => $link , 'user_id' => auth()->user()->id];
         }
 
         SocialLink::insert($socailLinks);
@@ -333,11 +333,11 @@ class UserHandler{
     public function updateSocialLink($url , $platform)
     {
         $socailLinks = [];
-        
+
         SocialLink::where('user_id' , auth()->user()->id)->delete();
 
         foreach($url as $index => $link){
-           $socailLinks[] = ['platform' => $platform[$index] , 'url' => $link, 'user_id' => auth()->user()->id]; 
+           $socailLinks[] = ['platform' => $platform[$index] , 'url' => $link, 'user_id' => auth()->user()->id];
         }
 
         SocialLink::insert($socailLinks);
@@ -355,7 +355,7 @@ class UserHandler{
             {
                 PortfolioVideo::create(['user_id' => auth()->user()->id , 'video_url' => $name] );
             }
-        }        
+        }
 
         return ['status' => true , 'msg' => 'Portfolio video updated successfully'];
 
@@ -378,7 +378,7 @@ class UserHandler{
     public function deletePortfolioVideo($request)
     {
         $video = PortfolioVideo::where('id' , $request->id)->first();
-        
+
         if($video){
             $filename = 'user-porfolio/'.$video->video_url;
             $check = $this->awsHandler->deleteMedia($filename);
@@ -393,7 +393,7 @@ class UserHandler{
         }
 
 
-        
+
     }
 
     public function uploadPortfolioFile($request)
@@ -412,6 +412,19 @@ class UserHandler{
             'user_id' => auth()->user()->id
         ]);
         return ['status' => true , 'msg' => 'Portfolio file added successfully'];
+    }
+
+    public function getEditorPortfolioVideo($editorId)
+    {
+        $bucketName = config('filesystems.disks.s3.bucket');
+
+        $bucketAddress = "https://$bucketName.s3.amazonaws.com/user-porfolio";
+
+        $portfolioVideo = PortfolioVideo::where('user_id' , $editorId)->get();
+
+        $thumbnailPrefix = asset('uploads');
+
+        return response()->json(['status' => true , 'bucketAddress' => $bucketAddress , 'portfolioVideo' => $portfolioVideo , 'thumbnailPrefix' => $thumbnailPrefix]);
     }
 
 }

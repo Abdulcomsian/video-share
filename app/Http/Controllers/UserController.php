@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Repository\{ EditorHandler , UserHandler };
 use App\Models\EditorPortfolio;
 use DataTables;
-use PhpParser\Node\Expr\AssignOp\Div;
 
 class UserController extends Controller
 {
@@ -16,7 +15,7 @@ class UserController extends Controller
 
     public function __construct(EditorHandler $editorHandler , UserHandler $userHandler)
     {
-        $this->editorHandler = $editorHandler;    
+        $this->editorHandler = $editorHandler;
         $this->userHandler  = $userHandler;
     }
 
@@ -31,7 +30,7 @@ class UserController extends Controller
 
             $editorSkills = json_decode($request->skills);
 
-            $validator2 = Validator::make($editorSkills , 
+            $validator2 = Validator::make($editorSkills ,
                 [ '*' => 'max:190'],
                 ['max' => 'skill must be less then 190 characters.' ]
             );
@@ -41,14 +40,14 @@ class UserController extends Controller
             if($validator->fails() || $validator2->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->fails() ? $validator->getMessageBag() : $validator2->getMessageBag()] ,400);
-                
+
             }else{
                 $response = $this->editorHandler->editorProfile($request);
 
                 return response()->json($response);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
@@ -66,13 +65,13 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
 
                 return $this->editorHandler->editorPortfolio($request);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
@@ -89,17 +88,17 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
 
                 return $this->editorHandler->addEditorPortfolio($request);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
-        } 
+        }
     }
 
     public function updateProfile(Request $request)
@@ -117,12 +116,12 @@ class UserController extends Controller
             if($request->skills){
                 $this->editorHandler->updateEditorSkills($request);
             }
-           
+
 
             if($request->language){
                 $this->editorHandler->updateEditorLanguage($request);
             }
-          
+
             if($request->education){
                 $this->editorHandler->editorEducation($request);
             }
@@ -134,7 +133,7 @@ class UserController extends Controller
         }catch(\Exception $e){
 
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
-        
+
         }
     }
 
@@ -148,14 +147,14 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
                 $response = $this->editorHandler->editorEducation($request);
 
                 return response()->json($response);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
@@ -172,7 +171,7 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
 
                 $response = $this->editorHandler->editorHourlyRate($request);
@@ -180,7 +179,7 @@ class UserController extends Controller
                 return response()->json($response);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
@@ -201,7 +200,7 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
 
                 $response = $this->editorHandler->updateEditorAddress($request);
@@ -209,7 +208,7 @@ class UserController extends Controller
                 return response()->json($response);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
@@ -226,7 +225,7 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
 
                 $response = $this->editorHandler->updateEditorBiography($request);
@@ -234,7 +233,7 @@ class UserController extends Controller
                 return response()->json($response);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
@@ -251,7 +250,7 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
 
                 $response = $this->editorHandler->updateEditorLanguage($request);
@@ -259,7 +258,7 @@ class UserController extends Controller
                 return response()->json($response);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
@@ -276,7 +275,7 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
 
                 $response = $this->editorHandler->deleteEditorSkill($request);
@@ -284,7 +283,7 @@ class UserController extends Controller
                 return response()->json($response);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
@@ -301,7 +300,7 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
 
                 $response = $this->editorHandler->addMoreEditorSkill($request);
@@ -309,7 +308,7 @@ class UserController extends Controller
                 return response()->json($response);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
@@ -329,7 +328,7 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
 
                 $response = $this->editorHandler->updateEditorEducation($request);
@@ -337,7 +336,7 @@ class UserController extends Controller
                 return response()->json($response);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
@@ -354,7 +353,7 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
 
                 $response = $this->userHandler->addEditorFavourite($request);
@@ -362,11 +361,11 @@ class UserController extends Controller
                 return response()->json($response);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
-        } 
+        }
     }
 
     public function deleteFavourite(Request $request)
@@ -379,7 +378,7 @@ class UserController extends Controller
             if($validator->fails())
             {
                 return response()->json(["success"=>false , "msg" => "Something went wrong" , "error" => $validator->getMessageBag()] ,400);
-            
+
             }else{
 
                 $response = $this->userHandler->deleteEditorFavourite($request);
@@ -387,11 +386,11 @@ class UserController extends Controller
                 return response()->json($response);
             }
 
-        
+
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
-        } 
+        }
     }
 
 
@@ -406,7 +405,7 @@ class UserController extends Controller
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
-        } 
+        }
     }
 
     public function getProfileDetail(Request $request)
@@ -416,7 +415,7 @@ class UserController extends Controller
                     ]);
 
         if($validator->fails()){
-            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $validator->getMessage()] ,400); 
+            return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $validator->getMessage()] ,400);
         }
 
         try{
@@ -429,7 +428,7 @@ class UserController extends Controller
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
-        } 
+        }
     }
 
     public function getEditorList()
@@ -451,7 +450,7 @@ class UserController extends Controller
             // $validator = Validator::make( $request->all() , [
             //  'file' => 'required|max:10000|mimes:jfif,jpef,jpg,png'
             // ]);
-     
+
             // if($validator->fails()){
             //      return response()->json(['success' => false , 'msg' => "Something Went Wrong" , "error" => $validator->getMessageBag()] , 400);
             // }else{
@@ -537,7 +536,7 @@ class UserController extends Controller
 
         $fileName = [];
         $files = $request->input("files");
-       
+
         foreach($files as $index => $file){
             if($file == "null")
             {
@@ -562,8 +561,8 @@ class UserController extends Controller
         return response()->json(["success" => true , "msg" => "Editor Portfolio Added Successfully"]);
 
     }
-    
-    
+
+
     public function changePassword(Request $request){
 
         $validator = Validator::make($request->all() , [
@@ -590,7 +589,7 @@ class UserController extends Controller
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
-        } 
+        }
     }
 
     public function forgetPassword(Request $request){
@@ -615,7 +614,7 @@ class UserController extends Controller
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
-        } 
+        }
     }
 
     public function updatePassword(Request $request){
@@ -643,7 +642,7 @@ class UserController extends Controller
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
-        } 
+        }
     }
 
 
@@ -669,7 +668,7 @@ class UserController extends Controller
         }catch(\Exception $e)
         {
             return response()->json(['success' =>false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] ,400);
-        } 
+        }
     }
 
 
@@ -683,44 +682,44 @@ class UserController extends Controller
         }
 
         try{
-            
+
             $response = $this->userHandler->updatePushNotification($request);
 
             return response()->json($response);
 
         }catch(\Exception $e){
 
-            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()]);  
+            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()]);
         }
     }
 
     public function deleteUser(){
         try{
-            
+
             $response = $this->userHandler->deleteUserProfile();
 
             return response()->json($response);
 
         }catch(\Exception $e){
 
-            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()]);  
-        }  
+            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()]);
+        }
     }
 
     public function getClientProfile(){
         try{
-            
+
             $response = $this->userHandler->clientProfile();
 
             return response()->json($response);
 
         }catch(\Exception $e){
 
-            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()] , 400);  
-        }  
+            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
+        }
     }
 
-   
+
 
    public function updateUserProfile(Request $request){
     $validator = Validator ::make($request->all() , [
@@ -736,14 +735,14 @@ class UserController extends Controller
     }
 
     try{
-        
+
         $response = $this->userHandler->updateUserProfile($request);
 
         return response()->json($response);
 
     }catch(\Exception $e){
 
-        return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()]);  
+        return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $e->getMessage()]);
     }
 
    }
@@ -751,7 +750,7 @@ class UserController extends Controller
 
    public function addSocialLink(Request $request)
    {
-    
+
     $platform = json_decode($request->platform);
     $url = json_decode($request->url);
 
@@ -770,7 +769,7 @@ class UserController extends Controller
     }catch(\Exception $e){
         return response()->json(['status' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
     }
-    
+
    }
 
 
@@ -794,7 +793,7 @@ class UserController extends Controller
     }catch(\Exception $e){
         return response()->json(['status' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
     }
-    
+
    }
 
    public function uploadPortfolioVideo(Request $request)
@@ -802,7 +801,7 @@ class UserController extends Controller
     $validator = Validator::make($request->all() , [
         "files.*" => "required",
     ]);
-    
+
     if($validator->fails()){
         return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $validator->getMessageBag()]);
     }
@@ -831,7 +830,7 @@ class UserController extends Controller
     $validator = Validator::make($request->all() , [
         "id" => "required|numeric",
     ]);
-    
+
     if($validator->fails()){
         return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $validator->getMessageBag()]);
     }
@@ -856,7 +855,7 @@ class UserController extends Controller
             "filename" => 'required|string',
             "thumbnail" => 'nullable|file'
         ]);
-        
+
         if($validator->fails()){
             return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $validator->getMessageBag()]);
         }
@@ -864,10 +863,29 @@ class UserController extends Controller
         try{
             $response = $this->userHandler->uploadPortfolioFile($request);
             return response()->json($response);
-        
+
         }catch(\Exception $e){
             return response()->json(['status' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
         }
    }
+
+    public function getEditorPortfolioVideo(Request $request)
+    {
+
+        $validator = Validator::make($request->all() , [
+            "editor_id" => 'required|string|exists:users,id',
+        ]);
+
+        if($validator->fails()){
+            return response()->json(["status" => false , "msg" => "Something Went Wrong" , "error" => $validator->getMessageBag()]);
+        }
+
+        try{
+            $response = $this->userHandler->getEditorPortfolioVideo($request->editor_id);
+            return response()->json($response);
+        }catch(\Exception $e){
+            return response()->json(['status' => false , 'msg' => "Something Went Wrong" , "error" => $e->getMessage()] , 400);
+        }
+    }
 
 }

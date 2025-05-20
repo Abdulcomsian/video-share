@@ -217,6 +217,12 @@ class JobHandler{
             $requestId = $request->request_id;
             $paymentIntentId = $request->payment_intent_id;
 
+            $personalJob = PersonalJob::findOrFail($jobId);
+
+            if($personalJob->status == 'awarded') {
+                return ['success' => false , 'msg' => 'Job is already awarderd.'];
+            }
+
             EditorRequest::where(
               [
                 ['job_id' , $jobId],

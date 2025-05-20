@@ -182,6 +182,7 @@ Route::middleware(['verify.authentication' , 'api.client.verify'])->group(functi
     Route::post('search-folder' , [FolderController::class , 'searchFolder']);
     Route::post('get-editor-review' , [ReviewController::class , 'getEditorReviews']);
     Route::post('extend-job-delivery-date-request', [JobController::class, 'extendJobDeliveryDateRequest']);
+    Route::get('get-editor-portfolio-video' , [UserController::class , 'getEditorPortfolioVideo']);
 });
 
 // Route::post('add-links' , [UserController::class , 'addLinks']);

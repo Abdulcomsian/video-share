@@ -4,7 +4,7 @@ namespace App\Http\Repository;
 
 use App\Http\AppConst;
 use app\Http\Repository\StripeService;
-use App\Models\{EditorRequest, PersonalJob , Skill , JobProposal, JobPayment , User , Folder, Review};
+use App\Models\{EditorRequest, FavouriteRequest, PersonalJob , Skill , JobProposal, JobPayment , User , Folder, Review};
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -235,6 +235,9 @@ class JobHandler{
             JobProposal::where('id' , $requestId)->update(['status' => 1]);
 
             JobPayment::create(['job_id' => $jobId , 'request_id' => $requestId ,'payment_intent_id' => $paymentIntentId, 'client_transfer_status' => AppConst::CLIENT_PENDING , 'editor_transfer_status' => AppConst::EDITOR_PENDING]);
+
+            // remove all favourite request of job
+            FavouriteRequest::where('job_id' , $jobId)->delete();
 
             return ['success' => true , 'msg' => 'Job Awarded Successfully'];
 

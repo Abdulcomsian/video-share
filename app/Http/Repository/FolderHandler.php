@@ -292,6 +292,7 @@ class FolderHandler
                                 "editor_id" => $editorId,
                                 "job_id" => $request->job_id,
                                 "name"  => $request->folderName,
+                                "comment" => $request->comment ?? null
                             ]);
             return ["status" => true , "shareFolder" => $shareFolder];
         }

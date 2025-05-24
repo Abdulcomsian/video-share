@@ -187,6 +187,7 @@ class StripeService{
 
     public function capturedPayment($paymentIntentId)
     {
+        Stripe::setApiKey(env('STRIPE_SECRET'));
         return PaymentIntent::retrieve($paymentIntentId)->capture();
     }
 

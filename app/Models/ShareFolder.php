@@ -12,7 +12,7 @@ class ShareFolder extends Model
 
     protected $table = "share_folder";
     protected $primaryKey = "id";
-    protected $fillable = ['editor_id' , 'job_id' , 'name', 'comment' ];
+    protected $fillable = ['editor_id' , 'job_id' , 'name' ];
 
 
     public function editor()

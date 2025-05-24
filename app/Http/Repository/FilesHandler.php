@@ -3,7 +3,7 @@
 namespace App\Http\Repository;
 use File;
 use Illuminate\Support\Facades\Storage;
-use App\Models\{ Files , Folder, PersonalJob , ShareFolderFiles};
+use App\Models\{ Files , Folder, PersonalJob , ShareFolderFiles, Comment};
 use App\Http\Repository\AwsHandler;
 class FilesHandler{
 
@@ -255,7 +255,18 @@ class FilesHandler{
 
         $comment = $request->comment ?? null;
        $shareFile =  ['share_folder_id' => $shareFolder->id , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnail, 'comment' => $comment ];
-       ShareFolderFiles::create($shareFile);
+       $shareFolderFile = ShareFolderFiles::create($shareFile);
+
+       if(!empty($comment)){
+
+            Comment::create([
+                'commentable_type' => ShareFolderFiles::class,
+                'commentable_id' => $shareFolderFile->id,
+                'comment_text' => $comment,
+                'user_id' => auth()->user()->id
+            ]);
+       }
+
        return ["success" => true , "msg" => "Files Added Successfully"];
     }
 

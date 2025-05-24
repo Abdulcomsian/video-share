@@ -33,8 +33,8 @@ class FilesHandler{
             //     //     $fileName = $file->getClientOriginalName();
             //     //     $extension = $file->extension();
             //     //     $name = time() . "-" . $fileName;
-                    
-            //     //     //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
+
+            //     //     //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));
             //     //     $check = $this->aws->uploadMedia( $folder->name , $name , $file);
             //     //     if($check['success']){
             //     //         $type =in_array($extension , $videoExtension) ? 1 : 2;
@@ -49,11 +49,11 @@ class FilesHandler{
 
             //     //         $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];
             //     //     }
-                
+
             //     // }
 
 
-              
+
 
 
             //     // foreach($request->data as $index => $data)
@@ -62,8 +62,8 @@ class FilesHandler{
             //     //     $fileName = $file->getClientOriginalName();
             //     //     $extension = $file->extension();
             //     //     $name = time() . "-" . $fileName;
-                    
-            //     //     //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
+
+            //     //     //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));
             //     //     $check = $this->aws->uploadMedia( $folder->name , $name , $file);
             //     //     if($check['success']){
             //     //         $type =in_array($extension , $videoExtension) ? 1 : 2;
@@ -77,21 +77,21 @@ class FilesHandler{
 
             //     //         $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];
             //     //     }
-                
+
             //     // }
-                
-            //     // Files::insert($fileList);    
+
+            //     // Files::insert($fileList);
             // }
             //multiple file upload code ends here
 
             //single file upload code starts here
             if($request->hasFile('file'))
             {
-                
+
                 $file = $request->file('file');
                 $fileName = $file->getClientOriginalName();
                 $extension = $file->extension();
-                $name = time() . "-" . $fileName;  
+                $name = time() . "-" . $fileName;
 
                 $check = $this->aws->uploadMedia( $folder->name , $name , $file);
 
@@ -110,13 +110,13 @@ class FilesHandler{
                 }
 
                 Files::create(['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName]);
-   
+
                 return ["success" => true , "msg" => "Files Added Successfully"];
             } else {
                 return response()->json(['success' => false , "msg" => 'Please add file']);
             }
             //single upload file code ends here
-            
+
 
         }catch(\Exception $e){
             return response()->json(['success' => false , "msg" => $e->getMessage()]);
@@ -149,10 +149,10 @@ class FilesHandler{
     {
 
         try{
-            $fileId = $request->file_id;    
-            
+            $fileId = $request->file_id;
+
             $file = Files::where('id' , $fileId)->first();
-            
+
             if($file){
                 $folder = Folder::find($file->folder_id);
                 $fileName = $folder->name.'/'.$file->path;
@@ -170,7 +170,7 @@ class FilesHandler{
                 //     Storage::disk('s3')->delete($fileName);
                 //     $file->delete();
                 //     return ["success" => true , "msg" => "File Deleted Successfully"];
-        
+
                 // }else{
                 //     return ["success" => false , "msg" => "File Not Found"];
                 // }
@@ -205,29 +205,29 @@ class FilesHandler{
                     $fileName = $file->getClientOriginalName();
                     $extension = $file->getClientOriginalExtension();
                     $name = time() . "-" . $fileName;
-                    // $check = Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));     
+                    // $check = Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));
                     // dd($folder->name , $name );
                     // dd($file);
                     $check = $this->aws->uploadMedia($folder->name , $name , $file );
-                    
+
                     if($check['success']){
-                        
+
                         $type =in_array($extension , $videoExtension) ? 1 : 2;
                         $thumbnailName  = null;
                         if( isset($thumbnails[$index]) && !is_null($thumbnails[$index]) ){
                             $imageUrl = substr($thumbnails[$index], strpos($thumbnails[$index], ',') + 1);
                             $image = base64_decode($imageUrl);
-                            $thumbnailName = time().$index."-share-file-thumbnail".".png"; 
+                            $thumbnailName = time().$index."-share-file-thumbnail".".png";
                             file_put_contents(public_path()."/uploads/".$thumbnailName , $image);
                         }
-                    
+
                         $fileList[] = ['share_folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName ];
                     }
                 }
-                
-                ShareFolderFiles::insert($fileList);    
+
+                ShareFolderFiles::insert($fileList);
             }
-    
+
             return ["success" => true , "msg" => "Files Added Successfully"];
 
         }catch(\Exception $e){
@@ -253,8 +253,9 @@ class FilesHandler{
             $file->move(public_path('uploads') , $thumbnail);
         }
 
-       $shareFile =  ['share_folder_id' => $shareFolder->id , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnail ];
-       ShareFolderFiles::create($shareFile);  
+        $comment = $request->comment ?? null;
+       $shareFile =  ['share_folder_id' => $shareFolder->id , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnail, 'comment' => $comment ];
+       ShareFolderFiles::create($shareFile);
        return ["success" => true , "msg" => "Files Added Successfully"];
     }
 
@@ -270,7 +271,7 @@ class FilesHandler{
             if(Storage::disk('s3')->exists($fileName))
             {
                 Storage::disk('s3')->delete($fileName);
-                
+
                 $file->delete();
 
                 return ["success" => true , "msg" => "File Deleted Successfully"];
@@ -294,15 +295,15 @@ class FilesHandler{
         }
 
         $bucketName = config('filesystems.disks.s3.bucket');
-        
+
         $folderPath = $file->folder->name;
-        
+
         $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
 
         $thumbnailPath = public_path('uploads');
-        
+
         return ['success' => true ,  'file'  => $file , 'bucketAddress' => $bucketAddress , 'thumbnailPath' => $thumbnailPath];
-    
+
     }
 
     public function getShareFile($request){
@@ -314,15 +315,15 @@ class FilesHandler{
         }
 
         $bucketName = config('filesystems.disks.s3.bucket');
-        
+
         $folderPath = $file->folder->name;
-        
+
         $bucketAddress = "https://$bucketName.s3.amazonaws.com/".$folderPath;
 
         $thumbnailPath = public_path('uploads');
-        
+
         return ['success' => true ,  'file'  => $file , 'bucketAddress' => $bucketAddress , 'thumbnailPath' => $thumbnailPath];
-    
+
     }
 
 }

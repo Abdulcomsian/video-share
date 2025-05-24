@@ -192,6 +192,7 @@ class StripeService{
 
     public function reversePayment($paymentIntentId)
     {
+        Stripe::setApiKey(env('STRIPE_SECRET'));
         return PaymentIntent::retrieve($paymentIntentId)->cancel();
     }
 

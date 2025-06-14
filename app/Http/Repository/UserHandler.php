@@ -320,13 +320,25 @@ class UserHandler{
 
     public function addSocialLink($url , $platform )
     {
-        $socailLinks = [];
+        // $socailLinks = [];
 
         foreach($url as $index => $link){
-           $socailLinks[] = ['platform' => $platform[$index] , 'url' => $link , 'user_id' => auth()->user()->id];
+
+            $socialLink = SocialLink::where('user_id' , auth()->user()->id)->where('platform' , $platform[$index])->first();
+
+            if($socialLink){
+                $socialLink->url = $link;
+                $socialLink->save();
+                continue;
+            }
+            else{
+                SocialLink::create([
+                    'platform' => $platform[$index] , 'url' => $link , 'user_id' => auth()->user()->id
+                ]);
+            }
         }
 
-        SocialLink::insert($socailLinks);
+        // SocialLink::insert($socailLinks);
         return ["status" => true , "msg"=>"Social links added successfully"];
     }
 

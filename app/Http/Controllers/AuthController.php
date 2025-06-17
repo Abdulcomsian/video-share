@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Http\AppConst;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Repository\UserHandler;
@@ -29,30 +31,34 @@ class AuthController extends Controller
             ]);
 
             if ($validator->fails()) {
-                
+
                 return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $validator->getMessageBag()] , 400);
-            
+
             } else {
 
                 $fullName = $request->full_name;
                 $email = $request->email;
                 $password = $request->password;
                 $type = $request->type;
-                
-                User::create([
+
+                $user = User::create([
                     "full_name" => $fullName,
                     "email" => $email,
                     "password" => Hash::make($password),
                     "type" => $type
                 ]);
+
+                if($type == AppConst::EDITOR){
+                    User::where('id' , auth()->user()->id)->update(['verification_code' => rand(1111,9999)]);
+                }
                 return $this->userHandler->findUser($email, $password , "register");
             }
         } catch (\Exception $e) {
 
             return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $e->getMessage()] , 401);
-        
+
         }
-        
+
 
     }
 
@@ -66,21 +72,21 @@ class AuthController extends Controller
 
             if($validator->fails())
             {
-                return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $validator->getMessageBag()] , 400); 
-            
+                return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $validator->getMessageBag()] , 400);
+
             }else{
-                
+
                 $email = $request->email;
                 $password   = $request->password;
 
                 return $this->userHandler->findUser($email, $password , "login");
-            
+
             }
 
         }catch(\Exception $e){
-            
+
             return response()->json(["success" => false, "msg" => "Something went wrong", "error" => $e->getMessage()] , 401);
-        
+
         }
     }
 
@@ -89,7 +95,7 @@ class AuthController extends Controller
         try{
             $verificationCode = $request->verification_code;
             $email = $request->email;
-            
+
             $user = User::where('email' , $email )->first();
 
 
@@ -115,7 +121,7 @@ class AuthController extends Controller
     {
         auth()->logout();
         return response()->json(["success" => "successfully logout"]);
-        
+
     }
 
 

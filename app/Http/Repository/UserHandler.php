@@ -439,4 +439,14 @@ class UserHandler{
         return response()->json(['status' => true , 'bucketAddress' => $bucketAddress , 'portfolioVideo' => $portfolioVideo , 'thumbnailPrefix' => $thumbnailPrefix]);
     }
 
+    public function updateUserByConditions($data, $conditions)
+    {
+        return User::where($conditions)->update($data);
+    }
+
+    public function getRowByColumns($conditions)
+    {
+        return User::where($conditions)->first();
+    }
+
 }

@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use app\Http\Repository\StripeService;
-use App\Services\Contracts\{UserServiceInterface, MerchantServiceInterface};
+use App\Http\Repository\{EditorHandler, UserHandler, StripeService};
+use App\Models\EditorStripePaymentMethod;
 use Stripe\{Stripe, Account, AccountLink};
 use Illuminate\Http\Request;
 
 class EditorOnboardingController extends Controller
 {
-    protected $stripeService;
-    protected $userService;
-    protected $merchantService;
-    public function __construct(StripeService $stripeService, UserServiceInterface $userService, MerchantServiceInterface $merchantService)
+    protected $stripeService, $userHandler, $editorHandler;
+
+    public function __construct(StripeService $stripeService, UserHandler $userHandler, EditorHandler $editorHandler)
     {
         $this->stripeService = $stripeService;
-        $this->userService = $userService;
-        $this->merchantService = $merchantService;
+        $this->userHandler = $userHandler;
+        $this->editorHandler = $editorHandler;
     }
 
     public function onBoardingSuccess(Request $request)
@@ -24,22 +23,15 @@ class EditorOnboardingController extends Controller
         $accountId = $request->query('account_id'); // Get account ID from query params
 
         if (!$accountId) {
-             info('f-onboarding onBoardingSuccess account ID is missing');
             throw new \Exception("Account ID is missing.", 1);
         }
 
         try {
 
-
-            $stripeMerchant = $this->stripeService->getStripeMerchantById($accountId);
-            $user = $this->userService->getRowByColumns(['stripe_id' => $accountId]);
-            info('f-onboarding sucess');
+            $user = $this->userHandler->getRowByColumns(['stripe_account_id' => $accountId]);
 
             return view('stripe.onboarding-success', compact('user'));
         } catch (\Exception $e) {
-            info('f-onboarding success error start');
-            info($e->getMessage());
-            info('f-onboarding success error end');
             return redirect()->route('stripe.onboarding.error')->with('error', $e->getMessage());
         }
     }
@@ -50,23 +42,16 @@ class EditorOnboardingController extends Controller
         $accountId = $request->query('account_id'); // Get account ID from query params
 
         if (!$accountId) {
-            info('f-onboarding refreshOnboarding account ID is missing');
             throw new \Exception("Account ID is missing.", 1);
         }
 
         try {
 
-            $accountLink = $this->stripeService->createMerchantOnboardingAccountLink($accountId);
-
-            info('f-onboarding referesh try');
+            $accountLink = $this->stripeService->createEditoryOnboardingAccountLink($accountId);
 
             return redirect($accountLink->url); // Redirect user back to Stripe onboarding
 
         } catch (\Exception $e) {
-
-            info('f-onboarding refreshOnboarding error start');
-            info($e->getMessage());
-            info('f-onboarding refreshOnboarding error end');
             return redirect()->route('stripe.onboarding.error')->with('error', $e->getMessage());
         }
     }
@@ -77,55 +62,60 @@ class EditorOnboardingController extends Controller
         $accountId = $request->query('account_id'); // Get account ID from query params
 
         if (!$accountId) {
-            info('f-onboarding stripeSuccess account ID is missing');
             throw new \Exception("Account ID is missing.", 1);
         }
 
+
         try {
 
-            info('f-onboarding stripe success try1');
+            $account = $this->stripeService->getEditorStripeDetailsById($accountId);
 
-            $account = $this->stripeService->getStripeMerchantById($accountId);
-
-            info($account);
-            info('f-onboarding stripe success after object get');
             // Check if onboarding is complete
             if (
                 empty($account->requirements->disabled_reason) &&
                 empty($account->requirements->currently_due) &&
                 empty($account->requirements->past_due)
-            ) {
+                ) {
 
-                info('f-onboarding stripe success before store external accounts');
-                // store external accounts
-                $this->merchantService->storeExternalAccounts($accountId);
+                // get external accounts
+                $externalAccounts = $this->stripeService->getAllEditorExternalAccountsByAccountType($accountId);
+                $user = $this->userHandler->getRowByColumns(['stripe_account_id' => $accountId]);
 
-                info('f-onboarding stripe success after store external accounts');
+                if ($externalAccounts->data) {
+                    foreach ($externalAccounts->data as $externalAccount) {
+                        $paymentMethod = $this->editorHandler->getEditorPaymentMethodById($externalAccount->id);
 
-                // update merchant onboarding status
-                $this->merchantService->updateMerchantStatus($accountId);
+                        if (!$paymentMethod) {
 
-                info('f-onboarding stripe success update merchant status');
+                            $arr = [
+                                'user_id' => $user->id,
+                                'stripe_payment_method_id' => $externalAccount->id,
+                                'type' => $externalAccount->object
+                            ];
+
+                            EditorStripePaymentMethod::create($arr);
+
+                        }
+                    }
+                }
+
+                // // update merchant onboarding status
+                $this->userHandler->updateUserByConditions([
+                    'onboarding' => 1
+                ], ['stripe_account_id' => $accountId]);
 
                 return redirect()->route('stripe.onboarding.success', ['account_id' => $accountId])->with('success', 'Onboarding completed successfully!');
             } else {
-
-                info('f-onboarding stripe success error onboarding incomplete');
                 return redirect()->route('stripe.onboarding.error')->with('error', 'Onboarding incomplete. Please try again.');
             }
 
         } catch (\Exception $e) {
-
-            info('f-onboarding stripeSuccess error start');
-            info($e->getMessage());
-            info('f-onboarding stripeSuccess error end');
             return redirect()->route('stripe.onboarding.error')->with('error', $e->getMessage());
         }
     }
 
     public function onBoardingError()
     {
-        info('onboarding error blade file');
         return view('stripe.onboarding-error');
     }
 }

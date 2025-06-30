@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Repository;
-use App\Models\{Address, EditorProfile , Skill , EditorPortfolio, Education , User , Favourite };
+use App\Models\{Address, EditorProfile , Skill , EditorPortfolio, EditorStripePaymentMethod, Education , User , Favourite };
 
 class EditorHandler{
 
@@ -15,7 +15,7 @@ class EditorHandler{
 
         $userId = auth()->user()->id;
 
-        EditorProfile::updateOrCreate( 
+        EditorProfile::updateOrCreate(
                 [ "editor_id" => $userId],
                 [
                     "editor_id" => $userId,
@@ -39,7 +39,7 @@ class EditorHandler{
             Skill::insert($skillList);
         }
 
-        return ["success" => true , "msg" => "Profile Updated Successfully" ];       
+        return ["success" => true , "msg" => "Profile Updated Successfully" ];
 
     }
 
@@ -61,7 +61,7 @@ class EditorHandler{
             Skill::insert($skillList);
         }
 
-        return ["success" => true , "msg" => "Skills Updated" ];      
+        return ["success" => true , "msg" => "Skills Updated" ];
     }
 
     public function updateEditorDetail($request)
@@ -72,7 +72,7 @@ class EditorHandler{
         $amountPerHour = $request->amount_per_hour;
 
         $editorProfile = EditorProfile::where('editor_id' , auth()->user()->id)->first();
-        
+
         if(isset($title) && !is_null($title)){
             $editorProfile->title = $title;
         }
@@ -91,7 +91,7 @@ class EditorHandler{
 
         $editorProfile->save();
 
-        return ["success" => true , "msg" => "Editor Detail Updated" ]; 
+        return ["success" => true , "msg" => "Editor Detail Updated" ];
 
     }
 
@@ -100,7 +100,7 @@ class EditorHandler{
     {
         $fileName = [];
         $files = json_decode($request->input("files"));
-       
+
         foreach($files as $index => $file){
             if($file == "null")
             {
@@ -113,7 +113,7 @@ class EditorHandler{
                 $fileName[] = $imageName;
             }
         }
-     
+
         EditorPortfolio::where('editor_id', auth()->user()->id )->delete();
         $portfolio = [];
         $links = json_decode($request->links);
@@ -124,7 +124,7 @@ class EditorHandler{
         EditorPortfolio::insert($portfolio);
 
         return response()->json(["success" => true , "msg" => "Editor Portfolio Added Successfully"]);
-        
+
 
     }
 
@@ -152,11 +152,11 @@ class EditorHandler{
     public function editorEducation($request)
     {
         $degrees = json_decode($request->education);
-          
+
         $degreeList = [];
 
         Education::where('user_id' , auth()->user()->id)->delete();
-        
+
         foreach($degrees as $degree)
         {
             $degreeList[] = [ "user_id" => auth()->user()->id , "institution" => $degree->institution , "degree" => $degree->degree , "start_date" => $degree->start_date, "end_date" => $degree->end_date ];
@@ -179,7 +179,7 @@ class EditorHandler{
                 'editor_id' => $editorId,
             ]
             );
-        
+
         return ["success"=> true , "msg" => "Editor Per Hour Rate Updated Successfully"];
 
     }
@@ -193,13 +193,13 @@ class EditorHandler{
 
         Address::updateOrCreate(
             [ "user_id" => auth()->user()->id],
-            [ 
+            [
                 "country_id" => $country,
                 "city_id"   => $city,
                 "address" => $address,
                 "language"=> $language,
                 "user_id" => auth()->user()->id
-            ] 
+            ]
         );
 
         if($request->hasFile("profile_image"))
@@ -264,8 +264,8 @@ class EditorHandler{
         $degree = $request->degree;
         $startDate = $request->start_date;
         $endDate = $request->end_date;
-        
-        Education::where("id" , $educationId)->update([ 
+
+        Education::where("id" , $educationId)->update([
             "institution" => $institute,
             "degree"    => $degree,
             "start_date"    => $startDate,
@@ -273,6 +273,11 @@ class EditorHandler{
         ]);
 
         return ["success"=> true , "msg" => "Editor Education Updated Successfully"];
+    }
+
+    public function getEditorPaymentMethodById($paymentMethodId)
+    {
+        return EditorStripePaymentMethod::where('stripe_payment_method_id' , $paymentMethodId)->first();
     }
 
 

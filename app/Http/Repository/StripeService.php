@@ -3,15 +3,17 @@
 namespace app\Http\Repository;
 
 use App\Http\AppConst;
-use Stripe\Stripe;
-use Stripe\Charge;
-use Stripe\Token;
-use Stripe\Transfer;
-use Stripe\StripeClient;
-use Stripe\PaymentIntent;
-use App\Models\{JobPayment, PersonalJob, JobProposal};
+use Stripe\{Stripe, Charge, Token, Transfer, StripeClient, PaymentIntent, Customer, Account, AccountLink};
+use App\Models\{JobPayment, PersonalJob, JobProposal, User};
+use Illuminate\Support\Facades\Auth;
+use Exception;
 
 class StripeService{
+
+    public function __construct()
+    {
+        Stripe::setApiKey(config('services.stripe.secret'));
+    }
 
     public function processPayment($request)
     {
@@ -49,7 +51,7 @@ class StripeService{
             // }
             $jobProposal = JobProposal::where('id' , $requestId)->first();
 
-            Stripe::setApiKey(env('STRIPE_SECRET'));
+            // Stripe::setApiKey(env('STRIPE_SECRET'));
             $amount = $jobProposal->bid_price * 100;
             $currency = 'usd';
 
@@ -79,7 +81,7 @@ class StripeService{
     public function partialPayment($request){
         try{
             //setting stripe secret key
-            Stripe::setApiKey(env('STRIPE_SECRET'));
+            // Stripe::setApiKey(env('STRIPE_SECRET'));
 
             //creating token
             $token = Token::create([
@@ -185,15 +187,94 @@ class StripeService{
         }
     }
 
+    public function clientOnboarding($data)
+    {
+        return Customer::create([
+            'email' => $data->email,
+            'name' => $data->full_name
+        ]);
+
+    }
+
+    public function editorOnboarding($data)
+    {
+
+        $user = Auth::user();
+        if ($user->onboarding) {
+            throw new Exception("Onboarding is already verified", 1);
+        }
+
+        if (!$user->stripe_account_id) {
+
+            $data = [
+                'type' => 'custom',
+                'tos_acceptance' => [
+                    'date' => time(), // Timestamp of acceptance
+                    'ip' => request()->ip(), // IP address of user
+                ],
+                'capabilities' => [
+                    'transfers' => ['requested' => true],  // Enables transfer capability (withdrawing funds)
+                    'card_payments' => ['requested' => true],  // Enables card payment capability (receiving payments via card)
+                ],
+            ];
+
+            //create stripe-connect(onbaording) account
+            $account = Account::create($data);
+
+            // update user stripe ID
+            User::where('id', $user->id)->update(['stripe_account_id' => $account->id]);
+
+            $stripeAccountId = $account->id;
+
+        } else {
+            $stripeAccountId = $user->stripe_account_id;
+        }
+
+        // creat onboarding account link
+        $accountLink = $this->createEditoryOnboardingAccountLink($stripeAccountId);
+
+        // refresh to update user data
+        $user->refresh();
+
+        return [
+            'user' => $user->toArray(),
+            'acccount_link' => $accountLink
+        ];
+
+    }
+
+    public function createEditoryOnboardingAccountLink($stripeAccountId)
+    {
+        $accountLink = AccountLink::create([
+            'account' => $stripeAccountId,
+            'refresh_url' => route('stripe.refresh', ['account_id' => $stripeAccountId]),
+            'return_url' => route('stripe.success', ['account_id' => $stripeAccountId]),
+            'type' => 'account_onboarding',
+        ]);
+
+        return $accountLink;
+    }
+
+    public function getEditorStripeDetailsById($stripeId)
+    {
+        return Account::retrieve($stripeId);
+    }
+
+    public function getAllEditorExternalAccountsByAccountType(string $merchantStripeId, ?array $params = null)
+    {
+        $params['limit'] = $params['limit'] ?? 100;
+        return Account::allExternalAccounts($merchantStripeId, $params);
+    }
+
     public function capturedPayment($paymentIntentId)
     {
-        Stripe::setApiKey(env('STRIPE_SECRET'));
+        // Stripe::setApiKey(env('STRIPE_SECRET'));
         return PaymentIntent::retrieve($paymentIntentId)->capture();
     }
 
     public function reversePayment($paymentIntentId)
     {
-        Stripe::setApiKey(env('STRIPE_SECRET'));
+        // Stripe::setApiKey(env('STRIPE_SECRET'));
         return PaymentIntent::retrieve($paymentIntentId)->cancel();
     }
 

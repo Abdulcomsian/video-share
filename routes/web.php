@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{BillingController, DashboardController, UserController , FolderController, HomeController, ProfileController};
+use App\Http\Controllers\{BillingController, DashboardController, UserController, FolderController, HomeController, ProfileController, EditorOnboardingController};
 use App\Http\Controllers\Web\{ClientController, EditorController, JobController};
 use Illuminate\Http\Request;
 
@@ -16,7 +16,15 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/terms-and-condition' , [HomeController::class , 'termsAndConditionPage'])->name('get.temsAndCondition.page');
+// stripe onboarding
+Route::get('stripe/onboarding/success', [EditorOnboardingController::class, 'onBoardingSuccess'])->name('stripe.onboarding.success');
+Route::get('stripe/onboarding/error', [EditorOnboardingController::class, 'onBoardingError'])->name('stripe.onboarding.error');
+Route::get('/stripe/refresh', [EditorOnboardingController::class, 'refreshOnboarding'])->name('stripe.refresh');
+Route::get('/stripe/success', [EditorOnboardingController::class, 'stripeSuccess'])->name('stripe.success');
+
+Route::get('/terms-and-condition', [HomeController::class, 'termsAndConditionPage'])->name('get.termsAndCondition.page');
+Route::get('/privacy-policy', [HomeController::class, 'privacyPolicyPage'])->name('get.privacyPolicy.page');
+Route::get('/help', [HomeController::class, 'helpPage'])->name('get.help.page');
 
 Auth::routes(['except' => ['register']]);
 
@@ -39,17 +47,17 @@ Route::get('db/dld', function () {
 });
 
 
-Route::middleware(['auth:web' , 'web.admin.verify'])->group(function(){
-    Route::get('/' , function (){
+Route::middleware(['auth:web', 'web.admin.verify'])->group(function () {
+    Route::get('/', function () {
         return redirect()->route('admin:dashboard');
     });
     Route::group(['prefix' => 'admin', 'as' => 'admin:'], function () {
-        Route::get('/dashboard' , [DashboardController::class , 'index'])->name('dashboard');
-        Route::get('/manage/clients' , [ClientController::class , 'index'])->name('clients.list');
-        Route::get('/manage/editors' , [EditorController::class , 'index'])->name('editors.list');
-        Route::get('/jobs' , [JobController::class , 'index'])->name('jobs.list');
-        Route::get('/jobs/{id}' , [JobController::class , 'show'])->name('jobs.show');
-        Route::get('/jobs/proposals/{id}' , [JobController::class , 'jobProposals'])->name('jobs.proposals-list');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/manage/clients', [ClientController::class, 'index'])->name('clients.list');
+        Route::get('/manage/editors', [EditorController::class, 'index'])->name('editors.list');
+        Route::get('/jobs', [JobController::class, 'index'])->name('jobs.list');
+        Route::get('/jobs/{id}', [JobController::class, 'show'])->name('jobs.show');
+        Route::get('/jobs/proposals/{id}', [JobController::class, 'jobProposals'])->name('jobs.proposals-list');
         // Route::get('/client-list' , [UserController::class , 'getDashboardClientList'])->name('get.client.list');
         // Route::get('/editors' , [DashboardController::class , 'getEditorPage'])->name('editor.page');
         // Route::get('/editor-list' , [UserController::class , 'getDashboardEditorList'])->name('get.editor.list');
@@ -66,21 +74,20 @@ Route::middleware(['auth:web' , 'web.admin.verify'])->group(function(){
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
         Route::put('password', [ProfileController::class, 'updatePassword'])->name('password.update');
     });
-
 });
 
-Route::get('test' , function(){
+Route::get('test', function () {
     \Storage::disk('s3')->makeDirectory("Hello-Mani2");
     dd("folder created successfully");
 });
 
 
-Route::view('test-data' , 'test' );
-Route::post('test-data' , function(Request $request){
+Route::view('test-data', 'test');
+Route::post('test-data', function (Request $request) {
     dd($request->all());
-    foreach($request->data  as $data){
+    foreach ($request->data  as $data) {
         $index = 0;
-        foreach($data['file'] as $file){
+        foreach ($data['file'] as $file) {
             $index++;
         }
         dd($index);

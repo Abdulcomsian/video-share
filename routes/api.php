@@ -13,9 +13,9 @@ use App\Http\Controllers\{ AuthController ,
                             FavouriteRequestController ,
                             HomeController,
                             ReviewController,
-                            PersonalJobChatController
+                            PersonalJobChatController,
                         };
-
+use App\Http\Controllers\Stripe\{ClientController as StripeClientController , EditorController as StripeEditorController};
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -102,6 +102,7 @@ Route::middleware(['verify.authentication'])->group(function(){
 
 /* Editor Routes*/
 Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(function(){
+    Route::post('editor/create-account', [StripeEditorController::class, 'createAccount']);
     Route::post('update-profile' , [UserController::class , 'updateProfile']);
     Route::post('update-editor-profile' , [UserController::class , 'updateEditorProfile']);
     Route::post('add-editor-portfolio' , [UserController::class , 'addEditorPortfolio']);
@@ -139,6 +140,7 @@ Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(functi
 
 /* Client Routes*/
 Route::middleware(['verify.authentication' , 'api.client.verify'])->group(function(){
+    Route::post('client/create-account', [StripeClientController::class, 'createAccount']);
     Route::post("create-folder" , [FolderController::class , 'createClientFolder']);
     Route::post("post-job" , [JobController::class , 'addJob']);
     Route::get("client-jobs" , [JobController::class , 'clientJob']);

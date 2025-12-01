@@ -60,43 +60,43 @@ class HomeController extends Controller
 
         $clientQuestion = [
             [
-            "question" => "How do I create an account on the platform?" , 
+            "question" => "How do I create an account on the platform?" ,
             "answer" =>  "To create an account, click on the 'Sign Up' button on the homepage, fill in the required information, and follow the on-screen instructions."
             ],
             [
-            "question" => "How can I post a video editing project on the platform?" , 
+            "question" => "How can I post a video editing project on the platform?" ,
             "answer" =>  "After logging in, go to your dashboard and click on 'Post a Project.' Fill in the project details, including a brief description, budget, and any specific requirements. Click 'Submit' to post your project for editors to see.",
             ],
             [
-            "question" => "What information should I include in my project description?" , 
+            "question" => "What information should I include in my project description?" ,
             "answer" =>  "Include details about your project's goals, style preferences, desired video length, and any specific instructions. The more information you provide, the better editors can understand and meet your needs.",
             ],
             [
-            "question" => "How do I choose an editor for my project?" , 
+            "question" => "How do I choose an editor for my project?" ,
             "answer" =>  "Review editor profiles, portfolios, and ratings. You can also communicate with editors to discuss your project before making a decision. Once you find a suitable match, click 'Hire' on their profile to start the collaboration.",
             ],
             [
-            "question" => "What if I'm not satisfied with the edited video?" , 
+            "question" => "What if I'm not satisfied with the edited video?" ,
             "answer" =>  "You can request revisions from the editor. If issues persist, our support team is here to help mediate and ensure your satisfaction. Your payment is held in escrow until the project meets your expectations.",
             ],
             [
-            "question" => "How does payment work on the platform?" , "answer" =>  
+            "question" => "How does payment work on the platform?" , "answer" =>
             "Payments are securely processed through the platform. When you hire an editor, the agreed-upon amount is held in escrow. Once you approve the final video, the payment is released to the editor.",
             ],
             [
-            "question" => "Can I request revisions after the project is completed?" , 
+            "question" => "Can I request revisions after the project is completed?" ,
             "answer" =>  "Yes, you can request revisions until you are satisfied with the edited video. Communication with the editor is key during this phase to ensure your vision is met.",
             ],
             [
-            "question" => "What if there's a dispute between me and the editor?" , 
+            "question" => "What if there's a dispute between me and the editor?" ,
             "answer" =>  "If a dispute arises, contact our support team immediately. We will work with both parties to resolve the issue and ensure a fair outcome.",
             ],
             [
-            "question" => "How do I leave feedback for an editor?" , "answer" =>  
+            "question" => "How do I leave feedback for an editor?" , "answer" =>
             "After the project is completed, you can leave feedback and rate the editor on their profile. Your feedback helps build a trusted community and assists other clients in choosing the right editors.",
             ],
             [
-            "question" => "Is there a way to communicate with the editor during the project?" , "answer" =>  
+            "question" => "Is there a way to communicate with the editor during the project?" , "answer" =>
             "Yes, you can communicate with the editor through our messaging system. Discuss project details, provide feedback, and ask questions to ensure a smooth collaboration.",
             ]
         ];
@@ -150,6 +150,14 @@ class HomeController extends Controller
 
     public function termsAndConditionPage(){
         return view('terms-and-condition');
+    }
+
+    public function privacyPolicyPage(){
+        return view('privacy-policy');
+    }
+
+    public function helpPage(){
+        return view('help');
     }
 
     public function suggestedSkills(){

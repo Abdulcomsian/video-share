@@ -8,13 +8,16 @@ use App\Mail\ {VerificationMail , TokenMail};
 use App\Http\AppConst;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Repository\AwsHandler;
+use app\Http\Repository\StripeService;
+
 class UserHandler{
 
-    protected $awsHandler;
+    protected $awsHandler, $stripeService;
 
-    function __construct(AwsHandler $awsHandler)
+    function __construct(AwsHandler $awsHandler, StripeService $stripeService)
     {
         $this->awsHandler = $awsHandler;
+        $this->stripeService = $stripeService;
     }
 
     public function findUser($email , $password , $type)
@@ -44,6 +47,44 @@ class UserHandler{
 
             if(auth()->user()->type == AppConst::EDITOR){
 
+                    $user = User::where('id' , auth()->user()->id)->first();
+                    User::with('editorProfile' ,'skills' , 'education' , 'portfolio' )->where('id' , auth()->user()->id)->first();
+                    $stripeId = $user->stripe_account_id;
+
+                    if($stripeId == '')
+                    {
+                        $updateOnboardingStatusArr = [
+                            'onboarding' => 0
+                        ];
+                    }
+                    else
+                    {
+
+                        $account = $this->stripeService->getEditorStripeDetailsById($stripeId);
+
+                        if (empty($account->requirements->disabled_reason) &&
+                            empty($account->requirements->currently_due) &&
+                            empty($account->requirements->past_due))
+                        {
+
+                            $updateOnboardingStatusArr = [
+                                'onboarding' => 1
+                            ];
+
+                        }
+                        else
+                        {
+
+                            $updateOnboardingStatusArr = [
+                                'onboarding' => 0
+                            ];
+
+                        }
+
+                    }
+
+                    $this->updateUserByConditions($updateOnboardingStatusArr, ['id' => $user->id]);
+
                 $profile = User::with('editorProfile' ,'skills' , 'education' , 'portfolio' )->where('id' , auth()->user()->id)->first();
 
                 $editorProfileAndSkill = ( isset($profile->editorProfile) && !is_null($profile->editorProfile)) && count($profile->skills) ? true :  false;
@@ -57,7 +98,6 @@ class UserHandler{
                 return response()->json(["success" => true , "msg" => $msg , 'token' => $jwt , 'baseUrl' => $baseUrl , "editorProfileAndSkill" => $editorProfileAndSkill , "editorPortfolio" => $editorPortfolio , "editorEducation" => $editorEducation, "editorPerHourRate" => $editorPerHourRate]);
 
             }else{
-
                 return response()->json(["success" => true , "msg" => $msg , 'token' => $jwt , 'baseUrl' => $baseUrl]);
             }
 

@@ -22,7 +22,9 @@ Route::get('stripe/onboarding/error', [EditorOnboardingController::class, 'onBoa
 Route::get('/stripe/refresh', [EditorOnboardingController::class, 'refreshOnboarding'])->name('stripe.refresh');
 Route::get('/stripe/success', [EditorOnboardingController::class, 'stripeSuccess'])->name('stripe.success');
 
-Route::get('/terms-and-condition', [HomeController::class, 'termsAndConditionPage'])->name('get.temsAndCondition.page');
+Route::get('/terms-and-condition', [HomeController::class, 'termsAndConditionPage'])->name('get.termsAndCondition.page');
+Route::get('/privacy-policy', [HomeController::class, 'privacyPolicyPage'])->name('get.privacyPolicy.page');
+Route::get('/help', [HomeController::class, 'helpPage'])->name('get.help.page');
 
 Auth::routes(['except' => ['register']]);
 

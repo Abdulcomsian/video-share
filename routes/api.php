@@ -42,6 +42,9 @@ Route::post('update-password' , [UserController::class , 'updatePassword']);
 Route::post('resend-passcode' , [UserController::class , 'sendPasscode']);
 
 Route::middleware(['verify.authentication'])->group(function(){
+    Route::get('get/google-location-api/token', function () {
+       return response()->json(['success' => true , '_token' => config('app.google_location_api_token')]);
+    });
     Route::post('update-profile-image' , [UserController::class , 'updateProfileImage']);
     Route::post('job-detail', [JobController::class, 'getJobDetail']);
     Route::post('add-file-comment', [CommentController::class, 'addFileComment']);

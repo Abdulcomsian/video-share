@@ -243,4 +243,6 @@ return [
 
     ],
 
+    'google_location_api_token' => env('GOOGLE_LOCATION_API_TOKEN'),
+
 ];

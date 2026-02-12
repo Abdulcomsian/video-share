@@ -121,6 +121,41 @@ class AuthController extends Controller
 
     }
 
+    public function refreshToken()
+    {
+        try {
+            $newToken = auth()->guard('api')->refresh();
+            $jwt = $this->userHandler->respondWithToken($newToken);
+
+            return response()->json([
+                "success" => true,
+                "msg"     => "Token refreshed successfully",
+                "token"   => $jwt
+            ]);
+
+        } catch (\Tymon\JWTAuth\Exceptions\TokenBlacklistedException $e) {
+            return response()->json([
+                "success" => false,
+                "msg"     => "This token has already been refreshed, please use the new token",
+                "error"   => "token_blacklisted"
+            ], 401);
+
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return response()->json([
+                "success" => false,
+                "msg"     => "Session has expired, please login again",
+                "error"   => "refresh_token_expired"
+            ], 401);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "msg"     => "Something went wrong",
+                "error"   => $e->getMessage()
+            ], 401);
+        }
+    }
+
     public function logout()
     {
         auth()->logout();

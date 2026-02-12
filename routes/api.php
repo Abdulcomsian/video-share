@@ -41,6 +41,7 @@ Route::post('forget-password' , [UserController::class , 'forgetPassword']);
 Route::post('update-password' , [UserController::class , 'updatePassword']);
 Route::post('resend-passcode' , [UserController::class , 'sendPasscode']);
 Route::post('social-login', [AuthController::class, 'socialLogin']);
+Route::post('refresh-token', [AuthController::class, 'refreshToken']);
 
 Route::middleware(['verify.authentication'])->group(function(){
     Route::get('get/google-location-api/token', function () {

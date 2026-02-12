@@ -35,7 +35,9 @@ class User extends Authenticatable implements JWTSubject
         'token',
         'remember_token',
         'profile_image',
-        'notification_status'
+        'notification_status',
+        'firebase_uid',
+        'login_provider',
     ];
 
     /**
@@ -46,6 +48,7 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'firebase_uid',
     ];
 
     /**

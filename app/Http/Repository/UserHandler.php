@@ -7,6 +7,7 @@ use App\Models\{ User , Favourite, Files, Review , PersonalJob, Address , Editor
 use App\Mail\ {VerificationMail , TokenMail};
 use App\Http\AppConst;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use App\Http\Repository\AwsHandler;
 use app\Http\Repository\StripeService;
 
@@ -110,9 +111,139 @@ class UserHandler{
         return [
                 'access_token'=>$token,
                 'token_type'=>'bearer',
-                'expires_in'=> JWTAuth::factory()->getTTL() * 180,
+                'expires_in'=> JWTAuth::factory()->getTTL() * 60,
                 'user'=> auth()->user()
         ];
+    }
+
+    public function findOrCreateSocialUser(array $socialData, ?int $type)
+    {
+        $firebaseUid = $socialData['uid'];
+        $email       = $socialData['email'];
+        $name        = $socialData['name'];
+        $provider    = $socialData['provider'];
+
+        if (empty($email)) {
+            return response()->json([
+                "success" => false,
+                "msg"     => "Something went wrong",
+                "error"   => "Email not provided by social provider"
+            ], 400);
+        }
+
+        // Try to find by firebase_uid first (most reliable)
+        $user = User::where('firebase_uid', $firebaseUid)->first();
+
+        if (!$user) {
+            // Try to find by email (handles account linking)
+            $user = User::where('email', $email)->first();
+
+            if ($user) {
+                // Check type mismatch before linking
+                $typeNames = [AppConst::CLIENT => 'Client', AppConst::EDITOR => 'Editor'];
+                if (!is_null($type) && $user->type != $type) {
+                    return response()->json([
+                        "success" => false,
+                        "msg"     => "This account is already registered as " . ($typeNames[$user->type] ?? 'unknown'),
+                        "error"   => "Account already exists with a different user type"
+                    ], 409);
+                }
+
+                // Account linking: existing email/password user now using social login
+                $user->firebase_uid   = $firebaseUid;
+                $user->login_provider = $provider;
+
+                if (is_null($user->email_verified_at)) {
+                    $user->email_verified_at = now();
+                }
+
+                $user->save();
+            } else {
+                // Brand new user — type is required for registration
+                if (is_null($type)) {
+                    return response()->json([
+                        "success" => false,
+                        "msg"     => "Something went wrong",
+                        "error"   => "Type is required for new user registration"
+                    ], 400);
+                }
+
+                $user = User::create([
+                    'full_name'         => $name ?? explode('@', $email)[0],
+                    'email'             => $email,
+                    'password'          => Hash::make(Str::random(64)),
+                    'type'              => $type,
+                    'firebase_uid'      => $firebaseUid,
+                    'login_provider'    => $provider,
+                    'email_verified_at' => now(),
+                ]);
+            }
+        } else {
+            // User found by firebase_uid — check type mismatch
+            $typeNames = [AppConst::CLIENT => 'Client', AppConst::EDITOR => 'Editor'];
+            if (!is_null($type) && $user->type != $type) {
+                return response()->json([
+                    "success" => false,
+                    "msg"     => "This account is already registered as " . ($typeNames[$user->type] ?? 'unknown'),
+                    "error"   => "Account already exists with a different user type"
+                ], 409);
+            }
+
+            // Update provider if changed
+            if ($user->login_provider !== $provider) {
+                $user->login_provider = $provider;
+                $user->save();
+            }
+        }
+
+        // Generate JWT directly from user model (no password needed)
+        $token = auth()->guard('api')->login($user);
+
+        if (!$token) {
+            return response()->json([
+                "success" => false,
+                "msg"     => "Something went wrong",
+                "error"   => "Could not generate token"
+            ], 500);
+        }
+
+        $jwt = $this->respondWithToken($token);
+        $msg = "User Signed In Successfully";
+        $baseUrl = public_path("uploads");
+
+        if ($user->type == AppConst::EDITOR) {
+            $profile = User::with('editorProfile', 'skills', 'education', 'portfolio')
+                           ->where('id', $user->id)->first();
+            $stripeId = $user->stripe_account_id;
+
+            if ($stripeId == '') {
+                $updateOnboardingStatusArr = ['onboarding' => 0];
+            } else {
+                $account = $this->stripeService->getEditorStripeDetailsById($stripeId);
+                if (empty($account->requirements->disabled_reason) &&
+                    empty($account->requirements->currently_due) &&
+                    empty($account->requirements->past_due)) {
+                    $updateOnboardingStatusArr = ['onboarding' => 1];
+                } else {
+                    $updateOnboardingStatusArr = ['onboarding' => 0];
+                }
+            }
+
+            $this->updateUserByConditions($updateOnboardingStatusArr, ['id' => $user->id]);
+
+            $editorProfileAndSkill = (isset($profile->editorProfile) && !is_null($profile->editorProfile)) && count($profile->skills) ? true : false;
+            $editorPortfolio = count($profile->portfolio) ? true : false;
+            $editorEducation = count($profile->education) ? true : false;
+            $editorPerHourRate = (isset($profile->editorProfile) && !is_null($profile->editorProfile)) && (isset($profile->editorProfile->amount_per_hour) && !is_null($profile->editorProfile->amount_per_hour)) ? true : false;
+
+            return response()->json([
+                "success" => true, "msg" => $msg, 'token' => $jwt, 'baseUrl' => $baseUrl,
+                "editorProfileAndSkill" => $editorProfileAndSkill, "editorPortfolio" => $editorPortfolio,
+                "editorEducation" => $editorEducation, "editorPerHourRate" => $editorPerHourRate
+            ]);
+        }
+
+        return response()->json(["success" => true, "msg" => $msg, 'token' => $jwt, 'baseUrl' => $baseUrl]);
     }
 
     public function addEditorFavourite($request)

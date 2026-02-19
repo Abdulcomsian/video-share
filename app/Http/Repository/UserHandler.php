@@ -479,9 +479,14 @@ class UserHandler{
 
         User::where("id" , auth()->user()->id)->update(["full_name" => $username]);
 
+        // Address::updateOrCreate(
+        //     ["user_id" => auth()->user()->id],
+        //     ["user_id" => auth()->user()->id , "country_id" => $request->country_id , "city_id" => $request->city_id , "language" => $request->language , "address" => $request->address],
+        // );
+
         Address::updateOrCreate(
             ["user_id" => auth()->user()->id],
-            ["user_id" => auth()->user()->id , "country_id" => $request->country_id , "city_id" => $request->city_id , "language" => $request->language , "address" => $request->address],
+            ["user_id" => auth()->user()->id , "language" => $request->language , "address" => $request->address],
         );
 
         return ["status" => true , "msg"=>"User Profile Updated Successfully"];

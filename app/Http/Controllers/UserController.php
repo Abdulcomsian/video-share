@@ -724,8 +724,10 @@ class UserController extends Controller
    public function updateUserProfile(Request $request){
     $validator = Validator ::make($request->all() , [
         "full_name" => "required|string",
-        "country_id" => "required|numeric",
-        "city_id" => "required|numeric",
+        // "country_id" => "required|numeric",
+        // "city_id" => "required|numeric",
+        "country_id" => "nullable|numeric",
+        "city_id" => "nullable|numeric",
         "language" => "required|string",
         "address" => "required|string"
     ]);

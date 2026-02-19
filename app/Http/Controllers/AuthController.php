@@ -52,9 +52,9 @@ class AuthController extends Controller
                     "type" => $type
                 ]);
 
-                if($type == AppConst::EDITOR){
-                    User::where('id' , auth()->user()->id)->update(['verification_code' => rand(1111,9999)]);
-                }
+                // if($type == AppConst::EDITOR){
+                //     User::where('id' , auth()->user()->id)->update(['verification_code' => rand(1111,9999)]);
+                // }
                 return $this->userHandler->findUser($email, $password , "register");
             }
         } catch (\Exception $e) {

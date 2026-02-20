@@ -191,9 +191,11 @@ class UserController extends Controller
     {
         try{
             $validator = Validator::make( $request->all(), [
-                "country" => "required|numeric",
+                // "country" => "required|numeric",
+                "country" => "nullable|numeric",
                 "address" => "required|string",
-                "city"    => "required|numeric",
+                // "city"    => "required|numeric",
+                "city"    => "nullable|numeric",
                 "language"=> "required|string"
             ]);
 

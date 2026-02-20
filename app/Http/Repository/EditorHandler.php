@@ -194,8 +194,8 @@ class EditorHandler{
         Address::updateOrCreate(
             [ "user_id" => auth()->user()->id],
             [
-                "country_id" => $country,
-                "city_id"   => $city,
+                // "country_id" => $country,
+                // "city_id"   => $city,
                 "address" => $address,
                 "language"=> $language,
                 "user_id" => auth()->user()->id

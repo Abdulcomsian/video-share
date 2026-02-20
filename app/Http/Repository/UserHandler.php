@@ -27,7 +27,7 @@ class UserHandler{
 
         if(!$token)
         {
-            return response()->json(["success" => false , "msg" => "Something went wrong" , "error" => "unauthorized"] , 400);
+            return response()->json(["success" => false , "msg" => "Something went wrong" , "error" => "Invalid email or password"] , 400);
 
         }else{
 

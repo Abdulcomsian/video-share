@@ -186,8 +186,8 @@ class EditorHandler{
 
     public function updateEditorAddress($request)
     {
-        $country = $request->country;
-        $city = $request->city;
+        // $country = $request->country;
+        // $city = $request->city;
         $address = $request->address;
         $language = $request->language;
 

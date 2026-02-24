@@ -112,7 +112,8 @@ class UserHandler{
                 'access_token'=>$token,
                 'token_type'=>'bearer',
                 'expires_in'=> JWTAuth::factory()->getTTL() * 60,
-                'user'=> auth()->user()
+                'user'=> auth()->user(),
+                'can_change_password'=> !empty(auth()->user()->password)
         ];
     }
 

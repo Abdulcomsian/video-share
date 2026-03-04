@@ -113,11 +113,11 @@ class UserHandler{
                 'token_type'=>'bearer',
                 'expires_in'=> JWTAuth::factory()->getTTL() * 60,
                 'user'=> auth()->user(),
-                // 'can_change_password'=> !empty(auth()->user()->password)
-                // 'can_change_password'=> !empty(auth()->user()->password) ? true : false
-                'can_change_password'=> auth()->user()->password == '' || auth()->user()->password == null ? false : true
+                'can_change_password'=> !empty(auth()->user()->password)
+
         ];
     }
+
 
     public function findOrCreateSocialUser(array $socialData, ?int $type)
     {
@@ -174,7 +174,7 @@ class UserHandler{
                 $user = User::create([
                     'full_name'         => $name ?? explode('@', $email)[0],
                     'email'             => $email,
-                    'password'          => Hash::make(Str::random(64)),
+                    'password'          => null,
                     'type'              => $type,
                     'firebase_uid'      => $firebaseUid,
                     'login_provider'    => $provider,

@@ -115,7 +115,7 @@ class UserHandler{
                 'user'=> auth()->user(),
                 // 'can_change_password'=> !empty(auth()->user()->password)
                 // 'can_change_password'=> !empty(auth()->user()->password) ? true : false
-                'can_change_password'=> false
+                'can_change_password'=> auth()->user()->password == '' || auth()->user()->password == null ? false : true
         ];
     }
 

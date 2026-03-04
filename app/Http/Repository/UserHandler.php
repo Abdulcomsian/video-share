@@ -114,7 +114,8 @@ class UserHandler{
                 'expires_in'=> JWTAuth::factory()->getTTL() * 60,
                 'user'=> auth()->user(),
                 // 'can_change_password'=> !empty(auth()->user()->password)
-                'can_change_password'=> !empty(auth()->user()->password) ? true : false
+                // 'can_change_password'=> !empty(auth()->user()->password) ? true : false
+                'can_change_password'=> false
         ];
     }
 

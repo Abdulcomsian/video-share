@@ -27,9 +27,16 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
+            // Check if a soft-deleted user exists with this email
+            $deletedUser = User::withTrashed()->where('email', $request->email)->whereNotNull('deleted_at')->first();
+
+            $emailRule = $deletedUser
+                ? "required|string"
+                : "required|string|unique:users,email";
+
             $validator = Validator::make($request->all(), [
                 "full_name" => "required|string",
-                "email" => "required|string|unique:users,email",
+                "email" => $emailRule,
                 "password" => "required|string",
                 "type" => "required|numeric"
             ]);
@@ -45,16 +52,30 @@ class AuthController extends Controller
                 $password = $request->password;
                 $type = $request->type;
 
-                $user = User::create([
-                    "full_name" => $fullName,
-                    "email" => $email,
-                    "password" => Hash::make($password),
-                    "type" => $type
-                ]);
+                if ($deletedUser) {
+                    $deletedUser->restore();
+                    $deletedUser->update([
+                        "full_name" => $fullName,
+                        "password" => Hash::make($password),
+                        "type" => $type,
+                        "email_verified_at" => null,
+                        "verification_code" => null,
+                        "token" => null,
+                        "profile_image" => null,
+                        "notification_status" => null,
+                        "firebase_uid" => null,
+                        "login_provider" => null,
+                    ]);
+                    $user = $deletedUser;
+                } else {
+                    $user = User::create([
+                        "full_name" => $fullName,
+                        "email" => $email,
+                        "password" => Hash::make($password),
+                        "type" => $type
+                    ]);
+                }
 
-                // if($type == AppConst::EDITOR){
-                //     User::where('id' , auth()->user()->id)->update(['verification_code' => rand(1111,9999)]);
-                // }
                 return $this->userHandler->findUser($email, $password , "register");
             }
         } catch (\Exception $e) {

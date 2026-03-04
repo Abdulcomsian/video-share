@@ -134,33 +134,58 @@ class UserHandler{
             ], 400);
         }
 
-        // Try to find by firebase_uid first (most reliable)
-        $user = User::where('firebase_uid', $firebaseUid)->first();
+        // Try to find by firebase_uid first (most reliable), including soft-deleted
+        $user = User::withTrashed()->where('firebase_uid', $firebaseUid)->first();
 
         if (!$user) {
-            // Try to find by email (handles account linking)
-            $user = User::where('email', $email)->first();
+            // Try to find by email (handles account linking), including soft-deleted
+            $user = User::withTrashed()->where('email', $email)->first();
 
             if ($user) {
-                // Check type mismatch before linking
-                $typeNames = [AppConst::CLIENT => 'Client', AppConst::EDITOR => 'Editor'];
-                if (!is_null($type) && $user->type != $type) {
-                    return response()->json([
-                        "success" => false,
-                        "msg"     => "This account is already registered as " . ($typeNames[$user->type] ?? 'unknown'),
-                        "error"   => "Account already exists with a different user type"
-                    ], 409);
+                // If user was soft-deleted, restore and update with new social data
+                if ($user->trashed()) {
+                    if (is_null($type)) {
+                        return response()->json([
+                            "success" => false,
+                            "msg"     => "Something went wrong",
+                            "error"   => "Type is required for new user registration"
+                        ], 400);
+                    }
+
+                    $user->restore();
+                    $user->update([
+                        'full_name'         => $name ?? $user->full_name,
+                        'password'          => null,
+                        'type'              => $type,
+                        'firebase_uid'      => $firebaseUid,
+                        'login_provider'    => $provider,
+                        'email_verified_at' => now(),
+                        'verification_code' => null,
+                        'token'             => null,
+                        'profile_image'     => null,
+                        'notification_status' => null,
+                    ]);
+                } else {
+                    // Check type mismatch before linking
+                    $typeNames = [AppConst::CLIENT => 'Client', AppConst::EDITOR => 'Editor'];
+                    if (!is_null($type) && $user->type != $type) {
+                        return response()->json([
+                            "success" => false,
+                            "msg"     => "This account is already registered as " . ($typeNames[$user->type] ?? 'unknown'),
+                            "error"   => "Account already exists with a different user type"
+                        ], 409);
+                    }
+
+                    // Account linking: existing email/password user now using social login
+                    $user->firebase_uid   = $firebaseUid;
+                    $user->login_provider = $provider;
+
+                    if (is_null($user->email_verified_at)) {
+                        $user->email_verified_at = now();
+                    }
+
+                    $user->save();
                 }
-
-                // Account linking: existing email/password user now using social login
-                $user->firebase_uid   = $firebaseUid;
-                $user->login_provider = $provider;
-
-                if (is_null($user->email_verified_at)) {
-                    $user->email_verified_at = now();
-                }
-
-                $user->save();
             } else {
                 // Brand new user — type is required for registration
                 if (is_null($type)) {
@@ -182,20 +207,45 @@ class UserHandler{
                 ]);
             }
         } else {
-            // User found by firebase_uid — check type mismatch
-            $typeNames = [AppConst::CLIENT => 'Client', AppConst::EDITOR => 'Editor'];
-            if (!is_null($type) && $user->type != $type) {
-                return response()->json([
-                    "success" => false,
-                    "msg"     => "This account is already registered as " . ($typeNames[$user->type] ?? 'unknown'),
-                    "error"   => "Account already exists with a different user type"
-                ], 409);
-            }
+            // If user was soft-deleted, restore and update with new social data
+            if ($user->trashed()) {
+                if (is_null($type)) {
+                    return response()->json([
+                        "success" => false,
+                        "msg"     => "Something went wrong",
+                        "error"   => "Type is required for new user registration"
+                    ], 400);
+                }
 
-            // Update provider if changed
-            if ($user->login_provider !== $provider) {
-                $user->login_provider = $provider;
-                $user->save();
+                $user->restore();
+                $user->update([
+                    'full_name'         => $name ?? $user->full_name,
+                    'password'          => null,
+                    'type'              => $type,
+                    'firebase_uid'      => $firebaseUid,
+                    'login_provider'    => $provider,
+                    'email_verified_at' => now(),
+                    'verification_code' => null,
+                    'token'             => null,
+                    'profile_image'     => null,
+                    'notification_status' => null,
+                ]);
+            } else {
+                // User found by firebase_uid — check type mismatch
+                $typeNames = [AppConst::CLIENT => 'Client', AppConst::EDITOR => 'Editor'];
+                if (!is_null($type) && $user->type != $type) {
+                    return response()->json([
+                        "success" => false,
+                        "msg"     => "This account is already registered as " . ($typeNames[$user->type] ?? 'unknown'),
+                        "error"   => "Account already exists with a different user type"
+                    ], 409);
+                }
+
+                // Update provider if changed
+                if ($user->login_provider !== $provider) {
+                    $user->login_provider = $provider;
+                    $user->save();
+                }
             }
         }
 

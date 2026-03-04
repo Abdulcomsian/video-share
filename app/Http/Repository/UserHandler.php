@@ -163,7 +163,7 @@ class UserHandler{
                         'verification_code' => null,
                         'token'             => null,
                         'profile_image'     => null,
-                        'notification_status' => null,
+                        'notification_status' => 0,
                     ]);
                 } else {
                     // Check type mismatch before linking
@@ -228,7 +228,7 @@ class UserHandler{
                     'verification_code' => null,
                     'token'             => null,
                     'profile_image'     => null,
-                    'notification_status' => null,
+                    'notification_status' => 0,
                 ]);
             } else {
                 // User found by firebase_uid — check type mismatch

@@ -62,7 +62,7 @@ class AuthController extends Controller
                         "verification_code" => null,
                         "token" => null,
                         "profile_image" => null,
-                        "notification_status" => null,
+                        "notification_status" => 0,
                         "firebase_uid" => null,
                         "login_provider" => null,
                     ]);

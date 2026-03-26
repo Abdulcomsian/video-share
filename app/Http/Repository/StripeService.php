@@ -2,257 +2,203 @@
 
 namespace app\Http\Repository;
 
-use App\Http\AppConst;
-use Stripe\{Stripe, Charge, Token, Transfer, StripeClient, PaymentIntent, Customer, Account, AccountLink};
-use App\Models\{JobPayment, PersonalJob, JobProposal, User};
+use Stripe\{Stripe, PaymentIntent, PaymentMethod, Customer, Account, AccountLink, SetupIntent};
+use App\Models\{JobProposal, User, EditorRequest};
 use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class StripeService{
+
+    const PLATFORM_FEE_PERCENT = 5;
 
     public function __construct()
     {
         Stripe::setApiKey(config('services.stripe.secret'));
     }
 
-    public function processPayment($request)
+    // -------------------------------------------------------
+    // Client: Stripe Customer
+    // -------------------------------------------------------
+
+    public function getOrCreateCustomer(User $user): Customer
     {
-        try{
-            // $amount = $request->amount;
-            JobPayment::where('request_id' , $request->request_id)
-                        ->where('job_id' , $request->job_id)
-                        ->update(['client_transfer_status' => AppConst::CLIENT_PAYED , 'client_payment_date' => date("Y-m-d")]);
-
-            return ['success' => true , 'msg' => 'Payment Processed Successfully' ];
-
-        }catch(\Exception $e){
-            return ['success' => false , 'msg' => 'Something Went Wrong' , 'error' => $e->getMessage()];
-        }
-    }
-
-    public function getPublishableKey(){
-        $publicKey = env('STRIPE_KEY');
-        return ['success' => true , 'publicKey' => $publicKey];
-    }
-
-
-    public function createPaymentIntent($request){
-        try{
-
-            // $jobId  = $request->job_id;
-            $requestId = $request->request_id;
-
-
-
-            // $jobDetail = PersonalJob::with('awardedRequest.proposal')->where('id' , $jobId)->first();
-
-            // if($jobDetail->status == "unawarded"){
-            //     return ["success" => false , 'msg' => "Something Went Wrong" , "error" => "Job Must Be Awarded First"];
-            // }
-            $jobProposal = JobProposal::where('id' , $requestId)->first();
-
-            // Stripe::setApiKey(env('STRIPE_SECRET'));
-            $amount = $jobProposal->bid_price * 100;
-            $currency = 'usd';
-
-            $paymentIntent = PaymentIntent::create([
-                'amount' => $amount,
-                'currency' => $currency,
-                'payment_method_types' => ['card'],
-                'capture_method' => 'manual', // This holds the payment
-                'description' => 'Job award payment hold for editor',
-                'metadata' => [
-                    'job_proposal_id' => $requestId,
-                    'client_id' => auth()->id(),
-                ],
-            ]);
-
-
-            return ['success' => true , 'clientSecret' => $paymentIntent->client_secret, 'payment_intent_id' => $paymentIntent->id];
-
-        }catch(\Exception $e){
-
-            return ['success' => false , 'error' => $e->getMessage()];
-
+        if ($user->stripe_customer_id) {
+            return Customer::retrieve($user->stripe_customer_id);
         }
 
-    }
-
-    public function partialPayment($request){
-        try{
-            //setting stripe secret key
-            // Stripe::setApiKey(env('STRIPE_SECRET'));
-
-            //creating token
-            $token = Token::create([
-                'card' => [
-                    'number' => $request->card_number,
-                    'exp_month' => $request->card_exp_month,
-                    'exp_year' => $request->card_exp_year,
-                    'cvc' => $request->cvc,
-                ],
-            ]);
-
-            $amount = $request->amount;
-
-            $platformCommission = $request->amount * 0.05;
-
-
-            $charge = Charge::create([
-                'amount' => $platformCommission * 100, // Stripe accepts amounts in cents
-                'currency' => 'usd',
-                'source' => $token->id,
-                'description' => 'Payment for service',
-            ]);
-
-            $editorAmount = $amount - $platformCommission;
-
-            // $EDITOR_STRIPE_ACCOUNT_ID = 4000000000000077;
-            // Create a transfer to the employee's Stripe account
-
-            $stripeConnectedAccount = new StripeClient(env('STRIPE_SECRET'));
-
-            $account = $stripeConnectedAccount->accounts->create([
-                'type' => 'standard',
-                'default_currency' => 'usd',
-                'email' => 'rajashayzee@yahoo.com'
-            ]);
-
-            $accountId = $account->id;
-
-
-            $transfer = Transfer::create([
-                'amount' => $editorAmount * 100,
-                'currency' => 'usd',
-                'destination' => $accountId,
-                'transfer_group' => 'ORDER_'.$charge->id,
-            ]);
-
-            dd( "Hrere bossss", $transfer);
-            }catch(\Exception $e){
-                dd($e->getMessage());
-            }
-    }
-
-
-    public function paymentIntent($request){
-        try{
-            // $amount = $request->amount;
-            $jobRequest = JobProposal::where('id' , $request->request_id)->first();
-
-            //creating token
-            //token code starts here
-            //Stripe::setApiKey(env('STRIPE_SECRET'));
-
-            // $token = Token::create([
-            //     'card' => [
-            //         'number' => $request->card_number,
-            //         'exp_month' => $request->card_exp_month,
-            //         'exp_year' => $request->card_exp_year,
-            //         'cvc' => $request->cvc,
-            //     ],
-            // ]);
-
-            // $charge = Charge::create([
-            //     'amount' => $jobRequest->bid_price * 100, // Stripe accepts amounts in cents
-            //     'currency' => 'usd',
-            //     'source' => $token->id,
-            //     'description' => 'Payment for service',
-            // ]);
-
-            //token code ends here
-            $stripe = new StripeClient(env('STRIPE_SECRET'));
-
-            $charge = $stripe->paymentIntents->create([
-                'amount' => 99 * 100,                   // Amount in cents (in this case, $99)
-                'currency' => 'usd',                   // Currency (US dollars)
-                'payment_method' => $request->payment_method,// provide id of payment
-                'description' => 'test stripe ',
-                'confirm' => true,                     // Confirm the payment immediately
-                'receipt_email' => $request->email     // Email address for receipt
-            ]);
-
-            if($charge->status == 'succeeded'){
-                JobPayment::where('request_id' , $request->request_id)
-                            ->where('job_id' , $request->job_id)
-                            ->update(['client_transfer_status' => AppConst::CLIENT_PAYED , 'client_payment_date' => date("Y-m-d")]);
-                return ['success' => true , 'msg' => 'Payment Processed Successfully' , 'detail' => $charge];
-            }else{
-                return ['success' => false , 'msg' => 'Something Went Wrong' , 'detail' => $charge];
-            }
-
-
-        }catch(\Exception $e){
-            return ['success' => false , 'msg' => 'Something Went Wrong' , 'error' => $e->getMessage()];
-        }
-    }
-
-    public function clientOnboarding($data)
-    {
-        return Customer::create([
-            'email' => $data->email,
-            'name' => $data->full_name
+        $customer = Customer::create([
+            'email' => $user->email,
+            'name' => $user->full_name,
+            'metadata' => ['user_id' => $user->id],
         ]);
 
+        $user->update(['stripe_customer_id' => $customer->id]);
+
+        return $customer;
     }
 
-    public function editorOnboarding($data)
+    public function createSetupIntent(User $user): SetupIntent
     {
+        $customer = $this->getOrCreateCustomer($user);
 
+        return SetupIntent::create([
+            'customer' => $customer->id,
+            'payment_method_types' => ['card'],
+        ]);
+    }
+
+    public function getPaymentMethods(User $user): array
+    {
+        if (!$user->stripe_customer_id) {
+            return [];
+        }
+
+        $methods = PaymentMethod::all([
+            'customer' => $user->stripe_customer_id,
+            'type' => 'card',
+        ]);
+
+        return $methods->data;
+    }
+
+    public function deletePaymentMethod(string $paymentMethodId): PaymentMethod
+    {
+        $paymentMethod = PaymentMethod::retrieve($paymentMethodId);
+        $paymentMethod->detach();
+        return $paymentMethod;
+    }
+
+    // -------------------------------------------------------
+    // Payment: Direct charge on editor's connected account
+    // -------------------------------------------------------
+
+    public function createPaymentIntent($request)
+    {
+        try {
+            $requestId = $request->request_id;
+
+            $jobProposal = JobProposal::findOrFail($requestId);
+
+            // Find the editor's connected account via the editor request
+            $editorRequest = EditorRequest::where('request_id', $requestId)->firstOrFail();
+            $editor = User::findOrFail($editorRequest->editor_id);
+
+            if (!$editor->stripe_account_id) {
+                return ['success' => false, 'error' => 'Editor has not completed Stripe onboarding'];
+            }
+
+            // Get or create Stripe Customer for the client
+            $client = auth()->user();
+            $customer = $this->getOrCreateCustomer($client);
+
+            $bidAmount = $jobProposal->bid_price;
+            $amountInCents = (int) round($bidAmount * 100);
+            $platformFeeInCents = (int) round($bidAmount * self::PLATFORM_FEE_PERCENT);
+
+            // Direct charge on editor's connected account
+            $paymentIntent = PaymentIntent::create([
+                'amount' => $amountInCents,
+                'currency' => 'usd',
+                'customer' => $customer->id,
+                'payment_method_types' => ['card'],
+                'capture_method' => 'manual',
+                'application_fee_amount' => $platformFeeInCents,
+                'description' => "Job payment for proposal #{$requestId}",
+                'metadata' => [
+                    'job_proposal_id' => $requestId,
+                    'client_id' => $client->id,
+                    'editor_id' => $editor->id,
+                ],
+            ], [
+                'stripe_account' => $editor->stripe_account_id,
+            ]);
+
+            return [
+                'success' => true,
+                'clientSecret' => $paymentIntent->client_secret,
+                'payment_intent_id' => $paymentIntent->id,
+                'stripe_account_id' => $editor->stripe_account_id,
+                'bid_amount' => $bidAmount,
+                'platform_fee' => round($bidAmount * self::PLATFORM_FEE_PERCENT / 100, 2),
+            ];
+
+        } catch (\Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    public function capturePayment(string $paymentIntentId, string $editorStripeAccountId)
+    {
+        return PaymentIntent::retrieve($paymentIntentId, [
+            'stripe_account' => $editorStripeAccountId,
+        ])->capture();
+    }
+
+    public function cancelPayment(string $paymentIntentId, string $editorStripeAccountId)
+    {
+        return PaymentIntent::retrieve($paymentIntentId, [
+            'stripe_account' => $editorStripeAccountId,
+        ])->cancel();
+    }
+
+    // -------------------------------------------------------
+    // Stripe publishable key for Flutter client
+    // -------------------------------------------------------
+
+    public function getPublishableKey()
+    {
+        return ['success' => true, 'publicKey' => config('services.stripe.public')];
+    }
+
+    // -------------------------------------------------------
+    // Editor: Stripe Connect onboarding
+    // -------------------------------------------------------
+
+    public function editorOnboarding()
+    {
         $user = Auth::user();
+
         if ($user->onboarding) {
             throw new Exception("Onboarding is already verified", 1);
         }
 
         if (!$user->stripe_account_id) {
-
-            $data = [
+            $account = Account::create([
                 'type' => 'custom',
                 'tos_acceptance' => [
-                    'date' => time(), // Timestamp of acceptance
-                    'ip' => request()->ip(), // IP address of user
+                    'date' => time(),
+                    'ip' => request()->ip(),
                 ],
                 'capabilities' => [
-                    'transfers' => ['requested' => true],  // Enables transfer capability (withdrawing funds)
-                    'card_payments' => ['requested' => true],  // Enables card payment capability (receiving payments via card)
+                    'transfers' => ['requested' => true],
+                    'card_payments' => ['requested' => true],
                 ],
-            ];
+            ]);
 
-            //create stripe-connect(onbaording) account
-            $account = Account::create($data);
-
-            // update user stripe ID
             User::where('id', $user->id)->update(['stripe_account_id' => $account->id]);
-
             $stripeAccountId = $account->id;
-
         } else {
             $stripeAccountId = $user->stripe_account_id;
         }
 
-        // creat onboarding account link
         $accountLink = $this->createEditoryOnboardingAccountLink($stripeAccountId);
 
-        // refresh to update user data
         $user->refresh();
 
         return [
             'user' => $user->toArray(),
-            'acccount_link' => $accountLink
+            'acccount_link' => $accountLink,
         ];
-
     }
 
     public function createEditoryOnboardingAccountLink($stripeAccountId)
     {
-        $accountLink = AccountLink::create([
+        return AccountLink::create([
             'account' => $stripeAccountId,
             'refresh_url' => route('stripe.refresh', ['account_id' => $stripeAccountId]),
             'return_url' => route('stripe.success', ['account_id' => $stripeAccountId]),
             'type' => 'account_onboarding',
         ]);
-
-        return $accountLink;
     }
 
     public function getEditorStripeDetailsById($stripeId)
@@ -264,18 +210,6 @@ class StripeService{
     {
         $params['limit'] = $params['limit'] ?? 100;
         return Account::allExternalAccounts($merchantStripeId, $params);
-    }
-
-    public function capturedPayment($paymentIntentId)
-    {
-        // Stripe::setApiKey(env('STRIPE_SECRET'));
-        return PaymentIntent::retrieve($paymentIntentId)->capture();
-    }
-
-    public function reversePayment($paymentIntentId)
-    {
-        // Stripe::setApiKey(env('STRIPE_SECRET'));
-        return PaymentIntent::retrieve($paymentIntentId)->cancel();
     }
 
 }

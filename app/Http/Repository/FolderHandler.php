@@ -29,7 +29,6 @@ class FolderHandler
                     // Store each file in the folder
                     $path = Storage::putFile('folder_files/' . $folder->id, $file);
                     $extension = $file->getClientOriginalExtension();
-                    // dd( $file->getClientMimeType());
                     // Create a new file record in the database
                     $createdFile = $folder->files()->create([
                         'folder_id' => $folder->id,
@@ -69,7 +68,6 @@ class FolderHandler
 
                 if($folderCount == 0){
 
-                   // $check = Storage::disk('s3')->makeDirectory($folderName);
                     $check = $this->aws->createFolder($folderName);
 
                     if($check['success'])
@@ -170,33 +168,6 @@ class FolderHandler
 
                 return $check;
 
-                // $files = Storage::disk('s3')->allFiles($folder->name);
-
-                // $newFolder = Storage::disk('s3')->makeDirectory($folderName);
-
-                // if($newFolder){
-
-                //     foreach($files as $file)
-                //     {
-                //         $newKey = str_replace($folder->name, $folderName, $file);
-
-                //         Storage::disk('s3')->copy($file, $newKey);
-                //     }
-
-                //     Storage::disk('s3')->deleteDirectory($folder->name);
-
-                //     $folder->name = $folderName;
-
-                //     $folder->save();
-
-                //     return ["success" => true , "msg" => "Folder Updated Successfully"];
-                // }else{
-
-                //     return ["success" => false , "msg" => "Something Went Wrong"];
-                // }
-
-
-
             }else{
                 return ["success" => false , "msg" => "Can't Change Folder Name Already Folder Exist With This Name"];
             }
@@ -229,16 +200,6 @@ class FolderHandler
 
             $thumbnailPath = public_path('uploads');
 
-
-
-            // $filesList = Storage::disk('s3')->files($folderPath);
-
-            // $files = array_map( function($file) use ($bucketAddress){
-            //     return $bucketAddress.$file;
-            // }, $filesList);
-
-            // dd($files);
-
             return ["success" => true , "files" => $files , "bucket_address" => $bucketAddress , 'thumbnailPath' =>$thumbnailPath ];
         }
 
@@ -260,7 +221,6 @@ class FolderHandler
 
                 $folderName = trim(str_replace(" " , "-" , $jobTitle).'-'.$editorId).'-'.strtotime(date('Y-m-d H:i:s'));
 
-                // $check = Storage::disk('s3')->makeDirectory($folderName);
                 $check = $this->aws->createFolder($folderName);
 
                 if($check['success'])

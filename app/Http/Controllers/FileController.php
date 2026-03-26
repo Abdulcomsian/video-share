@@ -22,13 +22,8 @@ class FileController extends Controller
             $validator = Validator::make($request->all(), [
                 'folder_id' => 'required',
                 'filename' => 'required|string'
-                // 'files' => 'required',
-                // 'files.*' => 'mimes:mp4,webm,png,jpg,jpeg,PNG,JPG,JPEG'
+            ]);
 
-            ]);   
-
-            // dd("here boss");
-            
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);

@@ -40,15 +40,6 @@ Route::middleware(['auth:web', 'web.admin.verify'])->group(function () {
         Route::get('/jobs', [JobController::class, 'index'])->name('jobs.list');
         Route::get('/jobs/{id}', [JobController::class, 'show'])->name('jobs.show');
         Route::get('/jobs/proposals/{id}', [JobController::class, 'jobProposals'])->name('jobs.proposals-list');
-        // Route::get('/client-list' , [UserController::class , 'getDashboardClientList'])->name('get.client.list');
-        // Route::get('/editors' , [DashboardController::class , 'getEditorPage'])->name('editor.page');
-        // Route::get('/editor-list' , [UserController::class , 'getDashboardEditorList'])->name('get.editor.list');
-        // Route::get('/folders' , [DashboardController::class , 'getFolderPage'])->name('folder.page');
-        // Route::get('/folder-list' , [FolderController::class , 'getFolderList'])->name('get.folder.list');
-        //test routes starts here
-        // Route::get("billing" , [BillingController::class , 'getBillingPage']);
-        // Route::post("add-billing" , [BillingController::class , 'processBillingFees'])->name('stripe.store');
-        //test routes ends here
 
         // profile
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

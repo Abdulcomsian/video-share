@@ -9,7 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\{ PersonalJob , Comment , Skill ,  EditorProfile , Education , Address , Folder , EditorRequest};
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 // use Illuminate\Database\Eloquent\SoftDeletes;
@@ -38,6 +38,7 @@ class User extends Authenticatable implements JWTSubject
         'notification_status',
         'firebase_uid',
         'login_provider',
+        'stripe_customer_id',
     ];
 
     /**

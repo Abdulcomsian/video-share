@@ -223,26 +223,35 @@ class JobHandler{
                 return ['success' => false , 'msg' => 'Job is already awarderd.'];
             }
 
-            EditorRequest::where(
-              [
+            $jobProposal = JobProposal::findOrFail($requestId);
+            $bidAmount = $jobProposal->bid_price;
+            $platformFee = round($bidAmount * 5 / 100, 2);
+
+            EditorRequest::where([
                 ['job_id' , $jobId],
                 ['request_id' , $requestId]
-              ]
-            )->update(['status' => 1]);
+            ])->update(['status' => 1]);
 
             PersonalJob::where( 'id' , $jobId )->update(['status' => 'awarded' , 'awarded_date' => date('Y-m-d H:i:s')]);
 
             JobProposal::where('id' , $requestId)->update(['status' => 1]);
 
-            JobPayment::create(['job_id' => $jobId , 'request_id' => $requestId ,'payment_intent_id' => $paymentIntentId, 'client_transfer_status' => AppConst::CLIENT_PENDING , 'editor_transfer_status' => AppConst::EDITOR_PENDING]);
+            JobPayment::create([
+                'job_id' => $jobId,
+                'request_id' => $requestId,
+                'payment_intent_id' => $paymentIntentId,
+                'bid_amount' => $bidAmount,
+                'platform_fee' => $platformFee,
+                'client_transfer_status' => AppConst::CLIENT_PENDING,
+                'editor_transfer_status' => AppConst::EDITOR_PENDING,
+            ]);
 
-            // remove all favourite request of job
             FavouriteRequest::where('job_id' , $jobId)->delete();
 
             return ['success' => true , 'msg' => 'Job Awarded Successfully'];
 
         }catch(\Exception $e){
-            return ['success' => true , 'msg' => $e->getMessage()];
+            return ['success' => false , 'msg' => $e->getMessage()];
         }
     }
 
@@ -261,11 +270,6 @@ class JobHandler{
                     ->orderBy('personal_jobs.id' , 'desc')
                     ->get();
 
-        // $user = User::with('cancelJob' , 'doneJob')->where('id' , auth()->user()->id)->first();
-        // $doneJobCount = $user->doneJob->count();
-        // $cancelledJobCount = $user->cancelJob->count();
-        // client.full_name as client_name, client.profile_image as client_image,
-
         $profileImageLinkPrefix = asset('uploads');
         return ['status' => true , 'jobs' => $jobs , 'profileImageLinkPrefix' => $profileImageLinkPrefix];
     }
@@ -282,28 +286,29 @@ class JobHandler{
 
         PersonalJob::where('id' , $jobId)->update(['status' => 'canceled']);
 
-        $requests = EditorRequest::where('job_id' , $jobId)
-                                    ->where('status' , 1)
-                                    ->get();
+        $editorRequest = EditorRequest::where('job_id' , $jobId)
+                                    ->where('status' , AppConst::AWARDED_JOB)
+                                    ->first();
 
-        foreach($requests as $editorRequest)
+        if($editorRequest)
         {
-            $requestId = $editorRequest->request_id;
-            JobProposal::where('id' , $requestId)
-                        ->where('status' , 1)
-                        ->update(['status' => 2]);
-            $editorRequest->status = 2;
+            JobProposal::where('id' , $editorRequest->request_id)
+                        ->where('status' , AppConst::AWARDED_JOB)
+                        ->update(['status' => AppConst::CANCEL_JOB]);
+            $editorRequest->status = AppConst::CANCEL_JOB;
             $editorRequest->save();
-        }
 
-        $jobPayment = JobPayment::where('job_id' , $jobId)->first();
-        if($jobPayment)
-        {
-            $jobPayment->client_transfer_status = AppConst::CLIENT_CANCELLED;
-            $jobPayment->client_payment_date = now()->format('Y-m-d');
-            $jobPayment->save();
+            $editor = User::findOrFail($editorRequest->editor_id);
 
-            $this->stripeService->reversePayment($jobPayment->payment_intent_id);
+            $jobPayment = JobPayment::where('job_id' , $jobId)->first();
+            if($jobPayment)
+            {
+                $jobPayment->client_transfer_status = AppConst::CLIENT_CANCELLED;
+                $jobPayment->client_payment_date = now()->format('Y-m-d');
+                $jobPayment->save();
+
+                $this->stripeService->cancelPayment($jobPayment->payment_intent_id, $editor->stripe_account_id);
+            }
         }
 
         return ['success' => true , 'msg' => 'Job Canceled Successfully'];
@@ -331,11 +336,18 @@ class JobHandler{
 
         if($jobPayment)
         {
+            $editor = User::findOrFail($editorRequest->editor_id);
 
-            JobPayment::where('id', $jobPayment->id)->update(['client_transfer_status' => AppConst::CLIENT_PAYED , 'client_payment_date' => Carbon::now()->format('Y-m-d')]);
+            // Capture the held payment on editor's connected account
+            // Stripe automatically: charges client, deducts Stripe fee from editor, sends application_fee to platform
+            $this->stripeService->capturePayment($jobPayment->payment_intent_id, $editor->stripe_account_id);
 
-            $this->stripeService->capturedPayment($jobPayment->payment_intent_id);
-
+            JobPayment::where('id', $jobPayment->id)->update([
+                'client_transfer_status' => AppConst::CLIENT_PAYED,
+                'client_payment_date' => Carbon::now()->format('Y-m-d'),
+                'editor_transfer_status' => AppConst::EDITOR_PAYED,
+                'editor_payment_date' => Carbon::now()->format('Y-m-d'),
+            ]);
         }
 
         return ['success' => true , 'msg' => 'Job Done Successfully'];

@@ -3,42 +3,63 @@
 namespace App\Http\Controllers\Stripe;
 
 use App\Http\Controllers\Controller;
-use app\Http\Repository\StripeService;
-use App\Http\Repository\UserHandler;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Repository\StripeService;
+use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
+    protected $stripeService;
 
-    protected $stripeService, $userHandler;
-
-    public function __construct(StripeService $stripeService, UserHandler $userHandler)
+    public function __construct(StripeService $stripeService)
     {
         $this->stripeService = $stripeService;
-        $this->userHandler = $userHandler;
     }
 
-    public function createAccount()
+    public function setupIntent()
     {
+        try {
+            $setupIntent = $this->stripeService->createSetupIntent(auth()->user());
 
-        // $user = Auth::user();
+            return response()->json([
+                'success' => true,
+                'clientSecret' => $setupIntent->client_secret,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 400);
+        }
+    }
 
-        // if($user->stripe_account_id)
-        // {
-        //    return response()->json(['success' => false, 'msg' => "Account Already Created"]);
-        // }
+    public function paymentMethods()
+    {
+        try {
+            $methods = $this->stripeService->getPaymentMethods(auth()->user());
 
-        // $stripeCustomer = $this->stripeService->clientOnboarding($user);
+            $cards = array_map(function ($method) {
+                return [
+                    'id' => $method->id,
+                    'brand' => $method->card->brand,
+                    'last4' => $method->card->last4,
+                    'exp_month' => $method->card->exp_month,
+                    'exp_year' => $method->card->exp_year,
+                ];
+            }, $methods);
 
-        // $this->userHandler->updateUserByConditions([
-        //     'stripe_i'
-        // ])
+            return response()->json(['success' => true, 'payment_methods' => $cards]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 400);
+        }
+    }
 
-        // dd($stripeCustomer);
+    public function deletePaymentMethod(Request $request)
+    {
+        try {
+            $request->validate(['payment_method_id' => 'required|string']);
 
-        // dd($user);
+            $this->stripeService->deletePaymentMethod($request->payment_method_id);
 
-        // dd($user);
-
+            return response()->json(['success' => true, 'msg' => 'Payment method removed']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 400);
+        }
     }
 }

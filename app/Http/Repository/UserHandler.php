@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Repository;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
 use App\Models\{ User , Favourite, Files, Review , PersonalJob, Address , EditorPortfolio, PortfolioVideo, SocialLink};
 use App\Mail\ {VerificationMail , TokenMail};

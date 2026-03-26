@@ -16,6 +16,7 @@ use App\Http\Controllers\{ AuthController ,
                             PersonalJobChatController,
                         };
 use App\Http\Controllers\Stripe\{ClientController as StripeClientController , EditorController as StripeEditorController};
+use App\Http\Controllers\GoogleMapsProxyController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,26 +28,23 @@ use App\Http\Controllers\Stripe\{ClientController as StripeClientController , Ed
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
-
-
-Route::match(['GET', 'POST'], '/login', [AuthController::class, 'login'])->name('login');
-Route::post('register' ,[AuthController::class , 'register']);
-Route::post('verify-code',[AuthController::class , 'verifyUser'])->middleware('throttle:5,1');
-Route::post('forget-password' , [UserController::class , 'forgetPassword']);
-Route::post('update-password' , [UserController::class , 'updatePassword']);
-Route::post('resend-passcode' , [UserController::class , 'sendPasscode']);
-Route::post('social-login', [AuthController::class, 'socialLogin']);
-Route::post('refresh-token', [AuthController::class, 'refreshToken']);
+Route::middleware('throttle:auth')->group(function () {
+    Route::match(['GET', 'POST'], '/login', [AuthController::class, 'login'])->name('login');
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('verify-code', [AuthController::class, 'verifyUser']);
+    Route::post('forget-password', [UserController::class, 'forgetPassword']);
+    Route::post('update-password', [UserController::class, 'updatePassword']);
+    Route::post('resend-passcode', [UserController::class, 'sendPasscode']);
+    Route::post('social-login', [AuthController::class, 'socialLogin']);
+    Route::post('refresh-token', [AuthController::class, 'refreshToken']);
+});
 
 Route::middleware(['verify.authentication'])->group(function(){
     Route::post('logout' , [AuthController::class , 'logout']);
-    Route::get('get/google-location-api/token', function () {
-       return response()->json(['success' => true , '_token' => config('app.google_location_api_token')]);
-    });
+    // Google Maps server-side proxy (API key never leaves the server)
+    Route::get('google/autocomplete', [GoogleMapsProxyController::class, 'autocomplete']);
+    Route::get('google/place-details', [GoogleMapsProxyController::class, 'placeDetails']);
+    Route::get('google/geocode', [GoogleMapsProxyController::class, 'geocode']);
     Route::post('update-profile-image' , [UserController::class , 'updateProfileImage']);
     Route::post('job-detail', [JobController::class, 'getJobDetail']);
     Route::post('add-file-comment', [CommentController::class, 'addFileComment']);
@@ -97,7 +95,6 @@ Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(functi
     Route::get('unassigned-job-list' , [JobController::class , 'getUnassignedJobs']);
     Route::post('share-files' , [FolderController::class , 'shareFile']);
     Route::post('direct-share-file-upload' , [FolderController::class , 'directShareFileUpload']);
-    // Route::post('share-files' , function(){dd("inside share file");});
     Route::post('getshares' , [FolderController::class , 'getshares']);
     Route::post('delete-share-file' , [FileController::class , 'deleteShareFile']);
     Route::get('cancel-jobs' , [JobController::class , 'cancelJobs']);
@@ -115,7 +112,9 @@ Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(functi
 
 /* Client Routes*/
 Route::middleware(['verify.authentication' , 'api.client.verify'])->group(function(){
-    Route::post('client/create-account', [StripeClientController::class, 'createAccount']);
+    Route::get('client/setup-intent', [StripeClientController::class, 'setupIntent']);
+    Route::get('client/payment-methods', [StripeClientController::class, 'paymentMethods']);
+    Route::post('client/delete-payment-method', [StripeClientController::class, 'deletePaymentMethod']);
     Route::post("create-folder" , [FolderController::class , 'createClientFolder']);
     Route::post("post-job" , [JobController::class , 'addJob']);
     Route::get("client-jobs" , [JobController::class , 'clientJob']);
@@ -127,7 +126,6 @@ Route::middleware(['verify.authentication' , 'api.client.verify'])->group(functi
     Route::get('favourite-list' , [UserController::class , 'getFavouriteList']);
     Route::post('add-folder-file', [FolderController::class, 'addFolderFile']);
     Route::get('editor-list' , [UserController::class , 'getEditorList']);
-    Route::post('pay-bill' , [BillingController::class , 'payBill']);
     Route::get('folder-list' , [FolderController::class , 'getClientFolders']);
     Route::post('folder-detail' , [FolderController::class , 'getFolderDetail']);
     Route::post('upload-files' , [FileController::class , 'uploadClientFile']);
@@ -136,7 +134,6 @@ Route::middleware(['verify.authentication' , 'api.client.verify'])->group(functi
     Route::post('update-folder' , [FolderController::class, 'updateClientFolder']);
     Route::post('delete-folder' , [FolderController::class , 'deleteClientFolder']);
     Route::post('get-folder-files' , [FolderController::class , 'getFolderFiles']);
-    Route::post('process-payment', [BillingController::class , 'processBilling']);
     Route::get('public-key' , [BillingController::class , 'getPublicKey']);
     Route::post('get-payment-intent' , [BillingController::class , 'getPaymentIntent']);
     Route::post('complete-job' , [JobController::class , 'doneAwardedJob']);
@@ -161,8 +158,3 @@ Route::middleware(['verify.authentication' , 'api.client.verify'])->group(functi
     Route::post('extend-job-delivery-date-request', [JobController::class, 'extendJobDeliveryDateRequest']);
     Route::get('get-editor-portfolio-video' , [UserController::class , 'getEditorPortfolioVideo']);
 });
-
-// Route::post('add-links' , [UserController::class , 'addLinks']);
-// Route::post('update-profile' , [UserController::class , 'updateProfile']);
-
-

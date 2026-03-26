@@ -18,73 +18,10 @@ class FilesHandler{
     {
         try{
             $folderId = $request->folder_id;
-            // $fileList = [];
             $videoExtension = ['mp4' , 'webm'];
-            // $thumbnails = json_decode($request->thumbnail);
-            // dd("inside file");
 
             $folder = Folder::find($folderId);
-            //multile file uplaod code starts here
-            // if($request->file('files') && count($request->file('files')))
-            // {
-            //     // foreach($request->file('files') as $index => $file)
-            //     // {
 
-            //     //     $fileName = $file->getClientOriginalName();
-            //     //     $extension = $file->extension();
-            //     //     $name = time() . "-" . $fileName;
-
-            //     //     //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));
-            //     //     $check = $this->aws->uploadMedia( $folder->name , $name , $file);
-            //     //     if($check['success']){
-            //     //         $type =in_array($extension , $videoExtension) ? 1 : 2;
-            //     //         $thumbnailName  = null;
-
-            //     //         if( isset($thumbnails[$index]) && !is_null($thumbnails[$index]) ){
-            //     //             $imageUrl = substr($thumbnails[$index], strpos($thumbnails[$index], ',') + 1);
-            //     //             $image = base64_decode($imageUrl);
-            //     //             $thumbnailName = time().$index."-job-file-thumbnail".".png";
-            //     //             file_put_contents(public_path()."/uploads/".$thumbnailName , $image);
-            //     //         }
-
-            //     //         $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];
-            //     //     }
-
-            //     // }
-
-
-
-
-
-            //     // foreach($request->data as $index => $data)
-            //     // {
-            //     //     $file = $data['file'];
-            //     //     $fileName = $file->getClientOriginalName();
-            //     //     $extension = $file->extension();
-            //     //     $name = time() . "-" . $fileName;
-
-            //     //     //Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));
-            //     //     $check = $this->aws->uploadMedia( $folder->name , $name , $file);
-            //     //     if($check['success']){
-            //     //         $type =in_array($extension , $videoExtension) ? 1 : 2;
-            //     //         $thumbnailName  = null;
-
-            //     //         if( isset($data['thumbnail']) ){
-            //     //             $thumbnail = $data['thumbnail'];
-            //     //             $thumbnailName = time()."-".str_replace(" ", "_" , $thumbnail->getClientOriginalName());
-            //     //             $thumbnail->move(public_path('uploads') , $thumbnailName);
-            //     //         }
-
-            //     //         $fileList[] = ['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName];
-            //     //     }
-
-            //     // }
-
-            //     // Files::insert($fileList);
-            // }
-            //multiple file upload code ends here
-
-            //single file upload code starts here
             if($request->hasFile('file'))
             {
 
@@ -105,7 +42,6 @@ class FilesHandler{
                 if( $request->hasFile('thumbnail') ){
                     $thumbnail = $request->file('thumbnail');
                     $thumbnailName = time().'-'.str_replace(" ", "_" , $request->filename);
-                    // $thumbnailName = time()."-".str_replace(" ", "_" , $thumbnail->getClientOriginalName());
                     $thumbnail->move(public_path('uploads') , $thumbnailName);
                 }
 
@@ -115,8 +51,6 @@ class FilesHandler{
             } else {
                 return response()->json(['success' => false , "msg" => 'Please add file']);
             }
-            //single upload file code ends here
-
 
         }catch(\Exception $e){
             return response()->json(['success' => false , "msg" => $e->getMessage()]);
@@ -163,17 +97,6 @@ class FilesHandler{
                 } else {
                     return ["success" => false , "msg" => "Something went wrong while deleting file"];
                 }
-                // return $check;
-                //file path in s3
-                // if(Storage::disk('s3')->exists($fileName))
-                // {
-                //     Storage::disk('s3')->delete($fileName);
-                //     $file->delete();
-                //     return ["success" => true , "msg" => "File Deleted Successfully"];
-
-                // }else{
-                //     return ["success" => false , "msg" => "File Not Found"];
-                // }
             }else{
                 return ["success" => false , "msg" => "File Not Found"];
             }
@@ -195,7 +118,6 @@ class FilesHandler{
             $fileList = [];
             $videoExtension = ['mp4' , 'webm'];
             $thumbnails = json_decode($request->thumbnail);
-            // dd("inside file");
 
             $folder = $personalJob->folder;
 
@@ -205,9 +127,6 @@ class FilesHandler{
                     $fileName = $file->getClientOriginalName();
                     $extension = $file->getClientOriginalExtension();
                     $name = time() . "-" . $fileName;
-                    // $check = Storage::disk('s3')->put($folder->name.'/'.$name, file_get_contents($file));
-                    // dd($folder->name , $name );
-                    // dd($file);
                     $check = $this->aws->uploadMedia($folder->name , $name , $file );
 
                     if($check['success']){

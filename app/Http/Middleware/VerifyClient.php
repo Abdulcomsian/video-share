@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Http\AppConst;
 
-class VerfiyClient
+class VerifyClient
 {
     /**
      * Handle an incoming request.
@@ -19,12 +19,12 @@ class VerfiyClient
     {
         if(!isset(auth()->user()->email_verified_at) || is_null(auth()->user()->email_verified_at))
         {
-            return response()->json(["success" => false , "msg" => "Please verify user code"]);
+            return response()->json(["success" => false , "msg" => "Please verify user code"], 403);
         }
-        
+
         if(auth()->user()->type != AppConst::CLIENT )
         {
-            return response()->json(["success" => false , "msg" => "Unauthorized"]);
+            return response()->json(["success" => false , "msg" => "Unauthorized"], 403);
         }
 
         return $next($request);

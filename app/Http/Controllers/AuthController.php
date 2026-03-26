@@ -158,14 +158,14 @@ class AuthController extends Controller
                 "token"   => $jwt
             ]);
 
-        } catch (\Tymon\JWTAuth\Exceptions\TokenBlacklistedException $e) {
+        } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenBlacklistedException $e) {
             return response()->json([
                 "success" => false,
                 "msg"     => "This token has already been refreshed, please use the new token",
                 "error"   => "token_blacklisted"
             ], 401);
 
-        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+        } catch (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException $e) {
             return response()->json([
                 "success" => false,
                 "msg"     => "Session has expired, please login again",

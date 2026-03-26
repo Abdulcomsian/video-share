@@ -15,16 +15,17 @@ use App\Models\PersonalJob;
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
-});
+}, ['guards' => ['api']]);
 
 Broadcast::channel('video-share-chat.{personalJobId}', function ($user, $personalJobId) {
-    // You can add role checks here if needed
     $personalJob = PersonalJob::find($personalJobId);
 
     if (!$personalJob) {
         return false;
     }
 
-    return true;
-
-});
+    return [
+        'name' => $user->full_name,
+        'email' => $user->email,
+    ];
+}, ['guards' => ['api']]);

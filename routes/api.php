@@ -69,38 +69,8 @@ Route::middleware(['verify.authentication'])->group(function(){
     Route::get('chat/{personalJobId}', [PersonalJobChatController::class, 'index']);
     Route::post('chat/send', [PersonalJobChatController::class, 'store']);
     Route::post('/broadcasting/auth', function (Request $request) {
-        $user = auth()->user();
-
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
-
-        $socketId = $request->input('socket_id');
-        $channelName = $request->input('channel_name');
-
-        // Build your custom channel data
-        $channelData = [
-            'user_id' => $user->id,
-            'user_info' => [
-                'name' => $user->full_name,
-                'email' => $user->email,
-            ],
-        ];
-
-        $encodedChannelData = json_encode($channelData);
-
-        // Build the signature manually
-        $stringToSign = "{$socketId}:{$channelName}:{$encodedChannelData}";
-        $authSignature = hash_hmac('sha256', $stringToSign, env('PUSHER_APP_SECRET'));
-
-        $auth = env('PUSHER_APP_KEY') . ':' . $authSignature;
-
-        // Return in Flutter's expected format
-        return response()->json([
-            'auth' => $auth,
-            'shared_secret' => hash('sha256', $user->id . now()), // optional, your logic
-            'channel_data' => $encodedChannelData,
-        ]);
+        $request->setUserResolver(fn () => auth()->guard('api')->user());
+        return Broadcast::auth($request);
     });
 
 });

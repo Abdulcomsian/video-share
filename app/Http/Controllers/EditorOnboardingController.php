@@ -106,11 +106,11 @@ class EditorOnboardingController extends Controller
 
                 return redirect()->route('stripe.onboarding.success', ['account_id' => $accountId])->with('success', 'Onboarding completed successfully!');
             } else {
-                return redirect()->route('stripe.onboarding.error')->with('error', 'Onboarding incomplete. Please try again.');
+                return redirect()->route('stripe.onboarding.error', ['account_id' => $accountId])->with('error', 'Onboarding incomplete. Please try again.');
             }
 
         } catch (\Exception $e) {
-            return redirect()->route('stripe.onboarding.error')->with('error', $e->getMessage());
+            return redirect()->route('stripe.onboarding.error', ['account_id' => $accountId])->with('error', $e->getMessage());
         }
     }
 

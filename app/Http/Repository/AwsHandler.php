@@ -44,7 +44,7 @@ class AwsHandler{
         ]);
 
         // Delete each file in the folder
-        foreach ($objects['Contents'] as $object) {
+        foreach ($objects['Contents'] ?? [] as $object) {
             $this->s3->deleteObject([
                 'Bucket' => $this->bucketName,
                 'Key'    => $object['Key'],
@@ -78,19 +78,19 @@ class AwsHandler{
             ]);
             
             // Copy each object from the old folder to the new folder
-            foreach ($objects['Contents'] as $object) {
+            foreach ($objects['Contents'] ?? [] as $object) {
                 $sourceKey = $object['Key'];
                 $destinationKey = str_replace($oldFolderPrefix, $newFolderPrefix, $sourceKey);
-            
+
                 $this->s3->copyObject([
                     'Bucket'     => $this->bucketName,
                     'CopySource' => "{$this->bucketName}/{$sourceKey}",
                     'Key'        => $destinationKey,
                 ]);
             }
-            
+
             // Delete the old folder and its contents
-            foreach ($objects['Contents'] as $object) {
+            foreach ($objects['Contents'] ?? [] as $object) {
                 $this->s3->deleteObject([
                     'Bucket' => $this->bucketName,
                     'Key'    => $object['Key'],

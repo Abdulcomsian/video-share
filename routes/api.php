@@ -35,7 +35,7 @@ use App\Http\Controllers\Stripe\{ClientController as StripeClientController , Ed
 
 Route::match(['GET', 'POST'], '/login', [AuthController::class, 'login'])->name('login');
 Route::post('register' ,[AuthController::class , 'register']);
-Route::post('verify-code',[AuthController::class , 'verifyUser']);
+Route::post('verify-code',[AuthController::class , 'verifyUser'])->middleware('throttle:5,1');
 Route::post('forget-password' , [UserController::class , 'forgetPassword']);
 Route::post('update-password' , [UserController::class , 'updatePassword']);
 Route::post('resend-passcode' , [UserController::class , 'sendPasscode']);

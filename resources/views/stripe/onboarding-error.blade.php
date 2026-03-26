@@ -46,6 +46,22 @@
             margin-top: 20px;
             display: inline-block;
         }
+        .retry-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #ecba16;
+            color: #FFFFFF;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .retry-btn:hover {
+            background-color: #d4a813;
+        }
     </style>
 </head>
 <body>
@@ -58,6 +74,12 @@
                 <div class="error-message">
                     {{ session('error') }}
                 </div>
+            @endif
+
+            @if(request()->query('account_id'))
+                <a href="{{ route('stripe.refresh', ['account_id' => request()->query('account_id')]) }}" class="retry-btn">
+                    Retry Onboarding
+                </a>
             @endif
         </div>
     </div>

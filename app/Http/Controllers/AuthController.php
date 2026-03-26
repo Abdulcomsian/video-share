@@ -123,6 +123,10 @@ class AuthController extends Controller
 
             $user = User::where('email' , $email )->first();
 
+            if(!$user)
+            {
+                return response()->json(['success' => false , 'msg' => 'Something Went Wrong' , 'error' => 'User not found'] , 404);
+            }
 
             if($user->verification_code === $verificationCode)
             {

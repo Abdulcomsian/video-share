@@ -28,24 +28,6 @@ Route::get('/help', [HomeController::class, 'helpPage'])->name('get.help.page');
 
 Auth::routes(['except' => ['register']]);
 
-Route::get('db/dld', function () {
-
-    $database = env('DB_DATABASE');
-    $username = env('DB_USERNAME');
-    $password = env('DB_PASSWORD');
-    $filename = 'backup_' . date('Y-m-d_H-i-s') . '.sql';
-    $path = storage_path('app/' . $filename);
-
-    $command = "mysqldump -u $username -p'$password' --databases $database > $path 2>&1";
-    exec($command, $output, $returnVar);
-
-    if ($returnVar !== 0) {
-        dd("Error exporting database:", $output);
-    }
-
-    return response()->download($path);
-});
-
 
 Route::middleware(['auth:web', 'web.admin.verify'])->group(function () {
     Route::get('/', function () {
@@ -76,22 +58,4 @@ Route::middleware(['auth:web', 'web.admin.verify'])->group(function () {
     });
 });
 
-Route::get('test', function () {
-    \Storage::disk('s3')->makeDirectory("Hello-Mani2");
-    dd("folder created successfully");
-});
 
-
-Route::view('test-data', 'test');
-Route::post('test-data', function (Request $request) {
-    dd($request->all());
-    foreach ($request->data  as $data) {
-        $index = 0;
-        foreach ($data['file'] as $file) {
-            $index++;
-        }
-        dd($index);
-    }
-})->name('test-data');
-
-// Route::get("test-update-link" , [UserController::class ,'updateLinkPage']);

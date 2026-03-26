@@ -32,7 +32,7 @@ class EditorOnboardingController extends Controller
 
             return view('stripe.onboarding-success', compact('user'));
         } catch (\Exception $e) {
-            return redirect()->route('stripe.onboarding.error')->with('error', $e->getMessage());
+            return redirect()->route('stripe.onboarding.error', ['account_id' => $accountId])->with('error', $e->getMessage());
         }
     }
 
@@ -52,7 +52,7 @@ class EditorOnboardingController extends Controller
             return redirect($accountLink->url); // Redirect user back to Stripe onboarding
 
         } catch (\Exception $e) {
-            return redirect()->route('stripe.onboarding.error')->with('error', $e->getMessage());
+            return redirect()->route('stripe.onboarding.error', ['account_id' => $accountId])->with('error', $e->getMessage());
         }
     }
 

@@ -112,9 +112,7 @@ Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(functi
 
 /* Client Routes*/
 Route::middleware(['verify.authentication' , 'api.client.verify'])->group(function(){
-    Route::get('client/setup-intent', [StripeClientController::class, 'setupIntent']);
-    Route::get('client/payment-methods', [StripeClientController::class, 'paymentMethods']);
-    Route::post('client/delete-payment-method', [StripeClientController::class, 'deletePaymentMethod']);
+    // Card management not needed for direct charges — client enters card per payment on editor's connected account
     Route::post("create-folder" , [FolderController::class , 'createClientFolder']);
     Route::post("post-job" , [JobController::class , 'addJob']);
     Route::get("client-jobs" , [JobController::class , 'clientJob']);

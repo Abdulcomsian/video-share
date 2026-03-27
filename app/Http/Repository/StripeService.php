@@ -2,7 +2,7 @@
 
 namespace app\Http\Repository;
 
-use Stripe\{Stripe, PaymentIntent, PaymentMethod, Customer, Account, AccountLink, SetupIntent};
+use Stripe\{Stripe, PaymentIntent, Customer, Account, AccountLink};
 use App\Models\{JobProposal, User, EditorRequest};
 use Illuminate\Support\Facades\Auth;
 use Exception;
@@ -17,55 +17,27 @@ class StripeService{
     }
 
     // -------------------------------------------------------
-    // Client: Stripe Customer
+    // Client: Customer on editor's connected account
     // -------------------------------------------------------
 
-    public function getOrCreateCustomer(User $user): Customer
+    public function getOrCreateConnectedCustomer(User $client, string $stripeAccountId): Customer
     {
-        if ($user->stripe_customer_id) {
-            return Customer::retrieve($user->stripe_customer_id);
+        // Check if customer already exists on the editor's connected account
+        $existing = Customer::all([
+            'email' => $client->email,
+            'limit' => 1,
+        ], ['stripe_account' => $stripeAccountId]);
+
+        if ($existing->data && count($existing->data) > 0) {
+            return $existing->data[0];
         }
 
-        $customer = Customer::create([
-            'email' => $user->email,
-            'name' => $user->full_name,
-            'metadata' => ['user_id' => $user->id],
-        ]);
-
-        $user->update(['stripe_customer_id' => $customer->id]);
-
-        return $customer;
-    }
-
-    public function createSetupIntent(User $user): SetupIntent
-    {
-        $customer = $this->getOrCreateCustomer($user);
-
-        return SetupIntent::create([
-            'customer' => $customer->id,
-            'payment_method_types' => ['card'],
-        ]);
-    }
-
-    public function getPaymentMethods(User $user): array
-    {
-        if (!$user->stripe_customer_id) {
-            return [];
-        }
-
-        $methods = PaymentMethod::all([
-            'customer' => $user->stripe_customer_id,
-            'type' => 'card',
-        ]);
-
-        return $methods->data;
-    }
-
-    public function deletePaymentMethod(string $paymentMethodId): PaymentMethod
-    {
-        $paymentMethod = PaymentMethod::retrieve($paymentMethodId);
-        $paymentMethod->detach();
-        return $paymentMethod;
+        // Create a new customer on the editor's connected account
+        return Customer::create([
+            'email' => $client->email,
+            'name' => $client->full_name,
+            'metadata' => ['user_id' => $client->id],
+        ], ['stripe_account' => $stripeAccountId]);
     }
 
     // -------------------------------------------------------
@@ -87,9 +59,9 @@ class StripeService{
                 return ['success' => false, 'error' => 'Editor has not completed Stripe onboarding'];
             }
 
-            // Get or create Stripe Customer for the client
+            // Get or create customer on the editor's connected account
             $client = auth()->user();
-            $customer = $this->getOrCreateCustomer($client);
+            $connectedCustomer = $this->getOrCreateConnectedCustomer($client, $editor->stripe_account_id);
 
             $bidAmount = $jobProposal->bid_price;
             $amountInCents = (int) round($bidAmount * 100);
@@ -99,7 +71,7 @@ class StripeService{
             $paymentIntent = PaymentIntent::create([
                 'amount' => $amountInCents,
                 'currency' => 'usd',
-                'customer' => $customer->id,
+                'customer' => $connectedCustomer->id,
                 'payment_method_types' => ['card'],
                 'capture_method' => 'manual',
                 'application_fee_amount' => $platformFeeInCents,

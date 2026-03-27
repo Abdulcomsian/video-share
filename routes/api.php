@@ -76,6 +76,7 @@ Route::middleware(['verify.authentication'])->group(function(){
 /* Editor Routes*/
 Route::middleware(['verify.authentication' , 'api.editor.verify'])->group(function(){
     Route::post('editor/create-account', [StripeEditorController::class, 'createAccount']);
+    Route::get('editor/account-status', [StripeEditorController::class, 'accountStatus']);
     Route::post('update-profile' , [UserController::class , 'updateProfile']);
     Route::post('update-editor-profile' , [UserController::class , 'updateEditorProfile']);
     Route::post('add-editor-portfolio' , [UserController::class , 'addEditorPortfolio']);

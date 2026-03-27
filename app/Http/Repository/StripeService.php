@@ -163,6 +163,79 @@ class StripeService{
         ];
     }
 
+    /**
+     * Check if editor's connected account is fully enabled for card_payments.
+     * Returns ['enabled' => true] if good, or ['enabled' => false, 'acccount_link' => ...] with onboarding link.
+     */
+    public function checkEditorAccountStatus(User $editor): array
+    {
+        if (!$editor->stripe_account_id) {
+            // No account yet — create one and return onboarding link
+            $data = $this->editorOnboardingForUser($editor);
+            return [
+                'enabled' => false,
+                'reason' => 'Stripe account not created yet',
+                'acccount_link' => $data['acccount_link'],
+            ];
+        }
+
+        $account = Account::retrieve($editor->stripe_account_id);
+
+        $cardPaymentsActive = isset($account->capabilities->card_payments) && $account->capabilities->card_payments === 'active';
+        $chargesEnabled = $account->charges_enabled;
+
+        if ($cardPaymentsActive && $chargesEnabled && empty($account->requirements->currently_due) && empty($account->requirements->past_due)) {
+            return ['enabled' => true];
+        }
+
+        // Account exists but restricted — generate new onboarding link
+        $accountLink = $this->createEditoryOnboardingAccountLink($editor->stripe_account_id);
+
+        // Reset onboarding flag since it's not actually complete
+        User::where('id', $editor->id)->update(['onboarding' => 0]);
+
+        return [
+            'enabled' => false,
+            'reason' => $account->requirements->disabled_reason ?? 'Pending requirements',
+            'currently_due' => $account->requirements->currently_due ?? [],
+            'acccount_link' => $accountLink,
+        ];
+    }
+
+    /**
+     * Create Stripe account and onboarding link for a specific editor user (not just auth user).
+     */
+    public function editorOnboardingForUser(User $user): array
+    {
+        if (!$user->stripe_account_id) {
+            $account = Account::create([
+                'type' => 'custom',
+                'tos_acceptance' => [
+                    'date' => time(),
+                    'ip' => request()->ip(),
+                ],
+                'capabilities' => [
+                    'transfers' => ['requested' => true],
+                    'card_payments' => ['requested' => true],
+                ],
+            ]);
+
+            User::where('id', $user->id)->update(['stripe_account_id' => $account->id]);
+            $stripeAccountId = $account->id;
+        } else {
+            $stripeAccountId = $user->stripe_account_id;
+        }
+
+        $accountLink = $this->createEditoryOnboardingAccountLink($stripeAccountId);
+
+        $user->refresh();
+
+        return [
+            'user' => $user->toArray(),
+            'acccount_link' => $accountLink,
+        ];
+    }
+
     public function createEditoryOnboardingAccountLink($stripeAccountId)
     {
         return AccountLink::create([

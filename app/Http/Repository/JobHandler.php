@@ -115,8 +115,6 @@ class JobHandler{
 
         return ["success" => true , "msg" => "Request Added Successfully"];
 
-
-
     }
 
 

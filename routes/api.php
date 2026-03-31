@@ -17,6 +17,7 @@ use App\Http\Controllers\{ AuthController ,
                         };
 use App\Http\Controllers\Stripe\{ClientController as StripeClientController , EditorController as StripeEditorController};
 use App\Http\Controllers\GoogleMapsProxyController;
+use App\Http\Controllers\PresignedUrlController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -45,6 +46,7 @@ Route::middleware(['verify.authentication'])->group(function(){
     // Route::get('google/autocomplete', [GoogleMapsProxyController::class, 'autocomplete']);
     // Route::get('google/place-details', [GoogleMapsProxyController::class, 'placeDetails']);
     // Route::get('google/geocode', [GoogleMapsProxyController::class, 'geocode']);
+    Route::post('presigned-upload-url', [PresignedUrlController::class, 'generateUploadUrl']);
     Route::post('update-profile-image' , [UserController::class , 'updateProfileImage']);
     Route::post('job-detail', [JobController::class, 'getJobDetail']);
     Route::post('add-file-comment', [CommentController::class, 'addFileComment']);

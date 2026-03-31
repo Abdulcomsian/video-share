@@ -130,6 +130,25 @@ class AwsHandler{
         }
     }
 
+    public function generatePresignedUploadUrl($folderName, $fileName, $contentType = null, $expiry = '+30 minutes')
+    {
+        $key = $folderName . '/' . $fileName;
+
+        $params = [
+            'Bucket' => $this->bucketName,
+            'Key'    => $key,
+        ];
+
+        if ($contentType) {
+            $params['ContentType'] = $contentType;
+        }
+
+        $cmd = $this->s3->getCommand('PutObject', $params);
+        $request = $this->s3->createPresignedRequest($cmd, $expiry);
+
+        return (string) $request->getUri();
+    }
+
     public function deleteMedia($file){
         try{
             $this->s3->headObject([

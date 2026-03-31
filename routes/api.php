@@ -43,9 +43,9 @@ Route::middleware('throttle:auth')->group(function () {
 Route::middleware(['verify.authentication'])->group(function(){
     Route::post('logout' , [AuthController::class , 'logout']);
     // Google Maps server-side proxy (API key never leaves the server)
-    // Route::get('google/autocomplete', [GoogleMapsProxyController::class, 'autocomplete']);
-    // Route::get('google/place-details', [GoogleMapsProxyController::class, 'placeDetails']);
-    // Route::get('google/geocode', [GoogleMapsProxyController::class, 'geocode']);
+    Route::get('google/autocomplete', [GoogleMapsProxyController::class, 'autocomplete']);
+    Route::get('google/place-details', [GoogleMapsProxyController::class, 'placeDetails']);
+    Route::get('google/geocode', [GoogleMapsProxyController::class, 'geocode']);
     Route::post('presigned-upload-url', [PresignedUrlController::class, 'generateUploadUrl']);
     Route::post('update-profile-image' , [UserController::class , 'updateProfileImage']);
     Route::post('job-detail', [JobController::class, 'getJobDetail']);

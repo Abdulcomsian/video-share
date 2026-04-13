@@ -12,7 +12,7 @@ class FileController extends Controller
 
     public function __construct(FilesHandler $filesHandler)
     {
-        $this->filesHandler = $filesHandler;    
+        $this->filesHandler = $filesHandler;
     }
 
     public function uploadClientFile(Request $request)
@@ -21,17 +21,17 @@ class FileController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'folder_id' => 'required',
-                'filename' => 'required|string'
+                'files' => 'required',
             ]);
 
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
+
                 $response = $this->filesHandler->uploadMedia($request);
-                
+
                 return response()->json($response);
             }
 
@@ -48,16 +48,16 @@ class FileController extends Controller
                 'folderId' => 'required',
                 'fileName' => 'required|string',
                 // 'thumbnailName' => 'required|string'
-            ]);   
-            
+            ]);
+
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
+
                 $response = $this->filesHandler->directMediaUpload($request);
-                
+
                 return response()->json($response);
             }
 
@@ -73,16 +73,16 @@ class FileController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'file_id' => 'required',
-            ]);   
-            
+            ]);
+
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
+
                 $response = $this->filesHandler->deleteMedia($request);
-                
+
                 return response()->json($response);
             }
 
@@ -91,23 +91,23 @@ class FileController extends Controller
         }
     }
 
-    
+
     public function deleteShareFile(Request $request)
     {
         try{
 
             $validator = Validator::make($request->all(), [
                 'file_id' => 'required',
-            ]);   
-            
+            ]);
+
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
+
                 $response = $this->filesHandler->deleteShareMedia($request);
-                
+
                 return response()->json($response);
             }
 
@@ -121,20 +121,20 @@ class FileController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'file_id' => 'required',
-            ]);   
-            
+            ]);
+
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
+
                 $response = $this->filesHandler->getFile($request);
 
                 if(!$response['success']){
                     return response()->json($response , 400);
                 }
-                
+
                 return response()->json($response);
             }
 
@@ -148,20 +148,20 @@ class FileController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'file_id' => 'required',
-            ]);   
-            
+            ]);
+
             if ($validator->fails()) {
 
                 return response()->json(["success" => false, "msg" => "Something Went Wrong", "error" => $validator->getMessageBag()] ,400);
-            
+
             } else {
-                
+
                 $response = $this->filesHandler->getShareFile($request);
 
                 if(!$response['success']){
                     return response()->json($response , 400);
                 }
-                
+
                 return response()->json($response);
             }
 

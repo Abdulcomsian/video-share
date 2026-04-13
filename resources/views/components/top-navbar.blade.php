@@ -151,8 +151,3 @@
     </div>
     <!--end::Container-->
 </div>
-{{-- @php
-use Illuminate\Support\Facades\Auth;
-$user = Auth::user();
-@dd($user)
-@endphp --}}

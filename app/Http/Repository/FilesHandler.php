@@ -16,44 +16,87 @@ class FilesHandler{
 
     public function uploadMedia($request)
     {
-        try{
+        try {
             $folderId = $request->folder_id;
-            $videoExtension = ['mp4' , 'webm'];
-
+            $videoExtension = ['mp4', 'webm'];
             $folder = Folder::find($folderId);
 
-            if($request->hasFile('file'))
-            {
-
-                $file = $request->file('file');
-                $fileName = $file->getClientOriginalName();
-                $extension = $file->extension();
-                $name = time() . "-" . $fileName;
-
-                $check = $this->aws->uploadMedia( $folder->name , $name , $file);
-
-                if(!$check['success']){
-                    return response()->json(['success' => false , "msg" => 'something went wrong while adding file']);
-                }
-
-                $type =in_array($extension , $videoExtension) ? 1 : 2;
-                $thumbnailName  = null;
-
-                if( $request->hasFile('thumbnail') ){
-                    $thumbnail = $request->file('thumbnail');
-                    $thumbnailName = time().'-'.str_replace(" ", "_" , $request->filename);
-                    $thumbnail->move(public_path('uploads') , $thumbnailName);
-                }
-
-                Files::create(['folder_id' => $folderId , 'type' => $type , 'path' => $name , 'extension' => $extension , "thumbnail" => $thumbnailName]);
-
-                return ["success" => true , "msg" => "Files Added Successfully"];
-            } else {
-                return response()->json(['success' => false , "msg" => 'Please add file']);
+            if (!$folder) {
+                return ['success' => false, 'msg' => 'Folder not found'];
             }
 
-        }catch(\Exception $e){
-            return response()->json(['success' => false , "msg" => $e->getMessage()]);
+            // ── Web app path: files[] array ──────────────────────────────
+            if ($request->hasFile('files')) {
+                $files = $request->file('files');
+                if (!is_array($files)) {
+                    $files = [$files]; // normalise single file to array
+                }
+
+                foreach ($files as $file) {
+                    $fileName = $file->getClientOriginalName();
+                    $extension = $file->getClientOriginalExtension();
+                    $name = time() . '-' . str_replace(' ', '_', $fileName);
+
+                    $check = $this->aws->uploadMedia($folder->name, $name, $file);
+
+                    if ($check['success']) {
+                        $type = in_array(strtolower($extension), $videoExtension)
+                            ? 1 : 2;
+
+                        Files::create([
+                            'folder_id' => $folderId,
+                            'type'      => $type,
+                            'path'      => $name,
+                            'extension' => $extension,
+                            'thumbnail' => null,
+                        ]);
+                    }
+                }
+
+                return ['success' => true, 'msg' => 'Files Added Successfully'];
+            }
+
+            // ── Mobile app path: single 'file' field (keep for mobile) ───
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $fileName = $file->getClientOriginalName();
+                $extension = $file->getClientOriginalExtension();
+                $name = time() . '-' . str_replace(' ', '_', $fileName);
+
+                $check = $this->aws->uploadMedia($folder->name, $name, $file);
+
+                if (!$check['success']) {
+                    return ['success' => false, 'msg' => 'S3 upload failed'];
+                }
+
+                $type = in_array(strtolower($extension), $videoExtension)
+                    ? 1 : 2;
+
+                $thumbnailName = null;
+
+                if ($request->hasFile('thumbnail')) {
+                    $thumbnail = $request->file('thumbnail');
+                    $thumbnailName = time() . '-'
+                        . str_replace(' ', '_',
+                            $thumbnail->getClientOriginalName());
+                    $thumbnail->move(public_path('uploads'), $thumbnailName);
+                }
+
+                Files::create([
+                    'folder_id' => $folderId,
+                    'type'      => $type,
+                    'path'      => $name,
+                    'extension' => $extension,
+                    'thumbnail' => $thumbnailName,
+                ]);
+
+                return ['success' => true, 'msg' => 'Files Added Successfully'];
+            }
+
+            return ['success' => false, 'msg' => 'No file provided'];
+
+        } catch (\Exception $e) {
+            return ['success' => false, 'msg' => $e->getMessage()];
         }
     }
 
@@ -117,7 +160,8 @@ class FilesHandler{
             $folderId = $personalJob->folder->id;
             $fileList = [];
             $videoExtension = ['mp4' , 'webm'];
-            $thumbnails = json_decode($request->thumbnail);
+            // $thumbnails = json_decode($request->thumbnail);
+            $thumbnails = $request->thumbnail ? json_decode($request->thumbnail) : [];
 
             $folder = $personalJob->folder;
 

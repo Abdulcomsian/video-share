@@ -62,7 +62,7 @@
             <p style="font-size: 24px; font-weight: bold; color: #A694DD;">{{ $otp }}</p>
         </div>
         <div class="footer">
-            <p>If you have any questions, contact us at support@example.com.</p>
+            <p>If you have any questions, contact us at {{ config('variables.supportEmail') }}.</p>
         </div>
     </div>
 </body>

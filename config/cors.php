@@ -19,7 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [
+        'https://openedit.net',
+        'https://app.openedit.net',
+        'https://api.openedit.net'
+    ],
 
     'allowed_origins_patterns' => [],
 

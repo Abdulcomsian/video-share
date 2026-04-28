@@ -17,8 +17,20 @@
                 <td>{{ $editorRequest->editor->email ?? '' }}</td>
                 <td class="text-center">{{ $editorRequest->proposal->bid_price ?? 0 }}</td>
                 <td class="text-center">
-                    <span class="badge bg-label-{{ Helper::getProposalStatus($editorRequest->status) === 'unawarded' || Helper::getProposalStatus($editorRequest->status) === 'cancelled' ? 'danger' : 'success' }} rounded-pill">
-                        {{ ucfirst(Helper::getProposalStatus($editorRequest->status)) }}
+
+                    @php
+                        $statusLabels = [
+                            0 => 'unawarded',
+                            1 => 'awarded',
+                            2 => 'cancelled',
+                            3 => 'completed',
+                        ];
+
+                        $statusTxt = $statusLabels[$status] ?? 'Unknown';
+
+                    @endphp
+                    <span class="badge bg-label-{{ $statusTxt === 'unawarded' || $statusTxt === 'cancelled' ? 'danger' : 'success' }} rounded-pill">
+                        {{ ucfirst($statusTxt) }}
                     </span>
                 </td>
                 {{-- <td class="text-center">

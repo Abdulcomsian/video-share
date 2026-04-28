@@ -26,7 +26,7 @@
                             3 => 'completed',
                         ];
 
-                        $statusTxt = $statusLabels[$status] ?? 'Unknown';
+                        $statusTxt = $statusLabels[$editorRequest->status] ?? 'Unknown';
 
                     @endphp
                     <span class="badge bg-label-{{ $statusTxt === 'unawarded' || $statusTxt === 'cancelled' ? 'danger' : 'success' }} rounded-pill">

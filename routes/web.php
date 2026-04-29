@@ -41,7 +41,7 @@ $registerAdminRoutes = function () {
         Route::get('/', function () {
             return redirect()->route('admin:dashboard');
         });
-        Route::group(['prefix' => 'admin', 'as' => 'admin:'], function () {
+        Route::group(['as' => 'admin:'], function () {
             Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
             Route::get('/manage/clients', [ClientController::class, 'index'])->name('clients.list');
             Route::get('/manage/editors', [EditorController::class, 'index'])->name('editors.list');

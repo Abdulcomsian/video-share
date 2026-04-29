@@ -27,7 +27,12 @@ use App\Http\Controllers\PresignedUrlController;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
+| In production, set API_DOMAIN=api.openedit.net to restrict these routes
+| to that subdomain only. Leave unset for local development.
+|
 */
+
+$registerApiRoutes = function () {
 
 Route::middleware('throttle:auth')->group(function () {
     Route::match(['GET', 'POST'], '/login', [AuthController::class, 'login'])->name('login');
@@ -159,3 +164,11 @@ Route::middleware(['verify.authentication' , 'api.client.verify'])->group(functi
     Route::post('extend-job-delivery-date-request', [JobController::class, 'extendJobDeliveryDateRequest']);
     Route::get('get-editor-portfolio-video' , [UserController::class , 'getEditorPortfolioVideo']);
 });
+
+}; // end $registerApiRoutes
+
+if ($apiDomain = env('API_DOMAIN')) {
+    Route::domain($apiDomain)->group($registerApiRoutes);
+} else {
+    $registerApiRoutes();
+}

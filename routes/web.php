@@ -14,39 +14,54 @@ use Illuminate\Http\Request;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
+| In production, set ADMIN_DOMAIN=admin.openedit.net to restrict admin
+| login + dashboard to that subdomain. Public routes (terms, privacy,
+| help, Stripe callbacks) stay accessible from any host so mobile
+| webviews and Stripe redirects continue to work.
+|
 */
 
-// stripe onboarding
+// ── Public routes (accessible from any host) ──────────────────────────
+// stripe onboarding callbacks
 Route::get('stripe/onboarding/success', [EditorOnboardingController::class, 'onBoardingSuccess'])->name('stripe.onboarding.success');
 Route::get('stripe/onboarding/error', [EditorOnboardingController::class, 'onBoardingError'])->name('stripe.onboarding.error');
 Route::get('/stripe/refresh', [EditorOnboardingController::class, 'refreshOnboarding'])->name('stripe.refresh');
 Route::get('/stripe/success', [EditorOnboardingController::class, 'stripeSuccess'])->name('stripe.success');
 
+// mobile-app webview pages
 Route::get('/terms-and-condition', [HomeController::class, 'termsAndConditionPage'])->name('get.termsAndCondition.page');
 Route::get('/privacy-policy', [HomeController::class, 'privacyPolicyPage'])->name('get.privacyPolicy.page');
 Route::get('/help', [HomeController::class, 'helpPage'])->name('get.help.page');
 
-Auth::routes(['except' => ['register']]);
+// ── Admin-only routes (login + dashboard) ─────────────────────────────
+$registerAdminRoutes = function () {
+    Auth::routes(['except' => ['register']]);
 
+    Route::middleware(['auth:web', 'web.admin.verify'])->group(function () {
+        Route::get('/', function () {
+            return redirect()->route('admin:dashboard');
+        });
+        Route::group(['prefix' => 'admin', 'as' => 'admin:'], function () {
+            Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+            Route::get('/manage/clients', [ClientController::class, 'index'])->name('clients.list');
+            Route::get('/manage/editors', [EditorController::class, 'index'])->name('editors.list');
+            Route::get('/jobs', [JobController::class, 'index'])->name('jobs.list');
+            Route::get('/jobs/{id}', [JobController::class, 'show'])->name('jobs.show');
+            Route::get('/jobs/proposals/{id}', [JobController::class, 'jobProposals'])->name('jobs.proposals-list');
 
-Route::middleware(['auth:web', 'web.admin.verify'])->group(function () {
-    Route::get('/', function () {
-        return redirect()->route('admin:dashboard');
+            // profile
+            Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+            Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+            Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+            Route::put('password', [ProfileController::class, 'updatePassword'])->name('password.update');
+        });
     });
-    Route::group(['prefix' => 'admin', 'as' => 'admin:'], function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        Route::get('/manage/clients', [ClientController::class, 'index'])->name('clients.list');
-        Route::get('/manage/editors', [EditorController::class, 'index'])->name('editors.list');
-        Route::get('/jobs', [JobController::class, 'index'])->name('jobs.list');
-        Route::get('/jobs/{id}', [JobController::class, 'show'])->name('jobs.show');
-        Route::get('/jobs/proposals/{id}', [JobController::class, 'jobProposals'])->name('jobs.proposals-list');
+};
 
-        // profile
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-        Route::put('password', [ProfileController::class, 'updatePassword'])->name('password.update');
-    });
-});
+if ($adminDomain = env('ADMIN_DOMAIN')) {
+    Route::domain($adminDomain)->group($registerAdminRoutes);
+} else {
+    $registerAdminRoutes();
+}
 
 

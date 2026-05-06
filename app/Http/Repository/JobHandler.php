@@ -317,36 +317,42 @@ class JobHandler{
     public function doneJob($request){
         $jobId = $request->job_id;
 
-        PersonalJob::where('id' , $jobId)->update(['status' => 'completed']);
-
         $editorRequest = EditorRequest::where('job_id' , $jobId)
                                     ->where('status' , AppConst::AWARDED_JOB)
                                     ->first();
 
-        JobProposal::where('id' , $editorRequest->request_id)
-                        ->where('status' , 1)
-                        ->update(['status' => AppConst::DONE_JOB]);
-
-        $editorRequest->status = AppConst::DONE_JOB;
-        $editorRequest->save();
-
         $jobPayment = JobPayment::where(['job_id' => $jobId , 'request_id' => $editorRequest->request_id])->first();
 
+        // Capture payment FIRST — if Stripe fails, abort before touching DB so funds aren't left held
         if($jobPayment)
         {
             $editor = User::findOrFail($editorRequest->editor_id);
 
-            // Capture the held payment on editor's connected account
             // Stripe automatically: charges client, deducts Stripe fee from editor, sends application_fee to platform
             $this->stripeService->capturePayment($jobPayment->payment_intent_id, $editor->stripe_account_id);
-
-            JobPayment::where('id', $jobPayment->id)->update([
-                'client_transfer_status' => AppConst::CLIENT_PAYED,
-                'client_payment_date' => Carbon::now()->format('Y-m-d'),
-                'editor_transfer_status' => AppConst::EDITOR_PAYED,
-                'editor_payment_date' => Carbon::now()->format('Y-m-d'),
-            ]);
         }
+
+        // Capture succeeded (or no payment to capture) — now safely commit DB state
+        DB::transaction(function () use ($jobId, $editorRequest, $jobPayment) {
+            PersonalJob::where('id' , $jobId)->update(['status' => 'completed']);
+
+            JobProposal::where('id' , $editorRequest->request_id)
+                            ->where('status' , 1)
+                            ->update(['status' => AppConst::DONE_JOB]);
+
+            $editorRequest->status = AppConst::DONE_JOB;
+            $editorRequest->save();
+
+            if($jobPayment)
+            {
+                JobPayment::where('id', $jobPayment->id)->update([
+                    'client_transfer_status' => AppConst::CLIENT_PAYED,
+                    'client_payment_date' => Carbon::now()->format('Y-m-d'),
+                    'editor_transfer_status' => AppConst::EDITOR_PAYED,
+                    'editor_payment_date' => Carbon::now()->format('Y-m-d'),
+                ]);
+            }
+        });
 
         return ['success' => true , 'msg' => 'Job Done Successfully'];
     }

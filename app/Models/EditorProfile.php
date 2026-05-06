@@ -16,7 +16,12 @@ class EditorProfile extends Model
         "title",
         "bio",
         "service_offering",
-        "amount_per_hour"
+        "amount_per_hour",
+        "inferred_skills",
+    ];
+
+    protected $casts = [
+        "inferred_skills" => "array",
     ];
 
 }

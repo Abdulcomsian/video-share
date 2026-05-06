@@ -1,14 +1,32 @@
 <?php
 
-namespace Database\Seeders;
-
-use Illuminate\Database\Seeder;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-class SuggestedSkillsSeeder extends Seeder
+return new class extends Migration
 {
-    public function run()
+    public function up(): void
     {
+        // 1. Deduplicate existing rows (keep oldest id per name) before adding unique index
+        DB::statement("
+            DELETE s1 FROM suggested_skills s1
+            INNER JOIN suggested_skills s2
+            WHERE s1.name = s2.name AND s1.id > s2.id
+        ");
+
+        // 2. Add unique index on name (idempotent — skip if already present)
+        $hasUnique = collect(DB::select('SHOW INDEX FROM suggested_skills'))
+            ->contains(fn ($i) => $i->Key_name === 'suggested_skills_name_unique');
+
+        if (! $hasUnique) {
+            Schema::table('suggested_skills', function (Blueprint $table) {
+                $table->unique('name');
+            });
+        }
+
+        // 3. Upsert canonical taxonomy — leaves user-added entries untouched
         $skills = [
             // EDITING & POST
             'Video editing',
@@ -66,7 +84,11 @@ class SuggestedSkillsSeeder extends Seeder
             'updated_at' => $now,
         ], $skills);
 
-        // Upsert by name — safe to re-run, preserves user-added entries
         DB::table('suggested_skills')->upsert($rows, ['name'], ['updated_at']);
     }
-}
+
+    public function down(): void
+    {
+        // No rollback — canonical taxonomy + unique index are intentional and shared with user-added rows
+    }
+};

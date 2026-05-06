@@ -38,7 +38,8 @@ class AuthController extends Controller
                 "full_name" => "required|string",
                 "email" => $emailRule,
                 "password" => "required|string",
-                "type" => "required|numeric"
+                "type" => "required|numeric",
+                "invite_token" => "nullable|string",
             ]);
 
             if ($validator->fails()) {

@@ -26,8 +26,8 @@ class CountrySeeder extends Seeder
             }
 
             City::insert($cityList);
-            
-        } 
+
+        }
 
         echo "Country and City added successfully";
     }

@@ -20,9 +20,10 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'https://openedit.net',
         'https://app.openedit.net',
-        'https://api.openedit.net'
+        'https://openedit-net.lovable.app',
+        'https://*.<lovableproject.com>',
+        'https://*.<lovable.app>',
     ],
 
     'allowed_origins_patterns' => [],

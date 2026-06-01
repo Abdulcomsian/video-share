@@ -21,6 +21,7 @@ return [
 
     'allowed_origins' => [
         'https://app.openedit.net',
+        'https://api.openedit.net',
         'https://openedit-net.lovable.app',
         'https://*.<lovableproject.com>',
         'https://*.<lovable.app>',

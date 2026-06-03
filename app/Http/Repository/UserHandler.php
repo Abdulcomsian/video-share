@@ -3,6 +3,7 @@
 namespace App\Http\Repository;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use App\Models\{ User , Favourite, Files, Review , PersonalJob, Address , EditorPortfolio, PortfolioVideo, SocialLink};
 use App\Mail\ {VerificationMail , TokenMail};
 use App\Http\AppConst;
@@ -126,7 +127,16 @@ class UserHandler{
         $name        = $socialData['name'];
         $provider    = $socialData['provider'];
 
+        Log::info('[social-login] findOrCreateSocialUser entry', [
+            'uid'      => $firebaseUid,
+            'email'    => $email,
+            'name'     => $name,
+            'provider' => $provider,
+            'type'     => $type,
+        ]);
+
         if (empty($email)) {
+            Log::warning('[social-login] empty email from provider', ['uid' => $firebaseUid]);
             return response()->json([
                 "success" => false,
                 "msg"     => "Something went wrong",
@@ -136,15 +146,25 @@ class UserHandler{
 
         // Try to find by firebase_uid first (most reliable), including soft-deleted
         $user = User::withTrashed()->where('firebase_uid', $firebaseUid)->first();
+        Log::info('[social-login] lookup by firebase_uid', ['found' => (bool) $user, 'user_id' => $user?->id]);
 
         if (!$user) {
             // Try to find by email (handles account linking), including soft-deleted
             $user = User::withTrashed()->where('email', $email)->first();
+            Log::info('[social-login] lookup by email', [
+                'found'    => (bool) $user,
+                'user_id'  => $user?->id,
+                'trashed'  => $user ? $user->trashed() : null,
+                'existing_type' => $user?->type,
+            ]);
 
             if ($user) {
                 // If user was soft-deleted, restore and update with new social data
                 if ($user->trashed()) {
                     if (is_null($type)) {
+                        Log::warning('[social-login] soft-deleted user found but type missing', [
+                            'user_id' => $user->id, 'email' => $email,
+                        ]);
                         return response()->json([
                             "success" => false,
                             "msg"     => "Something went wrong",
@@ -169,12 +189,19 @@ class UserHandler{
                     // Check type mismatch before linking
                     $typeNames = [AppConst::CLIENT => 'Client', AppConst::EDITOR => 'Editor'];
                     if (!is_null($type) && $user->type != $type) {
+                        Log::warning('[social-login] type mismatch on existing user', [
+                            'user_id' => $user->id, 'existing_type' => $user->type, 'requested_type' => $type,
+                        ]);
                         return response()->json([
                             "success" => false,
                             "msg"     => "This account is already registered as " . ($typeNames[$user->type] ?? 'unknown'),
                             "error"   => "Account already exists with a different user type"
                         ], 409);
                     }
+
+                    Log::info('[social-login] linking existing email/password user to social provider', [
+                        'user_id' => $user->id, 'provider' => $provider,
+                    ]);
 
                     // Account linking: existing email/password user now using social login
                     $user->firebase_uid   = $firebaseUid;
@@ -189,12 +216,17 @@ class UserHandler{
             } else {
                 // Brand new user — type is required for registration
                 if (is_null($type)) {
+                    Log::warning('[social-login] brand new user but type missing', ['email' => $email]);
                     return response()->json([
                         "success" => false,
                         "msg"     => "Something went wrong",
                         "error"   => "Type is required for new user registration"
                     ], 400);
                 }
+
+                Log::info('[social-login] creating brand new social user', [
+                    'email' => $email, 'type' => $type, 'provider' => $provider,
+                ]);
 
                 $user = User::create([
                     'full_name'         => $name ?? explode('@', $email)[0],
@@ -205,6 +237,8 @@ class UserHandler{
                     'login_provider'    => $provider,
                     'email_verified_at' => now(),
                 ]);
+
+                Log::info('[social-login] new user created', ['user_id' => $user->id]);
             }
         } else {
             // If user was soft-deleted, restore and update with new social data
@@ -249,16 +283,21 @@ class UserHandler{
             }
         }
 
+        Log::info('[social-login] generating JWT', ['user_id' => $user->id]);
+
         // Generate JWT directly from user model (no password needed)
         $token = auth()->guard('api')->login($user);
 
         if (!$token) {
+            Log::error('[social-login] JWT generation failed', ['user_id' => $user->id]);
             return response()->json([
                 "success" => false,
                 "msg"     => "Something went wrong",
                 "error"   => "Could not generate token"
             ], 500);
         }
+
+        Log::info('[social-login] JWT issued successfully', ['user_id' => $user->id, 'type' => $user->type]);
 
         $jwt = $this->respondWithToken($token);
         $msg = "User Signed In Successfully";

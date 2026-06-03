@@ -9,6 +9,7 @@ use App\Http\Repository\UserHandler;
 use App\Services\FirebaseAuthService;
 use App\Models\User;
 use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
+use Illuminate\Support\Facades\Log;
 
 use Illuminate\Http\Request;
 
@@ -191,6 +192,19 @@ class AuthController extends Controller
 
     public function socialLogin(Request $request)
     {
+        $tokenPreview = $request->firebase_token
+            ? substr($request->firebase_token, 0, 20) . '...' . substr($request->firebase_token, -10)
+            : null;
+
+        Log::info('[social-login] request received', [
+            'ip'              => $request->ip(),
+            'user_agent'      => $request->userAgent(),
+            'type'            => $request->type,
+            'has_token'       => !empty($request->firebase_token),
+            'token_length'    => $request->firebase_token ? strlen($request->firebase_token) : 0,
+            'token_preview'   => $tokenPreview,
+        ]);
+
         try {
             $validator = Validator::make($request->all(), [
                 "firebase_token" => "required|string",
@@ -198,6 +212,9 @@ class AuthController extends Controller
             ]);
 
             if ($validator->fails()) {
+                Log::warning('[social-login] validation failed', [
+                    'errors' => $validator->getMessageBag()->toArray(),
+                ]);
                 return response()->json([
                     "success" => false,
                     "msg"     => "Something went wrong",
@@ -205,12 +222,24 @@ class AuthController extends Controller
                 ], 400);
             }
 
+            Log::info('[social-login] verifying Firebase ID token');
+
             // Verify Firebase ID token server-side (cryptographic verification)
             $socialData = $this->firebaseAuth->verifyIdToken($request->firebase_token);
+
+            Log::info('[social-login] token verified', [
+                'uid'      => $socialData['uid'] ?? null,
+                'email'    => $socialData['email'] ?? null,
+                'name'     => $socialData['name'] ?? null,
+                'provider' => $socialData['provider'] ?? null,
+            ]);
 
             // Validate the provider is one we support
             $allowedProviders = ['google', 'apple', 'microsoft'];
             if (!in_array($socialData['provider'], $allowedProviders)) {
+                Log::warning('[social-login] unsupported provider', [
+                    'provider' => $socialData['provider'] ?? null,
+                ]);
                 return response()->json([
                     "success" => false,
                     "msg"     => "Something went wrong",
@@ -218,12 +247,19 @@ class AuthController extends Controller
                 ], 400);
             }
 
+            Log::info('[social-login] handing off to findOrCreateSocialUser', [
+                'requested_type' => $request->type ? (int) $request->type : null,
+            ]);
+
             return $this->userHandler->findOrCreateSocialUser(
                 $socialData,
                 $request->type ? (int) $request->type : null
             );
 
         } catch (FailedToVerifyToken $e) {
+            Log::error('[social-login] FailedToVerifyToken', [
+                'message' => $e->getMessage(),
+            ]);
             return response()->json([
                 "success" => false,
                 "msg"     => "Something went wrong",
@@ -231,6 +267,13 @@ class AuthController extends Controller
             ], 401);
 
         } catch (\Exception $e) {
+            Log::error('[social-login] unexpected exception', [
+                'class'   => get_class($e),
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
             return response()->json([
                 "success" => false,
                 "msg"     => "Something went wrong",

@@ -19,7 +19,7 @@ class AdminSeeder extends Seeder
         User::create([
             "type" => 3,
             "full_name" => "admin",
-            "email" => "admin@gmail.com",
+            "email" => "akili@neotecllc.com",
             "phone_number" => "12312312",
             "email_verified_at" => Carbon::now(),
             "password" => Hash::make("admin123")
